@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default async function Home() {
+export default async function AdminDashboard() {
   const session = await auth();
   console.log("Home Page Session: ", session);
   return (
