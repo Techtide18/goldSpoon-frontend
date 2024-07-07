@@ -4,7 +4,7 @@ export default middleware((req) => {
   const isLoggedIn = !!req.auth;
   const { nextUrl } = req;
   const userRole = req.auth?.user?.role;
-  console.log("middlewaree", userRole);
+  console.log("middleware", userRole);
 
   if (isLoggedIn) {
     if (nextUrl.pathname.startsWith("/login")) {
