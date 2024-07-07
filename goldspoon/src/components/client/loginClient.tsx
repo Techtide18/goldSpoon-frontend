@@ -9,11 +9,11 @@ const LoginClient = () => {
   return (
     <form
       action={async (formData) => {
-        const memberId = formData.get("memberId") as String;
-        const password = formData.get("password") as String;
+        const memberId = formData.get("memberId") as string;
+        const password = formData.get("password") as string;
 
         if (!memberId || !password) {
-          toast.error("Please fill both");
+          return toast.error("Please fill both memberId and password");
         }
 
         const toastId = toast.loading("Logging in..");
