@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { loginAction } from "../action/loginAction";
+import { sleep } from "@/lib/utils";
 
 const LoginClient = () => {
   return (
@@ -17,6 +18,7 @@ const LoginClient = () => {
         }
 
         const toastId = toast.loading("Logging in..");
+        await sleep(800);
 
         const error = await loginAction(memberId, password);
         if (!error) {

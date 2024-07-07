@@ -18,7 +18,7 @@ export default middleware((req) => {
     }
 
     if (userRole === "user" && nextUrl.pathname.startsWith("/admin")) {
-      return Response.redirect(new URL("/user", nextUrl));
+      return Response.redirect(new URL("/", nextUrl));
     }
   } else {
     if (nextUrl.pathname != "/login") {
