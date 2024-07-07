@@ -27,24 +27,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
   },
-  // callbacks: {
-  //   async signIn(user, account, profile) {
-  //     console.log("signIn callback - user:", user);
-  //     console.log("signIn callback - account:", account);
-  //     console.log("signIn callback - profile:", profile);
-  //     return true;
-  //   },
-  //   jwt: async ({ token, user }) => {
-  //     if (user) {
-  //       token.role = "admin";
-  //     }
-  //     return token;
-  //   },
-  //   session: async ({ session, token }) => {
-  //     if (session?.user) {
-  //       session.user.role = token.role;
-  //     }
-  //     return session;
-  //   },
-  // },
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.userId = token.id;
+        session.user.role = token.role;
+      }
+      return session;
+    },
+  },
 });
