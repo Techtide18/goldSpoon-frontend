@@ -9,11 +9,12 @@ export async function loginAction(memberId: string, password: string) {
     await signIn("credentials", {
       memberId,
       password,
-      redirect: true,
-      redirectTo: "/",
+      redirect: false,
     });
   } catch (error) {
     const err = error as CredentialsSignin;
+    console.log(err.message);
     return err.message;
   }
+  redirect("/");
 }
