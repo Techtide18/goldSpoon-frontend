@@ -24,7 +24,7 @@ const LoginClient = () => {
             id: toastId,
           });
         } else {
-          toast.error(error, {
+          toast.error("Invalid memberId or password", {
             id: toastId,
           });
         }
