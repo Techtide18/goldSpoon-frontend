@@ -10,7 +10,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password", required: true },
       },
       authorize: async (credentials) => {
-        //api hit
+        //api hit {
         const user = { id: 100, name: "enz", password: "1234", role: "admin" };
         if (
           credentials?.memberId === user.name &&
@@ -20,6 +20,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         } else {
           return null;
         }
+        //} till here
       },
     }),
   ],
@@ -31,13 +32,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
         token.role = user.role;
       }
       return token;
     },
     session: async ({ session, token }) => {
       if (session?.user) {
-        session.userId = token.id;
+        session.user.id = token.id;
+        session.user.name = token.name;
         session.user.role = token.role;
       }
       return session;
