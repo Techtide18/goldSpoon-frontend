@@ -11,11 +11,11 @@ export default async function AdminDashboard() {
   return (
     <div className="max-w-xl mx-auto mt-20">
       <div className="text-4xl text-gray-800">
-        Welcome admin {session.user?.name}
+      Welcome admin {session.user?.name}
       </div>
-      <Link href="/api/auth/signout">Logout</Link>
+      <Link href="/api/auth/signout">Logout button</Link>
 	  <div>
-		<Button> LEs go</Button>
+		<Button> Letssss go</Button>
 	</div>
     </div>
   );
