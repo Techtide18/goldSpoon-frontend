@@ -4,15 +4,16 @@ import CredentialsProvider from "next-auth/providers/credentials";
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
+      name: "credentials",
       credentials: {
-        username: { label: "Member Id", required: true },
+        memberId: { label: "Member Id", required: true },
         password: { label: "Password", type: "password", required: true },
       },
       authorize: async (credentials) => {
         //api hit
         const user = { id: 100, name: "enz", password: "1234", role: "admin" };
         if (
-          credentials?.username === user.name &&
+          credentials?.memberId === user.name &&
           credentials?.password === user.password
         ) {
           return user;
@@ -23,10 +24,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   secret: process.env.AUTH_SECRET,
-  // pages: {
-  //   signIn: "/login",
-  // },
+  pages: {
+    signIn: "/login",
+  },
   // callbacks: {
+  //   async signIn(user, account, profile) {
+  //     console.log("signIn callback - user:", user);
+  //     console.log("signIn callback - account:", account);
+  //     console.log("signIn callback - profile:", profile);
+  //     return true;
+  //   },
   //   jwt: async ({ token, user }) => {
   //     if (user) {
   //       token.role = "admin";
@@ -40,8 +47,4 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   //     return session;
   //   },
   // },
-  session: {
-    strategy: "jwt",
-    maxAge: 4 * 60,
-  },
 });
