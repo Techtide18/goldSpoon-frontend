@@ -7,10 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { signIn } from "@/auth";
-import { loginAction } from "@/components/action/loginAction";
+import LoginClient from "@/components/client/loginClient";
 
 const Login = () => {
   return (
@@ -20,11 +18,7 @@ const Login = () => {
           <CardTitle>Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={loginAction} className="flex flex-col gap-4">
-            <Input placeholder="Member Id" name="memberId" />
-            <Input placeholder="Password" type="password" name="password" />
-            <Button type="submit"> Login</Button>
-          </form>
+          <LoginClient />
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <span>Or</span>
