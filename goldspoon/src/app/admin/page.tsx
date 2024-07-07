@@ -9,11 +9,12 @@ export default async function Home() {
   return (
     <div className="max-w-xl mx-auto mt-20">
       <div className="text-4xl text-gray-800">
-        Welcome user{session.user?.name}
+        Welcome admin {session.user?.name}
       </div>
       <Link href="/api/auth/signout">Logout</Link>
-
+	  <div>
+		<Button> LEs go</Button>
+	</div>
     </div>
-
   );
 }
