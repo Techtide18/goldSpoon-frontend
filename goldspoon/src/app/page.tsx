@@ -14,8 +14,6 @@ export default async function UserDashboard() {
         Welcome user{session.user?.name}
       </div>
       <Link href="/api/auth/signout">Logout</Link>
-
     </div>
-
   );
 }
