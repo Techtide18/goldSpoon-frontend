@@ -16,5 +16,5 @@ export async function loginAction(memberId: string, password: string) {
     console.log(err.message);
     return err.message;
   }
-  redirect("/");
+  redirect("/user");
 }
