@@ -39,12 +39,12 @@ export default function Register() {
         id: toastId,
       });
     }
-    //API HIT
+    // API HIT
     toast.success("Member created!", {
       id: toastId,
     });
-    //a popup with memberId and tell them to copy it as it wont show again.
-    //and in the popup give a back to login button
+    // a popup with memberId and tell them to copy it as it won't show again.
+    // and in the popup give a back to login button
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -56,192 +56,197 @@ export default function Register() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Register With Epin
-      </h1>
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-md mx-auto bg-white p-8 shadow-md rounded-md"
-      >
-        <div className="mb-4">
-          <Label
-            htmlFor="epinId"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Epin ID *
-          </Label>
-          <Input
-            type="text"
-            id="epinId"
-            name="epinId"
-            value={formData.epinId}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Full Name
-          </Label>
-          <Input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="gender"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Gender
-          </Label>
-          <div className="relative">
-            <select
-              id="gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleSelectChange}
-              className="mt-1 block w-full h-12 rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm pl-3 pr-8 appearance-none"
+    <div className="relative min-h-screen bg-black">
+      <div className="absolute inset-0 bg-cover bg-center bg-fixed">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-900 to-black opacity-75"></div>
+      </div>
+      <div className="relative container mx-auto px-4 py-8 flex justify-center items-center min-h-screen">
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-md w-full bg-white bg-opacity-90 p-8 shadow-md rounded-md"
+        >
+          <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
+            Register With Epin
+          </h1>
+          <div className="mb-4">
+            <Label
+              htmlFor="epinId"
+              className="block text-sm font-medium text-gray-700"
             >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="others">Others</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-700">
-              <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                <path d="M7 7l3-3 3 3m0 6l-3 3-3-3"></path>
-              </svg>
+              Epin ID *
+            </Label>
+            <Input
+              type="text"
+              id="epinId"
+              name="epinId"
+              value={formData.epinId}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="fullName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Full Name
+            </Label>
+            <Input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Gender
+            </Label>
+            <div className="relative">
+              <select
+                id="gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleSelectChange}
+                className="mt-1 block w-full h-12 rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm pl-3 pr-8 appearance-none"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-700">
+                <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                  <path d="M7 7l3-3 3 3m0 6l-3 3-3-3"></path>
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="phone"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Phone
-          </Label>
-          <Input
-            type="text"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </Label>
-          <Input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="aadhaarNumber"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Aadhaar Number
-          </Label>
-          <Input
-            type="text"
-            id="aadhaarNumber"
-            name="aadhaarNumber"
-            value={formData.aadhaarNumber}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="panNumber"
-            className="block text-sm font-medium text-gray-700"
-          >
-            PAN Number
-          </Label>
-          <Input
-            type="text"
-            id="panNumber"
-            name="panNumber"
-            value={formData.panNumber}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="addressDetails"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Address Details
-          </Label>
-          <Input
-            type="text"
-            id="addressDetails"
-            name="addressDetails"
-            value={formData.addressDetails}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password *
-          </Label>
-          <Input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <Label
-            htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Confirm Password *
-          </Label>
-          <Input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
-          />
-        </div>
-        <Button variant="destructive" type="submit" className="w-full py-2">
-          Register Now
-        </Button>
-      </form>
+          <div className="mb-4">
+            <Label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Phone
+            </Label>
+            <Input
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </Label>
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="aadhaarNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Aadhaar Number
+            </Label>
+            <Input
+              type="text"
+              id="aadhaarNumber"
+              name="aadhaarNumber"
+              value={formData.aadhaarNumber}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="panNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
+              PAN Number
+            </Label>
+            <Input
+              type="text"
+              id="panNumber"
+              name="panNumber"
+              value={formData.panNumber}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="addressDetails"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Address Details
+            </Label>
+            <Input
+              type="text"
+              id="addressDetails"
+              name="addressDetails"
+              value={formData.addressDetails}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password *
+            </Label>
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <Label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Confirm Password *
+            </Label>
+            <Input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm"
+            />
+          </div>
+          <Button variant="destructive" type="submit" className="w-full py-2">
+            Register Now
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
