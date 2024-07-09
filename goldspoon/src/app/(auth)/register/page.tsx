@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"; // Adjust this import based on your actual Label component in Sadchn UI
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { sleep } from "@/lib/utils";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -27,10 +29,22 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add your form submission logic here
     console.log(formData);
+    const toastId = toast.loading("Registering new member..");
+    await sleep(800);
+    if (formData.password !== formData.confirmPassword) {
+      return toast.error("Passwords do not match!", {
+        id: toastId,
+      });
+    }
+    //API HIT
+    toast.success("Member created!", {
+      id: toastId,
+    });
+    //a popup with memberId and tell them to copy it as it wont show again.
+    //and in the popup give a back to login button
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
