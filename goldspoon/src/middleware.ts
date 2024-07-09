@@ -7,18 +7,16 @@ export default middleware((req) => {
   console.log("middleware", userRole);
 
   if (isLoggedIn) {
-    if (nextUrl.pathname.startsWith("/login")) {
-      console.log("lin");
-      return Response.redirect(new URL("/", nextUrl));
-    }
-
-    if (userRole === "admin" && !nextUrl.pathname.startsWith("/admin")) {
-      console.log("lin2");
+    if (nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {
+      if (userRole === "admin") {
+        return Response.redirect(new URL("/admin", nextUrl));
+      } else if (userRole === "user") {
+        return Response.redirect(new URL("/user", nextUrl));
+      }
+    } else if (userRole === "admin" && !nextUrl.pathname.startsWith("/admin")) {
       return Response.redirect(new URL("/admin", nextUrl));
-    }
-
-    if (userRole === "user" && nextUrl.pathname.startsWith("/admin")) {
-      return Response.redirect(new URL("/", nextUrl));
+    } else if (userRole === "user" && !nextUrl.pathname.startsWith("/user")) {
+      return Response.redirect(new URL("/user", nextUrl));
     }
   } else {
     if (nextUrl.pathname === "/register") {
