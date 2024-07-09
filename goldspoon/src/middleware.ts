@@ -21,6 +21,9 @@ export default middleware((req) => {
       return Response.redirect(new URL("/", nextUrl));
     }
   } else {
+    if (nextUrl.pathname === "/register") {
+      return;
+    }
     if (nextUrl.pathname != "/login") {
       return Response.redirect(new URL("/login", nextUrl));
     }
