@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SIDENAV_ITEMS } from '../utils/constants';
+import { SIDENAV_ITEMS_ADMIN } from '../utils/sidenavRoutes';
 import { SideNavItem } from '@/components/utils/types';
 import { Icon } from '@iconify/react';
 
@@ -22,7 +22,7 @@ const SideNav = () => {
         </Link>
 
         <div className="flex flex-col space-y-2  md:px-6 ">
-          {SIDENAV_ITEMS.map((item, idx) => {
+          {SIDENAV_ITEMS_ADMIN.map((item, idx) => {
             return <MenuItem key={idx} item={item} />;
           })}
         </div>

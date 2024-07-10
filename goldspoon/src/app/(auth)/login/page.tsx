@@ -17,7 +17,7 @@ const Login = () => {
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>
-            Enter your memberId and password to login to your account
+            Enter your memberId and password to login to account
           </CardDescription>
         </CardHeader>
         <CardContent>
