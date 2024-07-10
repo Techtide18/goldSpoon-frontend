@@ -16,7 +16,7 @@ const SideNav = ({ session }: { session: Session }) => {
           <div className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 h-16 w-full">
             <div className="flex flex-col">
               <span className="font-bold text-xl hidden md:flex">
-                {session?.user?.name} - {session?.user?.id}
+                {session?.user?.name}
               </span>
             </div>
           </div>
