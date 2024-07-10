@@ -8,7 +8,6 @@ import { SideNavItem } from "../utils/dtos";
 import { Icon } from "@iconify/react";
 import { Session } from "../utils/dtos";
 
-
 const SideNav = ({ session }: { session: Session }) => {
   return (
     <div className="md:w-72 bg-white h-screen flex-1 fixed border-r border-zinc-200 hidden md:flex overflow-y-auto">
@@ -16,8 +15,9 @@ const SideNav = ({ session }: { session: Session }) => {
         <div className="fixed top-0 left-0 w-72 bg-white z-10 border-b border-zinc-200">
           <div className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 h-16 w-full">
             <div className="flex flex-col">
-              <span className="font-bold text-xl hidden md:flex">{session?.user?.name}</span>
-              <span className="text-md hidden md:flex">{session?.user?.id}</span>
+              <span className="font-bold text-xl hidden md:flex">
+                {session?.user?.name} - {session?.user?.id}
+              </span>
             </div>
           </div>
         </div>
@@ -55,7 +55,11 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
               <span className="font-semibold text-lg">{item.title}</span>
             </div>
 
-            <div className={`${subMenuOpen ? "rotate-180" : ""} transition-transform`}>
+            <div
+              className={`${
+                subMenuOpen ? "rotate-180" : ""
+              } transition-transform`}
+            >
               <Icon icon="lucide:chevron-down" width="24" height="24" />
             </div>
           </button>

@@ -69,11 +69,11 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "View Directs", path: "/admin/reports/viewDirects" },
-      { title: "View Members", path: "/admin/reports/viewMembers" },
-      { title: "View Member Income", path: "/admin/reports/viewMemberIncome" },
+      { title: "Epin History", path: "/admin/reports/epinHistory" },
       { title: "Used Epins", path: "/admin/reports/usedEpins" },
       { title: "Unused Epins", path: "/admin/reports/unusedEpins" },
-      { title: "Epin History", path: "/admin/reports/epinHistory" },
+      { title: "View Members", path: "/admin/reports/viewMembers" },
+      { title: "View Member Income", path: "/admin/reports/viewMemberIncome" },
     ],
   },
   {
