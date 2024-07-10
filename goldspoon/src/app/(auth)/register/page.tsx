@@ -56,10 +56,7 @@ export default function Register() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black">
-      <div className="absolute inset-0 bg-cover bg-center bg-fixed">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-900 to-black opacity-75"></div>
-      </div>
+    <div>
       <div className="relative container mx-auto px-4 py-8 flex justify-center items-center min-h-screen">
         <form
           onSubmit={handleSubmit}
