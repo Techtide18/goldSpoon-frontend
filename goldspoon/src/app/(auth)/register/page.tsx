@@ -62,6 +62,7 @@ export default function Register() {
     toast.success("Member created!", {
       id: toastId,
     });
+    
   };
 
   const handleSelectChange = (e) => {
@@ -243,3 +244,6 @@ export default function Register() {
     </div>
   );
 }
+
+//a popup after reguster sucssfully and show the memberNumber there, 
+//and tell them to keep it safely as it will not br generated again
