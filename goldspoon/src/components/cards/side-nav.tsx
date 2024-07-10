@@ -6,20 +6,22 @@ import { usePathname } from "next/navigation";
 import { SIDENAV_ITEMS_ADMIN } from "../utils/sidenavRoutes";
 import { SideNavItem } from "../utils/dtos";
 import { Icon } from "@iconify/react";
+import { Session } from "../utils/dtos";
 
-const SideNav = () => {
+
+const SideNav = ({ session }: { session: Session }) => {
   return (
     <div className="md:w-72 bg-white h-screen flex-1 fixed border-r border-zinc-200 hidden md:flex overflow-y-auto">
-      <div className="flex flex-col space-y-6 w-full">
-        <Link
-          href="/"
-          className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-zinc-200 h-16 w-full"
-        >
-          <span className="h-10 w-10 bg-zinc-300 rounded-lg" />
-          <span className="font-bold text-2xl hidden md:flex">Logo</span>
-        </Link>
-
-        <div className="flex flex-col space-y-2 md:px-6">
+      <div className="flex flex-col w-full">
+        <div className="fixed top-0 left-0 w-72 bg-white z-10 border-b border-zinc-200">
+          <div className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 h-16 w-full">
+            <div className="flex flex-col">
+              <span className="font-bold text-xl hidden md:flex">{session?.user?.name}</span>
+              <span className="text-md hidden md:flex">{session?.user?.id}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col space-y-2 mt-16 pt-6 md:px-6">
           {SIDENAV_ITEMS_ADMIN.map((item, idx) => (
             <MenuItem key={idx} item={item} />
           ))}
