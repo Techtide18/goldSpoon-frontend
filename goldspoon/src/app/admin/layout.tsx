@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex">
       <SideNav />
-      <main className="flex-1">
+      <main className="flex-1 ml-12 mt-4"> {/* Adjusted the left margin and top margin */}
         <MarginWidthWrapper>
           <Header />
           <PageWrapper>{children}</PageWrapper>
