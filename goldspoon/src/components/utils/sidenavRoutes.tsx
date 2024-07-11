@@ -48,7 +48,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "Create", path: "/admin/packages/create" },
-      { title: "Edit", path: "/admin/packages/edit" },
+      { title: "View & Edit", path: "/admin/packages/edit" },
     ],
   },
   {
@@ -59,8 +59,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     subMenuItems: [
       { title: "History", path: "/admin/payout/history" },
       {
-        title: "Generate Level Income",
-        path: "/admin/payout/generateLevelIncome",
+        title: "Generate Income",
+        path: "/admin/payout/generateIncome",
       },
     ],
   },
