@@ -44,7 +44,7 @@ export default function GeneratePayout() {
 
   const handleClick = async () => {
     const currentDate = new Date();
-    //localStorage.setItem("lastClicked", currentDate.toString());
+    localStorage.setItem("lastClicked", currentDate.toString());
     setIsButtonClicked(true);
     setIsButtonEnabled(false);
 
@@ -56,6 +56,10 @@ export default function GeneratePayout() {
 
     setIsLoading(false);
     setMessage("This month's payout has been generated successfully!");
+  };
+
+  const handleClose = () => {
+    setIsDialogOpen(false);
   };
 
   return (
@@ -94,7 +98,7 @@ export default function GeneratePayout() {
       {/* Success Dialog */}
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => setIsDialogOpen(open)}
+        onOpenChange={(open) => setIsDialogOpen(true)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto text-center">
@@ -103,7 +107,7 @@ export default function GeneratePayout() {
             {isLoading ? (
               <div className="flex flex-col items-center space-y-4">
                 <svg
-                  className="animate-spin h-10 w-10 text-gray-700"
+                  className="animate-spin h-10 w-10 text-black"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -130,9 +134,7 @@ export default function GeneratePayout() {
               <span className="font-semibold">{message}</span>
             )}
           </DialogDescription>
-          {!isLoading && (
-            <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
-          )}
+          {!isLoading && <Button onClick={handleClose}>Close</Button>}
         </DialogContent>
       </Dialog>
     </div>
