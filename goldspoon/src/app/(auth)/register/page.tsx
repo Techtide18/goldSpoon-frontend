@@ -19,6 +19,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -34,6 +41,9 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
+
+  const [memberNumber, setMemberNumber] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,14 +72,22 @@ export default function Register() {
     toast.success("Member created!", {
       id: toastId,
     });
-    
-  };
 
-  const handleSelectChange = (e) => {
-    const { name, value } = e.target;
+    const generatedMemberNumber = `LS-${Math.floor(Math.random() * 1000000)}`; // Simulated member number generation
+    setMemberNumber(generatedMemberNumber);
+    setIsDialogOpen(true);
     setFormData({
-      ...formData,
-      [name]: value,
+      epinId: "",
+      firstName: "",
+      lastName: "",
+      gender: "",
+      phone: "",
+      email: "",
+      aadhaarNumber: "",
+      panNumber: "",
+      addressDetails: "",
+      password: "",
+      confirmPassword: "",
     });
   };
 
@@ -241,9 +259,26 @@ export default function Register() {
           </p>
         </CardFooter>
       </Card>
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => open && setIsDialogOpen(true)}
+      >
+        <DialogContent>
+          <DialogTitle>Registration Successful</DialogTitle>
+          <DialogDescription>
+            Your member number is <strong>{memberNumber}</strong>. Please keep
+            it safely as it will not be generated again.
+          </DialogDescription>
+          <DialogClose asChild>
+            <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button onClick={() => (window.location.href = "/login")}>
+              Go to Login page
+            </Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
-//a popup after reguster sucssfully and show the memberNumber there, 
-//and tell them to keep it safely as it will not br generated again
