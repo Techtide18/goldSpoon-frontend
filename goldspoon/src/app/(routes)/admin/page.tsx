@@ -11,11 +11,16 @@ export default async function AdminDashboard() {
   return (
     <div className="max-w-xl mx-auto mt-20">
       <div className="text-4xl text-gray-800">
-      Welcome admin {session.user?.name}
+      Welcome admin Vineet {session.user?.name}
       </div>
-      <Link href="/api/auth/signout">Logout button</Link>
 	  <div>
-		<Button> Letssss go</Button>
+		<Button variant={"outline"}> Dashboard icons</Button>
+    </div>
+    <div>
+		--/
+    </div>
+    <div>
+    <Button> Letssss go</Button>
 	</div>
     </div>
   );
