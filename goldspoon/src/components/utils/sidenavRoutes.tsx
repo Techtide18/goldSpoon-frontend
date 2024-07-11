@@ -15,8 +15,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "Generate", path: "/admin/epins/generate" },
-      { title: "Re-topup", path: "/admin/epins/retopup" },
-      { title: "Transfer", path: "/admin/epins/transfer" },
+      { title: "Used", path: "/admin/epins/usedEpins" },
+      { title: "Unused", path: "/admin/epins/unusedEpins" },
     ],
   },
   {
@@ -35,8 +35,10 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="fa-solid:users" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "Block", path: "/admin/members/block" },
+      { title: "View", path: "/admin/members/view" },
       { title: "Edit", path: "/admin/members/edit" },
+      { title: "Block", path: "/admin/members/block" },
+      { title: "Re-topup", path: "/admin/members/retopup" },
     ],
   },
   {
@@ -69,10 +71,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "View Directs", path: "/admin/reports/viewDirects" },
+      { title: "View Groups", path: "/admin/reports/groups" },
       { title: "Epin History", path: "/admin/reports/epinHistory" },
-      { title: "Used Epins", path: "/admin/reports/usedEpins" },
-      { title: "Unused Epins", path: "/admin/reports/unusedEpins" },
-      { title: "View Members", path: "/admin/reports/viewMembers" },
       { title: "View Member Income", path: "/admin/reports/viewMemberIncome" },
     ],
   },
