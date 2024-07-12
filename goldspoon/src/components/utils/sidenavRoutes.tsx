@@ -133,7 +133,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "Epin",
+    title: "E-Pins",
     path: "/user/intallments",
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
     submenu: true,
