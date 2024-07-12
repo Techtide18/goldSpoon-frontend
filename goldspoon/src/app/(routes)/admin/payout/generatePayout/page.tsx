@@ -22,7 +22,7 @@ export default function GeneratePayout() {
     const dayOfMonth = currentDate.getDate();
 
     // Check if the date is between 15th and end of the month
-    if (dayOfMonth >= 15) {
+    if (dayOfMonth >= 10) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);

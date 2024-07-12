@@ -7,3 +7,7 @@ export default function Home() {
     </div>
   )
 }
+
+//get all installemts
+
+//get installments by member id
