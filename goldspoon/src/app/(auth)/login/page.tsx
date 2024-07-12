@@ -1,4 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -11,6 +15,28 @@ import LoginClient from "@/components/client/loginClient";
 import RegisterForm from "@/components/client/registerClient";
 
 const Login = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleLoginSuccess = async (memberId) => {
+    setLoading(true);
+    try {
+      // Simulating a delay to fetch session
+      const session = await getSession();
+      if (session?.user?.role === "admin") {
+        router.push("/admin");
+      } else if (session?.user?.role === "user") {
+        router.push("/user");
+      } else {
+        console.error("Invalid role or session");
+      }
+    } catch (error) {
+      console.error("Error during authentication", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-dvh">
       <Card>
@@ -21,13 +47,14 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginClient />
+          <LoginClient onSuccess={handleLoginSuccess} />
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <span>Or</span>
           <RegisterForm />
         </CardFooter>
       </Card>
+      {loading}
     </div>
   );
 };

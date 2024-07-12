@@ -44,7 +44,7 @@ export default function GeneratePayout() {
 
   const handleClick = async () => {
     const currentDate = new Date();
-    localStorage.setItem("lastClicked", currentDate.toString());
+   // localStorage.setItem("lastClicked", currentDate.toString());
     setIsButtonClicked(true);
     setIsButtonEnabled(false);
 

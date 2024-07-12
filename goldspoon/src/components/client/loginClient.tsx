@@ -6,7 +6,7 @@ import { Input } from "../ui/input";
 import { loginAction } from "../action/loginAction";
 import { sleep } from "@/lib/utils";
 
-const LoginClient = () => {
+const LoginClient = ({ onSuccess }) => {
   return (
     <form
       action={async (formData) => {
@@ -25,6 +25,7 @@ const LoginClient = () => {
           toast.success("Login successful", {
             id: toastId,
           });
+          onSuccess(memberId); // Pass the memberId to onSuccess
         } else {
           toast.error("Invalid memberId or password", {
             id: toastId,
@@ -35,7 +36,7 @@ const LoginClient = () => {
     >
       <Input placeholder="Member Id" name="memberId" />
       <Input placeholder="Password" type="password" name="password" />
-      <Button type="submit"> Login</Button>
+      <Button type="submit">Login</Button>
     </form>
   );
 };
