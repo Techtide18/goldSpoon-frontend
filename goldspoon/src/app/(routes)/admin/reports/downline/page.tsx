@@ -16,10 +16,30 @@ import { Label } from "@/components/ui/label";
 
 // Simulated Data
 const simulatedDownlines = [
-  { memberId: "D001", memberName: "Vineet Pandita", level: 1, lastInstallmentPaid: "2024-06-15" },
-  { memberId: "D002", memberName: "Shubham bhatia", level: 2, lastInstallmentPaid: "2024-07-01" },
-  { memberId: "D003", memberName: "Aniket ", level: 1, lastInstallmentPaid: "2024-07-10" },
-  { memberId: "D004", memberName: "Bhanu", level: 3, lastInstallmentPaid: "2024-07-15" },
+  {
+    memberId: "D001",
+    memberName: "Downline 1",
+    level: 1,
+    lastInstallmentPaid: "2024-06-15",
+  },
+  {
+    memberId: "D002",
+    memberName: "Downline 2",
+    level: 2,
+    lastInstallmentPaid: "2024-07-01",
+  },
+  {
+    memberId: "D003",
+    memberName: "Downline 3",
+    level: 1,
+    lastInstallmentPaid: "2024-07-10",
+  },
+  {
+    memberId: "D004",
+    memberName: "Downline 4",
+    level: 3,
+    lastInstallmentPaid: "2024-07-15",
+  },
   // Add more data to test pagination
 ];
 
@@ -61,27 +81,33 @@ export default function ViewDownline() {
           <CardTitle>VIEW DOWNLINE</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-4">
-            <Label htmlFor="memberId">Member ID:</Label>
+          <div className="flex flex-row items-center space-x-4">
+            <Label htmlFor="memberId" className="w-32">
+              Member ID:
+            </Label>
             <Input
               id="memberId"
               type="text"
               placeholder="Enter Member ID"
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
+              className="flex-1"
             />
           </div>
-          <div className="flex items-center space-x-4">
-            <Label htmlFor="memberName">Member Name:</Label>
+          <div className="flex flex-row items-center space-x-4">
+            <Label htmlFor="memberName" className="w-32">
+              Member Name:
+            </Label>
             <Input
               id="memberName"
               type="text"
               placeholder="Auto generated"
               value={memberName}
               readOnly
+              className="flex-1"
             />
           </div>
-          <Button onClick={getDownline}>
+          <Button onClick={getDownline} className="w-full">
             Get Downline
           </Button>
         </CardContent>
@@ -101,7 +127,7 @@ export default function ViewDownline() {
                     Downline Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Downline Member Name
+                    Member Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Level
