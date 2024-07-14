@@ -7,64 +7,74 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar"
 
 // Simulated Data
-const simulatedPackages = [
+const simulatedPayouts = [
   {
-    packageName: "Basic Plan",
-    packagePrice: "1000",
-    description: "This is the basic plan.",
-    duration: "6",
-    createdDate: "2024-01-01",
+    memberId: "M001",
+    dateTime: "2024-06-15 10:00:00",
+    receivedMoneyFor: "M002",
+    amountReceived: "500",
+    incomeType: "Referral Income",
   },
   {
-    packageName: "Premium Plan",
-    packagePrice: "2000",
-    description: "This is the premium plan.",
-    duration: "12",
-    createdDate: "2024-02-01",
+    memberId: "M003",
+    dateTime: "2024-06-20 14:30:00",
+    receivedMoneyFor: "M004",
+    amountReceived: "300",
+    incomeType: "Level Income",
   },
-  // Add more packages for testing
+  // Add more payouts for testing
 ];
 
-export default function ViewPackage() {
+export default function ViewMonthlyPayout() {
   const [viewOption, setViewOption] = useState("all");
-  const [packageName, setPackageName] = useState("");
-  const [filteredPackages, setFilteredPackages] = useState(simulatedPackages);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [filteredPayouts, setFilteredPayouts] = useState(simulatedPayouts);
+  const [showPayoutDetails, setShowPayoutDetails] = useState(true);
 
   const handleViewAll = () => {
     setViewOption("all");
-    setFilteredPackages(simulatedPackages);
-    setPackageName("");
+    setFilteredPayouts(simulatedPayouts);
+    setSelectedMonth(null);
+    setShowPayoutDetails(true);
   };
 
-  const handleViewByName = () => {
-    setViewOption("byName");
+  const handleViewByMonth = () => {
+    setViewOption("byMonth");
+    setShowPayoutDetails(false);
   };
 
-  const handlePackageNameChange = (e) => {
-    setPackageName(e.target.value);
+  const handleMonthChange = (date) => {
+    setSelectedMonth(date);
   };
 
-  const getPackageByName = () => {
-    if (!packageName) {
-      return toast.error("Please enter a Package Name.");
+  const getPayoutDetails = () => {
+    if (!selectedMonth) {
+      return toast.error("Please select a month.");
     }
 
-    const packageData = simulatedPackages.filter(
-      (pkg) => pkg.packageName.toLowerCase() === packageName.toLowerCase()
-    );
+    const month = selectedMonth.getMonth() + 1; // getMonth() returns 0-11
+    const year = selectedMonth.getFullYear();
 
-    if (packageData.length === 0) {
-      return toast.error("Package not found.");
+    const payoutData = simulatedPayouts.filter((payout) => {
+      const payoutDate = new Date(payout.dateTime);
+      return payoutDate.getMonth() + 1 === month && payoutDate.getFullYear() === year;
+    });
+
+    if (payoutData.length === 0) {
+      toast.error("No payout details found for the selected month.");
+      setShowPayoutDetails(true); // Ensure the card remains visible
+      setFilteredPayouts([]);
+      return;
     }
 
-    setFilteredPackages(packageData);
+    setFilteredPayouts(payoutData);
+    setShowPayoutDetails(true);
   };
 
   return (
@@ -73,7 +83,7 @@ export default function ViewPackage() {
         {/* View Options Card */}
         <Card>
           <CardHeader>
-            <CardTitle>View Packages</CardTitle>
+            <CardTitle>View Monthly Payout Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex space-x-4">
@@ -85,57 +95,78 @@ export default function ViewPackage() {
                 View All
               </Button>
               <Button
-                className={`font-bold ${viewOption === "byName" ? "bg-black text-white" : "border-black"}`}
-                onClick={handleViewByName}
-                variant={viewOption === "byName" ? "solid" : "outline"}
+                className={`font-bold ${viewOption === "byMonth" ? "bg-black text-white" : "border-black"}`}
+                onClick={handleViewByMonth}
+                variant={viewOption === "byMonth" ? "solid" : "outline"}
               >
-                View by Package Name
+                View by Month
               </Button>
             </div>
-            {viewOption === "byName" && (
-              <div className="flex space-x-4 items-center mt-4">
-                <Input
-                  id="packageName"
-                  name="packageName"
-                  placeholder="Package Name"
-                  value={packageName}
-                  onChange={handlePackageNameChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+            {viewOption === "byMonth" && (
+              <div className="flex flex-col items-center space-y-4 mt-4">
+                <Calendar
+                  onChange={handleMonthChange}
+                  value={selectedMonth}
+                  view="year"
+                  onClickMonth={handleMonthChange}
+                  className="border p-2 rounded-md w-1/2"
+                  tileClassName="text-center"
+                  selectionType="month"
                 />
-                <Button onClick={getPackageByName}>Get Package</Button>
+                <Input
+                  id="selectedMonth"
+                  name="selectedMonth"
+                  placeholder="Selected Month"
+                  value={selectedMonth ? selectedMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : ''}
+                  readOnly
+                  className="w-1/2 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button className="w-1/2" onClick={getPayoutDetails}>Get Payout Details</Button>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Packages Details Card */}
+        {/* Payout Details Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Package Details</CardTitle>
+            <CardTitle>Payout Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration (Months)</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredPackages.map((pkg, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{pkg.packageName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.packagePrice}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.duration}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.createdDate}</td>
+            {showPayoutDetails ? (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Received Money For (Member ID)</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Received</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Income Type</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredPayouts.length > 0 ? (
+                    filteredPayouts.map((payout, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{payout.memberId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payout.dateTime}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payout.receivedMoneyFor}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payout.amountReceived}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payout.incomeType}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                        No payout details found for the selected month.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center text-gray-500">Select a view option to see details.</div>
+            )}
           </CardContent>
         </Card>
       </div>

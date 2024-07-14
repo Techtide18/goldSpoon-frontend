@@ -65,7 +65,9 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
         title: "Generate Payout",
         path: "/admin/payout/generatePayout",
       },
-      { title: "Payout Details", path: "/admin/payout/payoutDetails" },
+      { title: "View Monthly Payout Details", path: "/admin/payout/payoutDetails" },
+      { title: "View Level Income", path: "/admin/payout/levelIncome" },
+      { title: "View Renewal Income", path: "/admin/payout/renewalIncome" },
     ],
   },
   {
@@ -78,6 +80,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "Epin History", path: "/admin/reports/epinHistory" },
       { title: "View Downline", path: "/admin/reports/downline" },
+
     ],
   },
   {
