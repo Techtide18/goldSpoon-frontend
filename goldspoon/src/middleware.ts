@@ -6,25 +6,17 @@ export default middleware((req) => {
   const userRole = req.auth?.user?.role;
   console.log("middleware", userRole);
 
+  if (nextUrl.pathname === "/register") {
+    return;
+  }
+
   if (isLoggedIn) {
-    if (nextUrl.pathname === "/register") {
-      return;
-    }
-    if (nextUrl.pathname === "/login") {
-      if (userRole === "admin") {
-        return Response.redirect(new URL("/admin", nextUrl));
-      } else if (userRole === "user") {
-        return Response.redirect(new URL("/user", nextUrl));
-      }
-    } else if (userRole === "admin" && !nextUrl.pathname.startsWith("/admin")) {
+    if (userRole === "admin" && !nextUrl.pathname.startsWith("/admin")) {
       return Response.redirect(new URL("/admin", nextUrl));
     } else if (userRole === "user" && !nextUrl.pathname.startsWith("/user")) {
       return Response.redirect(new URL("/user", nextUrl));
     }
   } else {
-    if (nextUrl.pathname === "/register") {
-      return;
-    }
     if (nextUrl.pathname != "/login") {
       return Response.redirect(new URL("/login", nextUrl));
     }

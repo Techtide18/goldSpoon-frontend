@@ -19,6 +19,7 @@ export default function CreatePackage() {
     packageName: "",
     packagePrice: "",
     description: "",
+    packageDuration: "", // Added package duration
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,9 +34,9 @@ export default function CreatePackage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { packageName, packagePrice, description } = formData;
+    const { packageName, packagePrice, description, packageDuration } = formData;
 
-    if (!packageName || !packagePrice || !description) {
+    if (!packageName || !packagePrice || !description || !packageDuration) {
       return toast.error("Please fill out all fields.");
     }
 
@@ -52,6 +53,7 @@ export default function CreatePackage() {
       packageName: "",
       packagePrice: "",
       description: "",
+      packageDuration: "", // Reset package duration
     });
   };
 
@@ -83,6 +85,19 @@ export default function CreatePackage() {
                 placeholder="Package Price"
                 type="number"
                 value={formData.packagePrice}
+                onChange={handleChange}
+                required
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="packageDuration">Package Duration (Months)</Label>
+              <Input
+                id="packageDuration"
+                name="packageDuration"
+                placeholder="Package Duration in Months"
+                type="number"
+                value={formData.packageDuration}
                 onChange={handleChange}
                 required
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
