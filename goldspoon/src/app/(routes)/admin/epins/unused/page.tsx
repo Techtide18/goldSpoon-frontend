@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/pagination";
 
 // Simulated Data
 const simulatedData = [
@@ -159,6 +161,7 @@ export default function Report() {
       ? simulatedData.filter((data) => data.referralMemberId === filterId)
       : simulatedData;
 
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
@@ -168,7 +171,7 @@ export default function Report() {
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle>VIEW USED EPINS</CardTitle>
+          <CardTitle>VIEW UNUSED EPINs</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
@@ -223,6 +226,9 @@ export default function Report() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Referral Member ID
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -240,26 +246,56 @@ export default function Report() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {data.referralMemberId}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <Link
+                      href={`/register?epinId=${data.EpinID}`}
+                      legacyBehavior
+                    >
+                      <a
+                        className="text-blue-600 hover:text-blue-900"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Register E-PIN
+                      </a>
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </CardContent>
         <CardFooter className="flex justify-center space-x-2">
-          <button
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, page) => setCurrentPage(page)}
+            siblingCount={1}
+            boundaryCount={1}
+            size="large"
+            shape="rounded"
+            variant="outlined"
+            color="primary"
+            className="mt-4"
+            showFirstButton
+            showLastButton
+          />
+          <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            Previous
-          </button>
-          <button
+            Previous 100
+          </Button>
+          <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={currentPage * PAGE_SIZE >= filteredData.length}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
           >
             Next 100
-          </button>
+          </Button>
         </CardFooter>
       </Card>
     </div>

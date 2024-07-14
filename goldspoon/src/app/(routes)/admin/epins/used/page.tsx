@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/pagination";
 
 // Simulated Data
 const simulatedData = [
@@ -154,38 +150,29 @@ export default function Report() {
     setCurrentPage(1);
   };
 
-  const filteredData =
-    viewOption === "referralId" && filterId
-      ? simulatedData.filter((data) => data.referralMemberId === filterId)
-      : simulatedData;
+  const filteredData = viewOption === "referralId" && filterId
+    ? simulatedData.filter((data) => data.referralMemberId === filterId)
+    : simulatedData;
 
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle>VIEW UNUSED EPINS</CardTitle>
+          <CardTitle >VIEW USED EPINs</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
-            className={`font-bold ${
-              viewOption === "all" ? "bg-black text-white" : "border-black"
-            }`}
+            className={`font-bold ${viewOption === "all" ? "bg-black text-white" : "border-black"}`}
             onClick={handleViewAll}
             variant={viewOption === "all" ? "solid" : "outline"}
           >
             View All
           </Button>
           <Button
-            className={`font-bold ${
-              viewOption === "referralId"
-                ? "bg-black text-white"
-                : "border-black"
-            }`}
+            className={`font-bold ${viewOption === "referralId" ? "bg-black text-white" : "border-black"}`}
             onClick={handleViewByReferralId}
             variant={viewOption === "referralId" ? "solid" : "outline"}
           >
@@ -211,55 +198,54 @@ export default function Report() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Epin ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Package Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Referral Member ID
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Epin ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Member ID</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((data, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {data.EpinID}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.packageName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.createdDate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.referralMemberId}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.referralMemberId}</td>
+                  
                 </tr>
               ))}
             </tbody>
           </table>
         </CardContent>
         <CardFooter className="flex justify-center space-x-2">
-          <button
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, page) => setCurrentPage(page)}
+            siblingCount={1}
+            boundaryCount={1}
+            size="large"
+            shape="rounded"
+            variant="outlined"
+            color="primary"
+            className="mt-4"
+            showFirstButton
+            showLastButton
+          />
+          <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            Previous
-          </button>
-          <button
+            Previous 100
+          </Button>
+          <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={currentPage * PAGE_SIZE >= filteredData.length}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
           >
             Next 100
-          </button>
+          </Button>
         </CardFooter>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,6 +29,9 @@ import {
 } from "@/components/ui/dialog";
 
 export default function Register() {
+  const searchParams = useSearchParams();
+  const epinId = searchParams.get('epinId');
+
   const [formData, setFormData] = useState({
     epinId: "",
     firstName: "",
@@ -44,6 +48,15 @@ export default function Register() {
 
   const [memberNumber, setMemberNumber] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (epinId) {
+      setFormData((prevData) => ({
+        ...prevData,
+        epinId: epinId || "",
+      }));
+    }
+  }, [epinId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

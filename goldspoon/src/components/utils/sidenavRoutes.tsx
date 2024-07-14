@@ -15,8 +15,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "Generate", path: "/admin/epins/generate" },
-      { title: "Used", path: "/admin/epins/usedEpins" },
-      { title: "Unused", path: "/admin/epins/unusedEpins" },
+      { title: "Used", path: "/admin/epins/used" },
+      { title: "Unused", path: "/admin/epins/unused" },
     ],
   },
   {
@@ -27,7 +27,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     subMenuItems: [
       { title: "Add", path: "/admin/installments/add" },
       { title: "Edit", path: "/admin/installments/edit" },
-      { title: "View", path: "/admin/installments/history" },
+      { title: "View", path: "/admin/installments/view" },
     ],
   },
   {
@@ -40,8 +40,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "Edit", path: "/admin/members/edit" },
       { title: "Block", path: "/admin/members/block" },
       { title: "Re-topup", path: "/admin/members/retopup" },
-      { title: "View Passwords", path: "/admin/members/retopup" },
-      { title: "Edit Passwords", path: "/admin/members/retopup" },
+      { title: "View Passwords", path: "/admin/members/viewPassword" },
+      { title: "Edit Passwords", path: "/admin/members/editPassword" },
     ],
   },
   {
@@ -50,7 +50,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="tabler:packages" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View", path: "/admin/packages/edit" },
+      { title: "View", path: "/admin/packages/view" },
       { title: "Create", path: "/admin/packages/create" },
       { title: "Edit", path: "/admin/packages/edit" },
     ],
@@ -65,7 +65,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
         title: "Generate Payout",
         path: "/admin/payout/generatePayout",
       },
-      { title: "Payout Details", path: "/admin/payout/history" },
+      { title: "Payout Details", path: "/admin/payout/payoutDetails" },
     ],
   },
   {
@@ -75,9 +75,9 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "View Directs", path: "/admin/reports/viewDirects" },
-      { title: "View Re-topups", path: "/admin/reports/groups" },
+      { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "Epin History", path: "/admin/reports/epinHistory" },
-      { title: "View Downline", path: "/admin/reports/viewMemberIncome" },
+      { title: "View Downline", path: "/admin/reports/downline" },
     ],
   },
   {
@@ -88,30 +88,30 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     subMenuItems: [
       {
         title: "Withdrawal Requests",
-        path: "/admin/walletRequests/allRequests",
+        path: "/admin/wallet/withdrawalRequests",
       },
       {
         title: "Wallet Details",
-        path: "/admin/walletRequests/rejectedRequests",
+        path: "/admin/wallet/walletDetails",
       },
       {
         title: "Transaction Details",
-        path: "/admin/walletRequests/rejectedRequests",
+        path: "/admin/wallet/transactionDetails",
       },
     ],
   },
   {
     title: "Group",
-    path: "/admin/wallet",
+    path: "/admin/group",
     icon: <Icon icon="heroicons:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View All Groups", path: "/admin/walletRequests/allRequests" },
+      { title: "View All Groups", path: "/admin/group/allGroups" },
       {
         title: "View All Members By Groups",
-        path: "/admin/walletRequests/allRequests",
+        path: "/admin/group/members",
       },
-      { title: "Add Groups", path: "/admin/walletRequests/allRequests" },
+      { title: "Add Groups", path: "/admin/group/addGroup" },
     ],
   },
 ];
@@ -123,35 +123,35 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   },
   {
     title: "Profile",
-    path: "/user/intallments",
+    path: "/user/profile",
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View Profile", path: "/user/intallments/add" },
-      { title: "Edit Profile", path: "/user/intallments/history" },
-      { title: "Edit Password", path: "/user/intallments/history" },
+      { title: "View Profile", path: "/user/profile/view" },
+      { title: "Edit Profile", path: "/user/profile/editProfile" },
+      { title: "Edit Password", path: "/user/profile/editPassword" },
     ],
   },
   {
     title: "E-Pins",
-    path: "/user/intallments",
+    path: "/user/epin",
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "Used", path: "/user/intallments/history" },
-      { title: "Unused", path: "/user/intallments/add" },
-      { title: "History", path: "/user/intallments/history" },
+      { title: "Used", path: "/user/epin/used" },
+      { title: "Unused", path: "/user/epin/unused" },
+      { title: "History", path: "/user/epin/history" },
     ],
   },
   {
     title: "My Team",
-    path: "/user/payout",
+    path: "/user/myTeam",
     icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View All", path: "/user/payout/history" },
-      { title: "View By Level", path: "/user/payout/levelincome" },
-      { title: "Pay For Member", path: "/user/payout/history" },
+      { title: "View All", path: "/user/myTeam/byAll" },
+      { title: "View By Level", path: "/user/myTeam/byLevel" },
+      { title: "Pay For Member", path: "/user/myTeam/pay" },
     ],
   },
   {
@@ -160,20 +160,20 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View Renewal Income", path: "/user/payout/history" },
-      { title: "View Level Income", path: "/user/payout/levelincome" },
+      { title: "View Renewal Income", path: "/user/payout/renewalIncome" },
+      { title: "View Level Income", path: "/user/payout/levelIncome" },
     ],
   },
   {
     title: "Wallet",
-    path: "/user/payout",
+    path: "/user/wallet",
     icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View Wallet Details", path: "/user/payout/levelincome" },
-      { title: "Add Withdrawal Request", path: "/user/payout/history" },
-      { title: "View Withdrawal Requests", path: "/user/payout/history" },
-      { title: "View Transaction Details", path: "/user/payout/levelincome" },
+      { title: "View Wallet Details", path: "/user/wallet/walletDetails" },
+      { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
+      { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
+      { title: "View Transaction Details", path: "/user/wallet/transactions" },
     ],
   },
 ];
