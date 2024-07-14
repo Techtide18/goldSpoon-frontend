@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { Pagination } from "@/components/ui/pagination";
 
 // Simulated Data
 const simulatedData = [
@@ -132,7 +136,7 @@ const simulatedData = [
   },
 ];
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 100;
 
 export default function Report() {
   const [viewOption, setViewOption] = useState("all");
@@ -150,32 +154,42 @@ export default function Report() {
     setCurrentPage(1);
   };
 
-  const filteredData = viewOption === "referralId" && filterId
-    ? simulatedData.filter((data) => data.referralMemberId === filterId)
-    : simulatedData;
+  const filteredData =
+    viewOption === "referralId" && filterId
+      ? simulatedData.filter((data) => data.referralMemberId === filterId)
+      : simulatedData;
 
-  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle>VIEW UNUSED EPINs</CardTitle>
+          <CardTitle>VIEW UNUSED EPINS</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
-            className={`font-bold ${viewOption === "all" ? "bg-black text-white" : "border-black"}`}
+            className={`font-bold ${
+              viewOption === "all" ? "bg-black text-white" : "border-black"
+            }`}
             onClick={handleViewAll}
             variant={viewOption === "all" ? "solid" : "outline"}
           >
             View All
           </Button>
           <Button
-            className={`font-bold ${viewOption === "referralId" ? "bg-black text-white" : "border-black"}`}
+            className={`font-bold ${
+              viewOption === "referralId"
+                ? "bg-black text-white"
+                : "border-black"
+            }`}
             onClick={handleViewByReferralId}
             variant={viewOption === "referralId" ? "solid" : "outline"}
           >
-            View by Referral Member ID
+            View by Referral Memebr ID ↓
           </Button>
         </CardContent>
         {viewOption === "referralId" && (
@@ -197,30 +211,55 @@ export default function Report() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Epin ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Member ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Epin ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Package Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Referral Member ID
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((data, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.referralMemberId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {data.EpinID}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {data.packageName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {data.createdDate}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {data.referralMemberId}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Pagination
-            count={Math.ceil(filteredData.length / PAGE_SIZE)}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-          />
+        <CardFooter className="flex justify-center space-x-2">
+          <button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={currentPage * PAGE_SIZE >= filteredData.length}
+          >
+            Next 100
+          </button>
         </CardFooter>
       </Card>
     </div>

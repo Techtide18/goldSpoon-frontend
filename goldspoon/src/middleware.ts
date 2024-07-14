@@ -7,6 +7,9 @@ export default middleware((req) => {
   console.log("middleware", userRole);
 
   if (isLoggedIn) {
+    if (nextUrl.pathname === "/register") {
+      return;
+    }
     if (nextUrl.pathname === "/login") {
       if (userRole === "admin") {
         return Response.redirect(new URL("/admin", nextUrl));
