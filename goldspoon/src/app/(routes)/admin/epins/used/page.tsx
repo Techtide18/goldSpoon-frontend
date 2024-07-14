@@ -14,36 +14,48 @@ const simulatedData = [
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123456",
+    group:"G12",
+    tokenNumber:"98",
   },
   {
     EpinID: "EPN123457",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123457",
+    group:"G12",
+    tokenNumber:"12",
   },
   {
     EpinID: "EPN123458",
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123458",
+    group:"G16",
+    tokenNumber:"2",
   },
   {
     EpinID: "EPN123459",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123459",
+    group:"G12",
+    tokenNumber:"98",
   },
   {
     EpinID: "EPN123460",
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123460",
+    group:"G12",
+    tokenNumber:"98",
   },
   {
     EpinID: "EPN123461",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123461",
+    group:"G12",
+    tokenNumber:"98",
   },
   {
     EpinID: "EPN123462",
@@ -202,6 +214,8 @@ export default function Report() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Member ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token Number (In Group) </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -211,7 +225,8 @@ export default function Report() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.referralMemberId}</td>
-                  
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.group}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.tokenNumber}</td>
                 </tr>
               ))}
             </tbody>

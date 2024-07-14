@@ -1,257 +1,238 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
-// Simulated Data
-const simulatedData = [
-  {
-    EpinID: "EPN123456",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123457",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123457",
-  },
-  {
-    EpinID: "EPN123458",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123458",
-  },
-  {
-    EpinID: "EPN123459",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123459",
-  },
-  {
-    EpinID: "EPN123460",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123460",
-  },
-  {
-    EpinID: "EPN123461",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123461",
-  },
-  {
-    EpinID: "EPN123462",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123462",
-  },
-  {
-    EpinID: "EPN123463",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123463",
-  },
-  {
-    EpinID: "EPN123464",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123464",
-  },
-  {
-    EpinID: "EPN123465",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123465",
-  },
-  // Add more data to test pagination
-  {
-    EpinID: "EPN123466",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123466",
-  },
-  {
-    EpinID: "EPN123467",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123467",
-  },
-  {
-    EpinID: "EPN123468",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123468",
-  },
-  {
-    EpinID: "EPN123469",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123469",
-  },
-  {
-    EpinID: "EPN123470",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123470",
-  },
-  {
-    EpinID: "EPN123471",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123471",
-  },
-  {
-    EpinID: "EPN123472",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123472",
-  },
-  {
-    EpinID: "EPN123473",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123473",
-  },
-  {
-    EpinID: "EPN123474",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123474",
-  },
-  {
-    EpinID: "EPN123475",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123475",
-  },
-];
+export default function EditInstallment() {
+  const [memberId, setMemberId] = useState("");
+  const [memberName, setMemberName] = useState("");
+  const [installmentMonth, setInstallmentMonth] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [installmentData, setInstallmentData] = useState({
+    installmentMonth: "",
+    amountPaid: "",
+    transactionId: "",
+    paymentMethod: "",
+  });
 
-const PAGE_SIZE = 100;
-
-export default function Report() {
-  const [viewOption, setViewOption] = useState("all");
-  const [filterId, setFilterId] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const handleViewAll = () => {
-    setViewOption("all");
-    setFilterId("");
-    setCurrentPage(1);
+  const handleMemberIdChange = (e) => {
+    setMemberId(e.target.value);
   };
 
-  const handleViewByReferralId = () => {
-    setViewOption("referralId");
-    setCurrentPage(1);
+  const getInstallmentDetails = async () => {
+    if (!memberId || !installmentMonth) {
+      return toast.error("Please enter Member ID and select Installment Month.");
+    }
+
+    // Simulate an API call to fetch installment details
+    const toastId = toast.loading("Fetching Installment Details...");
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Simulate fetched data
+    const fetchedData = {
+      installmentMonth: "January",
+      amountPaid: "1500",
+      transactionId: "TXN1234567890",
+      paymentMethod: "GPay",
+    };
+
+    setInstallmentData(fetchedData);
+    setMemberName("John Doe");
+    toast.success("Installment details fetched successfully!", { id: toastId });
   };
 
-  const filteredData = viewOption === "referralId" && filterId
-    ? simulatedData.filter((data) => data.referralMemberId === filterId)
-    : simulatedData;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInstallmentData({
+      ...installmentData,
+      [name]: value,
+    });
+  };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { amountPaid, transactionId, paymentMethod } = installmentData;
+
+    if (!amountPaid || !transactionId || !paymentMethod) {
+      return toast.error("Please fill out all fields.");
+    }
+
+    const toastId = toast.loading("Updating Installment Details...");
+    // Simulate API call to update installment details
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    toast.success("Installment details updated successfully!", {
+      id: toastId,
+    });
+
+    setIsDialogOpen(true);
+  };
 
   return (
-    <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
-      <Card className="w-full max-w-7xl mb-4">
-        <CardHeader>
-          <CardTitle >VIEW USED EPINs</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-row space-x-4">
-          <Button
-            className={`font-bold ${viewOption === "all" ? "bg-black text-white" : "border-black"}`}
-            onClick={handleViewAll}
-            variant={viewOption === "all" ? "solid" : "outline"}
-          >
-            View All
-          </Button>
-          <Button
-            className={`font-bold ${viewOption === "referralId" ? "bg-black text-white" : "border-black"}`}
-            onClick={handleViewByReferralId}
-            variant={viewOption === "referralId" ? "solid" : "outline"}
-          >
-            View by Referral Member ID ↓
-          </Button>
-        </CardContent>
-        {viewOption === "referralId" && (
-          <CardFooter className="flex flex-row space-x-4">
-            <Input
-              placeholder="Referral Member ID"
-              value={filterId}
-              onChange={(e) => setFilterId(e.target.value)}
-            />
-          </CardFooter>
-        )}
-      </Card>
+    <div className="flex justify-center items-center py-8 px-4">
+      <div className="w-full max-w-7xl space-y-8">
+        {/* First Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Edit Installment - Step 1</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="memberId">Member ID</Label>
+                <Input
+                  id="memberId"
+                  name="memberId"
+                  placeholder="Member ID"
+                  value={memberId}
+                  onChange={handleMemberIdChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="installmentMonth">Installment Month</Label>
+                <Select
+                  name="installmentMonth"
+                  value={installmentMonth}
+                  onValueChange={(value) => setInstallmentMonth(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Installment Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 15 }, (_, i) => (
+                      <SelectItem key={i + 1} value={`Month-${i + 1}`}>
+                        Month - {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="memberName">Member Name</Label>
+                <Input
+                  id="memberName"
+                  name="memberName"
+                  placeholder="Auto Generated"
+                  value={memberName}
+                  readOnly
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <Button className="w-full" onClick={getInstallmentDetails}>
+                Get Installment Details for Member
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card className="w-full max-w-7xl">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold">EPIN Report</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Epin ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Member ID</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((data, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.referralMemberId}</td>
-                  
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 100
-          </Button>
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next 100
-          </Button>
-        </CardFooter>
-      </Card>
+        {/* Second Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Edit Installment - Step 2</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="installmentMonth">Installment Month</Label>
+                <Input
+                  id="installmentMonth"
+                  name="installmentMonth"
+                  placeholder="Installment Month"
+                  value={installmentData.installmentMonth}
+                  readOnly
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="amountPaid">Amount Paid (Rupees)</Label>
+                <Input
+                  id="amountPaid"
+                  name="amountPaid"
+                  placeholder="Amount Paid"
+                  value={installmentData.amountPaid}
+                  onChange={handleChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="transactionId">Transaction ID</Label>
+                <Input
+                  id="transactionId"
+                  name="transactionId"
+                  placeholder="Transaction ID"
+                  value={installmentData.transactionId}
+                  onChange={handleChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="paymentMethod">Payment Method</Label>
+                <Select
+                  name="paymentMethod"
+                  value={installmentData.paymentMethod}
+                  onValueChange={(value) =>
+                    setInstallmentData({ ...installmentData, paymentMethod: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Payment Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GPay">GPay</SelectItem>
+                    <SelectItem value="UPI">UPI</SelectItem>
+                    <SelectItem value="Cheque">Cheque</SelectItem>
+                    <SelectItem value="NetBanking">NetBanking</SelectItem>
+                    <SelectItem value="Card">Card</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button className="w-full" type="submit">
+                Update Installment Detail for Member
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        className="mt-8 mb-8"
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Installment Updated</DialogTitle>
+          <DialogDescription>
+            <div className="mt-4 space-y-2">
+              <p>Installment details updated successfully!</p>
+            </div>
+          </DialogDescription>
+          <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
-//edit installemnt by member id
-
-//delete installment by member id
