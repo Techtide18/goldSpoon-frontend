@@ -23,6 +23,7 @@ const simulatedPayouts = [
     dateTime: "2024-06-15 10:00:00",
     receivedMoneyFor: "M002",
     amountReceived: "500",
+    level: "2",
     incomeType: "Referral Income",
   },
   {
@@ -30,6 +31,7 @@ const simulatedPayouts = [
     dateTime: "2024-06-20 14:30:00",
     receivedMoneyFor: "M004",
     amountReceived: "300",
+    level: "1",
     incomeType: "Level Income",
   },
   // Add more payouts for testing
@@ -38,6 +40,7 @@ const simulatedPayouts = [
     dateTime: "2024-07-01 12:00:00",
     receivedMoneyFor: "M005",
     amountReceived: "200",
+    level: "6",
     incomeType: "Referral Income",
   },
   {
@@ -45,6 +48,7 @@ const simulatedPayouts = [
     dateTime: "2024-07-02 15:45:00",
     receivedMoneyFor: "M007",
     amountReceived: "150",
+    level: "7",
     incomeType: "Level Income",
   },
   {
@@ -52,6 +56,7 @@ const simulatedPayouts = [
     dateTime: "2024-07-05 10:30:00",
     receivedMoneyFor: "M009",
     amountReceived: "100",
+    level: "3",
     incomeType: "Referral Income",
   },
 ];
@@ -205,6 +210,9 @@ export default function ViewMonthlyPayout() {
                     Received Money For (Member ID)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Level
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount Received
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -224,6 +232,9 @@ export default function ViewMonthlyPayout() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {payout.receivedMoneyFor}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {payout.level}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {payout.amountReceived}

@@ -19,12 +19,14 @@ const simulatedRenewalIncome = [
     memberId: "M001",
     dateTime: "2024-06-15 10:00:00",
     receivedMoneyFor: "M002",
+    level:"2",
     amountReceived: "500",
   },
   {
     memberId: "M003",
     dateTime: "2024-06-20 14:30:00",
     receivedMoneyFor: "M004",
+    level:"3",
     amountReceived: "300",
   },
   // Add more data to test pagination
@@ -32,18 +34,21 @@ const simulatedRenewalIncome = [
     memberId: "M004",
     dateTime: "2024-07-01 12:00:00",
     receivedMoneyFor: "M005",
+    level:"1",
     amountReceived: "200",
   },
   {
     memberId: "M006",
     dateTime: "2024-07-02 15:45:00",
     receivedMoneyFor: "M007",
+    level:"7",
     amountReceived: "150",
   },
   {
     memberId: "M008",
     dateTime: "2024-07-05 10:30:00",
     receivedMoneyFor: "M009",
+    level:"5",
     amountReceived: "100",
   },
 ];
@@ -156,6 +161,9 @@ export default function ViewRenewalIncome() {
                     Received Money For (Member ID)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                   Level
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount Received
                   </th>
                 </tr>
@@ -172,6 +180,9 @@ export default function ViewRenewalIncome() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.receivedMoneyFor}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.level}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.amountReceived}

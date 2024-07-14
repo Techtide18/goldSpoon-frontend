@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -15,59 +15,36 @@ import { toast } from "sonner";
 
 // Simulated Data
 const simulatedReTopups = [
-  {
-    memberId: "M001",
-    oldEpin: "E12345",
-    newEpin: "E67890",
-    oldPackage: "Basic",
-    newPackage: "Premium",
-    retopupDate: "2024-06-15",
-  },
-  {
-    memberId: "M002",
-    oldEpin: "E23456",
-    newEpin: "E78901",
-    oldPackage: "Standard",
-    newPackage: "Gold",
-    retopupDate: "2024-07-01",
-  },
-  {
-    memberId: "M003",
-    oldEpin: "E34567",
-    newEpin: "E89012",
-    oldPackage: "Gold",
-    newPackage: "Platinum",
-    retopupDate: "2024-07-10",
-  },
-  {
-    memberId: "M004",
-    oldEpin: "E45678",
-    newEpin: "E90123",
-    oldPackage: "Basic",
-    newPackage: "Standard",
-    retopupDate: "2024-07-15",
-  },
+  { memberId: "M001", oldEpin: "E12345", newEpin: "E67890", oldPackage: "Basic", newPackage: "Premium", retopupDate: "2024-06-15" },
+  { memberId: "M002", oldEpin: "E23456", newEpin: "E78901", oldPackage: "Standard", newPackage: "Gold", retopupDate: "2024-07-01" },
+  { memberId: "M003", oldEpin: "E34567", newEpin: "E89012", oldPackage: "Gold", newPackage: "Platinum", retopupDate: "2024-07-10" },
+  { memberId: "M004", oldEpin: "E45678", newEpin: "E90123", oldPackage: "Basic", newPackage: "Standard", retopupDate: "2024-07-15" },
   // Add more data to test pagination
 ];
 
 const PAGE_SIZE = 100;
 
 export default function ViewReTopups() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(simulatedReTopups);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    if (viewOption === "all") {
+      setFilteredData(simulatedReTopups);
+    }
+  }, [viewOption]);
 
   const handleViewAll = () => {
     setViewOption("all");
-    setFilteredData(simulatedReTopups);
     setFilterId("");
     setCurrentPage(1);
+    setFilteredData(simulatedReTopups);
   };
 
   const handleViewByMemberId = () => {
     setViewOption("memberId");
-    setFilteredData([]);
     setCurrentPage(1);
   };
 
@@ -76,9 +53,7 @@ export default function ViewReTopups() {
       return toast.error("Please enter a Member ID.");
     }
 
-    const filtered = simulatedReTopups.filter(
-      (data) => data.memberId === filterId
-    );
+    const filtered = simulatedReTopups.filter((data) => data.memberId === filterId);
     if (filtered.length === 0) {
       toast.error("No data found for the specified Member ID.");
       return;
@@ -114,7 +89,9 @@ export default function ViewReTopups() {
           </Button>
           <Button
             className={`font-bold ${
-              viewOption === "memberId" ? "bg-black text-white" : "border-black"
+              viewOption === "memberId"
+                ? "bg-black text-white"
+                : "border-black"
             }`}
             onClick={handleViewByMemberId}
             variant={viewOption === "memberId" ? "solid" : "outline"}
@@ -130,7 +107,9 @@ export default function ViewReTopups() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
-            <Button onClick={getByMemberId}>Get by Member ID</Button>
+            <Button onClick={getByMemberId}>
+              Get by Member ID
+            </Button>
           </CardFooter>
         )}
       </Card>
