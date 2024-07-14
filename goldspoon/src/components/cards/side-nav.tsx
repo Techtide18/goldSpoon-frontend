@@ -11,7 +11,7 @@ import { Session } from "../utils/dtos";
 const SideNav = ({ session }: { session: Session }) => {
   return (
     <div className="md:w-72 bg-white h-screen flex-1 fixed border-r border-zinc-200 hidden md:flex overflow-y-auto">
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full h-full">
         <div className="fixed top-0 left-0 w-72 bg-white z-10 border-b border-zinc-200">
           <div className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 h-16 w-full">
             <div className="flex flex-col">
@@ -21,7 +21,7 @@ const SideNav = ({ session }: { session: Session }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col space-y-2 mt-16 pt-6 md:px-6">
+        <div className="flex flex-col space-y-2 mt-16 pt-6 md:px-6 flex-1 pb-4">
           {SIDENAV_ITEMS_ADMIN.map((item, idx) => (
             <MenuItem key={idx} item={item} />
           ))}
