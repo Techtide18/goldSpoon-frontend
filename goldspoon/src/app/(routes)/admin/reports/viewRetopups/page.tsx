@@ -14,71 +14,79 @@ import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
 // Simulated Data
-const simulatedDirects = [
-  { memberId: "M001", memberName: "John Doe", directCount: 5 },
-  { memberId: "M002", memberName: "Jane Smith", directCount: 10 },
-  { memberId: "M003", memberName: "Alice Johnson", directCount: 7 },
-  { memberId: "M004", memberName: "Bob Brown", directCount: 3 },
-  { memberId: "M005", memberName: "Charlie Davis", directCount: 12 },
-  { memberId: "M006", memberName: "Dave Wilson", directCount: 8 },
-  { memberId: "M007", memberName: "Eva Green", directCount: 6 },
-  { memberId: "M008", memberName: "Frank Harris", directCount: 11 },
-  { memberId: "M009", memberName: "Grace Lee", directCount: 9 },
-  { memberId: "M010", memberName: "Hank Miller", directCount: 4 },
-  { memberId: "M011", memberName: "Ivy Walker", directCount: 20 },
-  { memberId: "M012", memberName: "Jack Young", directCount: 25 },
+const simulatedReTopups = [
+  {
+    memberId: "M001",
+    oldEpin: "E12345",
+    newEpin: "E67890",
+    oldPackage: "Basic",
+    newPackage: "Premium",
+    retopupDate: "2024-06-15",
+  },
+  {
+    memberId: "M002",
+    oldEpin: "E23456",
+    newEpin: "E78901",
+    oldPackage: "Standard",
+    newPackage: "Gold",
+    retopupDate: "2024-07-01",
+  },
+  {
+    memberId: "M003",
+    oldEpin: "E34567",
+    newEpin: "E89012",
+    oldPackage: "Gold",
+    newPackage: "Platinum",
+    retopupDate: "2024-07-10",
+  },
+  {
+    memberId: "M004",
+    oldEpin: "E45678",
+    newEpin: "E90123",
+    oldPackage: "Basic",
+    newPackage: "Standard",
+    retopupDate: "2024-07-15",
+  },
   // Add more data to test pagination
 ];
 
 const PAGE_SIZE = 100;
 
-export default function ViewDirects() {
+export default function ViewReTopups() {
   const [viewOption, setViewOption] = useState("");
-  const [customDirectCount, setCustomDirectCount] = useState(0);
+  const [filterId, setFilterId] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleView5Directs = () => {
-    setViewOption("5directs");
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= 5 && data.directCount < 10
-    );
-    setFilteredData(filtered);
+  const handleViewAll = () => {
+    setViewOption("all");
+    setFilteredData(simulatedReTopups);
+    setFilterId("");
     setCurrentPage(1);
   };
 
-  const handleView10Directs = () => {
-    setViewOption("10directs");
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= 10 && data.directCount < 20
-    );
-    setFilteredData(filtered);
+  const handleViewByMemberId = () => {
+    setViewOption("memberId");
+    setFilteredData([]);
     setCurrentPage(1);
   };
 
-  const handleView20Directs = () => {
-    setViewOption("20directs");
-    const filtered = simulatedDirects.filter((data) => data.directCount >= 20);
-    setFilteredData(filtered);
-    setCurrentPage(1);
-  };
-
-  const handleViewCustomDirects = () => {
-    if (!customDirectCount || customDirectCount <= 0) {
-      return toast.error("Please enter a valid number of directs.");
+  const getByMemberId = () => {
+    if (!filterId) {
+      return toast.error("Please enter a Member ID.");
     }
 
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= customDirectCount
+    const filtered = simulatedReTopups.filter(
+      (data) => data.memberId === filterId
     );
     if (filtered.length === 0) {
-      toast.error("No directs found for the specified count.");
+      toast.error("No data found for the specified Member ID.");
       return;
     }
 
     setFilteredData(filtered);
     setCurrentPage(1);
-    toast.success("Directs fetched successfully.");
+    toast.success("Data fetched successfully.");
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -92,63 +100,37 @@ export default function ViewDirects() {
       {/* Card 1 */}
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle>VIEW DIRECTS</CardTitle>
+          <CardTitle>VIEW RE-TOPUPS</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
             className={`font-bold ${
-              viewOption === "5directs" ? "bg-black text-white" : "border-black"
+              viewOption === "all" ? "bg-black text-white" : "border-black"
             }`}
-            onClick={handleView5Directs}
-            variant={viewOption === "5directs" ? "solid" : "outline"}
+            onClick={handleViewAll}
+            variant={viewOption === "all" ? "solid" : "outline"}
           >
-            View 5 Directs
+            View All
           </Button>
           <Button
             className={`font-bold ${
-              viewOption === "10directs"
-                ? "bg-black text-white"
-                : "border-black"
+              viewOption === "memberId" ? "bg-black text-white" : "border-black"
             }`}
-            onClick={handleView10Directs}
-            variant={viewOption === "10directs" ? "solid" : "outline"}
+            onClick={handleViewByMemberId}
+            variant={viewOption === "memberId" ? "solid" : "outline"}
           >
-            View 10 Directs
-          </Button>
-          <Button
-            className={`font-bold ${
-              viewOption === "20directs"
-                ? "bg-black text-white"
-                : "border-black"
-            }`}
-            onClick={handleView20Directs}
-            variant={viewOption === "20directs" ? "solid" : "outline"}
-          >
-            View 20 Directs
-          </Button>
-          <Button
-            className={`font-bold ${
-              viewOption === "customDirects"
-                ? "bg-black text-white"
-                : "border-black"
-            }`}
-            onClick={() => setViewOption("customDirects")}
-            variant={viewOption === "customDirects" ? "solid" : "outline"}
-          >
-            View Custom Directs
+            View by Member ID
           </Button>
         </CardContent>
-        {viewOption === "customDirects" && (
+        {viewOption === "memberId" && (
           <CardFooter className="flex flex-row space-x-4">
             <Input
-              type="number"
-              placeholder="Enter number of directs"
-              value={customDirectCount}
-              onChange={(e) => setCustomDirectCount(Number(e.target.value))}
+              type="text"
+              placeholder="Enter Member ID"
+              value={filterId}
+              onChange={(e) => setFilterId(e.target.value)}
             />
-            <Button onClick={handleViewCustomDirects}>
-              Get Custom Directs
-            </Button>
+            <Button onClick={getByMemberId}>Get by Member ID</Button>
           </CardFooter>
         )}
       </Card>
@@ -156,7 +138,7 @@ export default function ViewDirects() {
       {/* Card 2 */}
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle className="text-lg font-bold">Directs Report</CardTitle>
+          <CardTitle className="text-lg font-bold">Re-Topups Report</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -170,10 +152,19 @@ export default function ViewDirects() {
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Member Name
+                    Old EPIN
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Direct Count
+                    New EPIN
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Old Package
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    New Package
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Re-Topup Date
                   </th>
                 </tr>
               </thead>
@@ -188,17 +179,26 @@ export default function ViewDirects() {
                         {data.memberId}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.memberName}
+                        {data.oldEpin}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.directCount}
+                        {data.newEpin}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.oldPackage}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.newPackage}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.retopupDate}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="7"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No data

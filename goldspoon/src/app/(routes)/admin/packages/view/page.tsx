@@ -73,7 +73,7 @@ export default function ViewPackage() {
         {/* View Options Card */}
         <Card>
           <CardHeader>
-            <CardTitle>View Packages</CardTitle>
+            <CardTitle>VIEW PACKAGES</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex space-x-4">

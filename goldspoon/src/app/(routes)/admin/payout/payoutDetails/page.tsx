@@ -123,7 +123,7 @@ export default function ViewMonthlyPayout() {
         {/* View Options Card */}
         <Card>
           <CardHeader>
-            <CardTitle>View Monthly Payout Details</CardTitle>
+            <CardTitle>VIEW MONTHLY PAYOUT DETAILS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex space-x-4">
@@ -178,7 +178,7 @@ export default function ViewMonthlyPayout() {
                     className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                   <Button className="w-full" onClick={getPayoutDetails}>
-                    Get Payout Details
+                    Get Monthly Payout Details
                   </Button>
                 </div>
               </div>
