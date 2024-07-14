@@ -101,7 +101,7 @@ export default function ViewDownline() {
             <Input
               id="memberName"
               type="text"
-              placeholder="Auto generated"
+              placeholder="Auto Generated"
               value={memberName}
               readOnly
               className="flex-1"
