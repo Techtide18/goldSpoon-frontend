@@ -192,7 +192,7 @@ export default function Report() {
             onClick={handleViewByReferralId}
             variant={viewOption === "referralId" ? "solid" : "outline"}
           >
-            View by Referral Memebr ID ↓
+            View by Referral Member ID ↓
           </Button>
         </CardContent>
         {viewOption === "referralId" && (
