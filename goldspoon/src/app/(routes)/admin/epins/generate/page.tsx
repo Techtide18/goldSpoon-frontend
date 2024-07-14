@@ -150,7 +150,7 @@ export default function GenerateEpin() {
               <Input
                 id="referralMemberName"
                 name="referralMemberName"
-                placeholder="Referral Member Name"
+                placeholder="Auto Generated"
                 value={referralMemberName}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"

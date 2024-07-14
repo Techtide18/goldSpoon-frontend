@@ -104,17 +104,6 @@ export default function RetopUpMember() {
               />
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="memberName">Member Name</Label>
-              <Input
-                id="memberName"
-                name="memberName"
-                placeholder="Member Name"
-                value={memberName}
-                readOnly
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="pinPackage">Package</Label>
               <Select
                 name="pinPackage"
@@ -132,6 +121,17 @@ export default function RetopUpMember() {
                   <SelectItem value="Package-2000">Package - 2000</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="memberName">Member Name</Label>
+              <Input
+                id="memberName"
+                name="memberName"
+                placeholder="Auto Generated"
+                value={memberName}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
             </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">

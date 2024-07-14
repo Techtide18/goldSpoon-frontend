@@ -103,7 +103,7 @@ export default function BlockMember() {
               <Input
                 id="memberName"
                 name="memberName"
-                placeholder="Member Name"
+                placeholder="Auto Generated"
                 value={memberName}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
