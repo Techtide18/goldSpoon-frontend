@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -12,74 +12,103 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
 
 // Simulated Data
-const simulatedGroupMembers = [
+const simulatedWithdrawalRequests = [
   {
-    id: 1,
+    requestId: "W001",
+    requestDate: "2024-06-15",
     memberId: "M001",
-    memberName: "Member 1",
-    isActive: true,
-    phone: "123-456-7890",
-    email: "member1@example.com",
+    memberName: "John Doe",
+    epinId: "E12345",
+    amountRequested: 100,
     groupName: "G12",
+    status: "pending",
   },
   {
-    id: 2,
+    requestId: "W002",
+    requestDate: "2024-07-01",
     memberId: "M002",
-    memberName: "Member 2",
-    isActive: false,
-    phone: "234-567-8901",
-    email: "member2@example.com",
+    memberName: "Jane Smith",
+    epinId: "E23456",
+    amountRequested: 200,
     groupName: "G12",
+    status: "approved",
   },
   {
-    id: 3,
+    requestId: "W003",
+    requestDate: "2024-07-10",
     memberId: "M003",
-    memberName: "Member 3",
-    isActive: true,
-    phone: "345-678-9012",
-    email: "member3@example.com",
+    memberName: "Alice Johnson",
+    epinId: "E34567",
+    amountRequested: 300,
     groupName: "G20",
+    status: "rejected",
   },
   {
-    id: 4,
+    requestId: "W004",
+    requestDate: "2024-07-15",
     memberId: "M004",
-    memberName: "Member 4",
-    isActive: true,
-    phone: "456-789-0123",
-    email: "member4@example.com",
+    memberName: "Bob Brown",
+    epinId: "E45678",
+    amountRequested: 150,
     groupName: "G12",
+    status: "pending",
   },
   // Add more data to test pagination
 ];
 
 const PAGE_SIZE = 100;
 
-export default function ViewGroupMembers() {
-  const [filterGroupName, setFilterGroupName] = useState("");
+export default function ViewWithdrawalRequests() {
+  const [viewOption, setViewOption] = useState("pending");
+  const [filterId, setFilterId] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getGroupMembers = () => {
-    if (!filterGroupName) {
-      return toast.error("Please enter a Group Name.");
+  useEffect(() => {
+    if (viewOption !== "memberId") {
+      filterData();
+    }
+  }, [viewOption]);
+
+  const handleViewOption = (option) => {
+    setViewOption(option);
+    setFilterId("");
+    setCurrentPage(1);
+    if (option !== "memberId") {
+      filterData(option);
+    }
+  };
+
+  const filterData = (option = viewOption) => {
+    let filtered = [];
+    if (option === "memberId" && filterId) {
+      filtered = simulatedWithdrawalRequests.filter(
+        (data) => data.memberId === filterId
+      );
+    } else {
+      filtered = simulatedWithdrawalRequests.filter(
+        (data) => data.status === option
+      );
     }
 
-    // Simulate fetching group members data from backend based on the entered Group Name
-    const filtered = simulatedGroupMembers.filter(
-      (data) => data.groupName === filterGroupName
-    );
-
     if (filtered.length === 0) {
-      toast.error("No members found for the specified group.");
+      toast.error("No data found for the specified filter.");
     } else {
-      toast.success("Group members data fetched successfully.");
+      toast.success("Data fetched successfully.");
     }
 
     setFilteredData(filtered);
     setCurrentPage(1);
+  };
+
+  const getByMemberId = () => {
+    if (!filterId) {
+      return toast.error("Please enter a Member ID.");
+    }
+
+    filterData();
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -93,32 +122,63 @@ export default function ViewGroupMembers() {
       {/* Card 1 */}
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle>VIEW MEMBERS IN GROUP</CardTitle>
+          <CardTitle>VIEW WITHDRAWAL REQUESTS</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col space-y-4">
-          <div className="flex flex-row items-center space-x-4">
-            <Label htmlFor="groupName" className="w-32">
-              Group Name:
-            </Label>
-            <Input
-              id="groupName"
-              type="text"
-              placeholder="Enter Group Name"
-              value={filterGroupName}
-              onChange={(e) => setFilterGroupName(e.target.value)}
-              className="flex-1"
-            />
-          </div>
-          <Button onClick={getGroupMembers} className="w-full">
-            View Members in Group
+        <CardContent className="flex flex-row space-x-4">
+          <Button
+            className={`font-bold ${
+              viewOption === "pending" ? "bg-black text-white" : "border-black"
+            }`}
+            onClick={() => handleViewOption("pending")}
+            variant={viewOption === "pending" ? "solid" : "outline"}
+          >
+            View Pending Requests
+          </Button>
+          <Button
+            className={`font-bold ${
+              viewOption === "approved" ? "bg-black text-white" : "border-black"
+            }`}
+            onClick={() => handleViewOption("approved")}
+            variant={viewOption === "approved" ? "solid" : "outline"}
+          >
+            View Approved Requests
+          </Button>
+          <Button
+            className={`font-bold ${
+              viewOption === "rejected" ? "bg-black text-white" : "border-black"
+            }`}
+            onClick={() => handleViewOption("rejected")}
+            variant={viewOption === "rejected" ? "solid" : "outline"}
+          >
+            View Rejected Requests
+          </Button>
+          <Button
+            className={`font-bold ${
+              viewOption === "memberId" ? "bg-black text-white" : "border-black"
+            }`}
+            onClick={() => handleViewOption("memberId")}
+            variant={viewOption === "memberId" ? "solid" : "outline"}
+          >
+            View Requests by Member ID
           </Button>
         </CardContent>
+        {viewOption === "memberId" && (
+          <CardFooter className="flex flex-row space-x-4">
+            <Input
+              type="text"
+              placeholder="Enter Member ID"
+              value={filterId}
+              onChange={(e) => setFilterId(e.target.value)}
+            />
+            <Button onClick={getByMemberId}>Get by Member ID</Button>
+          </CardFooter>
+        )}
       </Card>
 
       {/* Card 2 */}
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle className="text-lg font-bold">Group Members Report</CardTitle>
+          <CardTitle className="text-lg font-bold">Withdrawal Requests Report</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -129,19 +189,19 @@ export default function ViewGroupMembers() {
                     ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Withdrawal Request Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Member Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Is Active
+                    EPIN ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
+                    Amount Requested
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Group Name
@@ -153,7 +213,10 @@ export default function ViewGroupMembers() {
                   paginatedData.map((data, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {data.id}
+                        {(currentPage - 1) * PAGE_SIZE + index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.requestDate}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.memberId}
@@ -162,13 +225,10 @@ export default function ViewGroupMembers() {
                         {data.memberName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.isActive ? "Yes" : "No"}
+                        {data.epinId}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.phone}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.email}
+                        {data.amountRequested}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.groupName}

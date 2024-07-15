@@ -31,6 +31,7 @@ export default function GenerateEpin() {
     numberOfPins: "",
     pinPackage: "",
     referralMemberId: "",
+    group: "",
   });
 
   const [referralMemberName, setReferralMemberName] = useState("");
@@ -61,9 +62,9 @@ export default function GenerateEpin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { numberOfPins, pinPackage, referralMemberId } = formData;
+    const { numberOfPins, pinPackage, referralMemberId, group } = formData;
 
-    if (!numberOfPins || !pinPackage || !referralMemberId) {
+    if (!numberOfPins || !pinPackage || !referralMemberId || !group) {
       return toast.error("Please fill out all fields.");
     }
 
@@ -89,6 +90,7 @@ export default function GenerateEpin() {
       numberOfPins: "",
       pinPackage: "",
       referralMemberId: "",
+      group: "",
     });
   };
 
@@ -155,6 +157,26 @@ export default function GenerateEpin() {
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="group">Select Group</Label>
+              <Select
+                name="group"
+                value={formData.group}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, group: value })
+                }
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto-assign">Auto Assign</SelectItem>
+                  <SelectItem value="g12">g12 (10 slots remaining)</SelectItem>
+                  <SelectItem value="g20">g20 (2 slots remaining)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">

@@ -65,7 +65,10 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
         title: "Generate Payout",
         path: "/admin/payout/generatePayout",
       },
-      { title: "View Monthly Payout Details", path: "/admin/payout/payoutDetails" },
+      {
+        title: "View Monthly Payout Details",
+        path: "/admin/payout/payoutDetails",
+      },
       { title: "View Level Income", path: "/admin/payout/levelIncome" },
       { title: "View Renewal Income", path: "/admin/payout/renewalIncome" },
     ],
@@ -80,7 +83,6 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "Epin History", path: "/admin/reports/epinHistory" },
       { title: "View Downline", path: "/admin/reports/downline" },
-
     ],
   },
   {
@@ -109,15 +111,16 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="heroicons:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View All Groups", path: "/admin/group/allGroups" },
+      { title: "Add", path: "/admin/group/add" },
+      { title: "View Groups", path: "/admin/group/allGroups" },
       {
-        title: "View All Members By Groups",
-        path: "/admin/group/members",
+        title: "View All Members In Group",
+        path: "/admin/group/allMembers",
       },
-      { title: "Add Groups", path: "/admin/group/addGroup" },
     ],
   },
 ];
+
 export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   {
     title: "Home",
