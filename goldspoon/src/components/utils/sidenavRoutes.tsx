@@ -81,7 +81,6 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     subMenuItems: [
       { title: "View Directs", path: "/admin/reports/viewDirects" },
       { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
-      { title: "Epin History", path: "/admin/reports/epinHistory" },
       { title: "View Downline", path: "/admin/reports/downline" },
     ],
   },
