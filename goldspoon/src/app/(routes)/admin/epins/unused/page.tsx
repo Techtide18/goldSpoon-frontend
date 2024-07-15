@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner";
 
 // Simulated Data
 const simulatedData = [
@@ -144,11 +145,13 @@ export default function Report() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(simulatedData);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
+    setFilteredData(simulatedData);
   };
 
   const handleViewByReferralId = () => {
@@ -156,10 +159,24 @@ export default function Report() {
     setCurrentPage(1);
   };
 
-  const filteredData =
-    viewOption === "referralId" && filterId
-      ? simulatedData.filter((data) => data.referralMemberId === filterId)
-      : simulatedData;
+  const getEpinByReferralId = () => {
+    if (!filterId) {
+      toast.error("Please enter a Referral Member ID.");
+      return;
+    }
+
+    const filtered = simulatedData.filter(
+      (data) => data.referralMemberId === filterId
+    );
+
+    if (filtered.length === 0) {
+      toast.error("No data found for the specified Referral Member ID.");
+      return;
+    }
+
+    setFilteredData(filtered);
+    toast.success("E-PIN data fetched successfully.");
+  };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const paginatedData = filteredData.slice(
@@ -202,6 +219,7 @@ export default function Report() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
+            <Button onClick={getEpinByReferralId}>Get E-PINs</Button>
           </CardFooter>
         )}
       </Card>

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner";
 
 // Simulated Data
 const simulatedData = [
@@ -14,48 +15,48 @@ const simulatedData = [
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123456",
-    group:"G12",
-    tokenNumber:"98",
+    group: "G12",
+    tokenNumber: "98",
   },
   {
     EpinID: "EPN123457",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123457",
-    group:"G12",
-    tokenNumber:"12",
+    group: "G12",
+    tokenNumber: "12",
   },
   {
     EpinID: "EPN123458",
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123458",
-    group:"G16",
-    tokenNumber:"2",
+    group: "G16",
+    tokenNumber: "2",
   },
   {
     EpinID: "EPN123459",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123459",
-    group:"G12",
-    tokenNumber:"98",
+    group: "G12",
+    tokenNumber: "98",
   },
   {
     EpinID: "EPN123460",
     packageName: "Package - 1500",
     createdDate: "13-07-2024",
     referralMemberId: "REF123460",
-    group:"G12",
-    tokenNumber:"98",
+    group: "G12",
+    tokenNumber: "98",
   },
   {
     EpinID: "EPN123461",
     packageName: "Package - 2000",
     createdDate: "13-07-2024",
     referralMemberId: "REF123461",
-    group:"G12",
-    tokenNumber:"98",
+    group: "G12",
+    tokenNumber: "98",
   },
   {
     EpinID: "EPN123462",
@@ -150,11 +151,13 @@ export default function Report() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(simulatedData);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
+    setFilteredData(simulatedData);
   };
 
   const handleViewByReferralId = () => {
@@ -162,29 +165,53 @@ export default function Report() {
     setCurrentPage(1);
   };
 
-  const filteredData = viewOption === "referralId" && filterId
-    ? simulatedData.filter((data) => data.referralMemberId === filterId)
-    : simulatedData;
+  const getEpinByReferralId = () => {
+    if (!filterId) {
+      toast.error("Please enter a Referral Member ID.");
+      return;
+    }
+
+    const filtered = simulatedData.filter(
+      (data) => data.referralMemberId === filterId
+    );
+
+    if (filtered.length === 0) {
+      toast.error("No data found for the specified Referral Member ID.");
+      return;
+    }
+
+    setFilteredData(filtered);
+    toast.success("E-PIN data fetched successfully.");
+  };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle >VIEW USED EPINs</CardTitle>
+          <CardTitle>VIEW USED EPINs</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
-            className={`font-bold ${viewOption === "all" ? "bg-black text-white" : "border-black"}`}
+            className={`font-bold ${
+              viewOption === "all" ? "bg-black text-white" : "border-black"
+            }`}
             onClick={handleViewAll}
             variant={viewOption === "all" ? "solid" : "outline"}
           >
             View All
           </Button>
           <Button
-            className={`font-bold ${viewOption === "referralId" ? "bg-black text-white" : "border-black"}`}
+            className={`font-bold ${
+              viewOption === "referralId"
+                ? "bg-black text-white"
+                : "border-black"
+            }`}
             onClick={handleViewByReferralId}
             variant={viewOption === "referralId" ? "solid" : "outline"}
           >
@@ -198,6 +225,7 @@ export default function Report() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
+            <Button onClick={getEpinByReferralId}>Get E-PINs</Button>
           </CardFooter>
         )}
       </Card>
@@ -210,25 +238,60 @@ export default function Report() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Epin ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Member ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token Number (In Group) </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Epin ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Package Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Referral Member ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Group
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Token Number (In Group)
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((data, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.referralMemberId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.group}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.tokenNumber}</td>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((data, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {data.EpinID}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.packageName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.createdDate}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.referralMemberId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.group}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.tokenNumber}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
+                  >
+                    No data
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>
@@ -256,7 +319,9 @@ export default function Report() {
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             Next 100

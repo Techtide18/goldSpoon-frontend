@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner";
 
 // Simulated Data
 const simulatedData = [
@@ -82,11 +83,13 @@ export default function ViewMembers() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(simulatedData);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
+    setFilteredData(simulatedData);
   };
 
   const handleViewByMemberId = () => {
@@ -94,9 +97,22 @@ export default function ViewMembers() {
     setCurrentPage(1);
   };
 
-  const filteredData = viewOption === "memberId" && filterId
-    ? simulatedData.filter((data) => data.memberId === filterId)
-    : simulatedData;
+  const getMemberByMemberId = () => {
+    if (!filterId) {
+      toast.error("Please enter a Member ID.");
+      return;
+    }
+
+    const filtered = simulatedData.filter((data) => data.memberId === filterId);
+
+    if (filtered.length === 0) {
+      toast.error("No data found for the specified Member ID.");
+      return;
+    }
+
+    setFilteredData(filtered);
+    toast.success("Member data fetched successfully.");
+  };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -130,84 +146,92 @@ export default function ViewMembers() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
+            <Button onClick={getMemberByMemberId}>Get Member</Button>
           </CardFooter>
         )}
       </Card>
 
       <Card className="w-full max-w-7xl mb-4">
-  <CardHeader>
-    <CardTitle className="text-lg font-bold">Members Report</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Name</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member ID</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aadhaar Number</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PAN Number</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account Details</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {paginatedData.map((data, index) => (
-            <tr key={index}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.memberName}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.phone}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.gender}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.aadhaarNumber}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.panNumber}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.bankAccDetails}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </CardContent>
-  <CardFooter className="flex justify-center space-x-2">
-    <Pagination
-      count={totalPages}
-      page={currentPage}
-      onChange={(e, page) => setCurrentPage(page)}
-      siblingCount={1}
-      boundaryCount={1}
-      size="large"
-      shape="rounded"
-      variant="outlined"
-      color="primary"
-      className="mt-4"
-      showFirstButton
-      showLastButton
-    />
-    <Button
-      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-    >
-      Previous 100
-    </Button>
-    <Button
-      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-    >
-      Next 100
-    </Button>
-  </CardFooter>
-</Card>
-
+        <CardHeader>
+          <CardTitle className="text-lg font-bold">Members Report</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aadhaar Number</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PAN Number</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account Details</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((data, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.memberName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.phone}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.gender}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.aadhaarNumber}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.panNumber}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.bankAccDetails}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="11" className="px-6 py-4 text-center text-sm text-gray-500">
+                      No data
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-center space-x-2">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, page) => setCurrentPage(page)}
+            siblingCount={1}
+            boundaryCount={1}
+            size="large"
+            shape="rounded"
+            variant="outlined"
+            color="primary"
+            className="mt-4"
+            showFirstButton
+            showLastButton
+          />
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous 100
+          </Button>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next 100
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

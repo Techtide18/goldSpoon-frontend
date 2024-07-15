@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner";
 
 // Simulated Data
 const simulatedData = [
@@ -106,11 +107,13 @@ export default function InstallmentsPaid() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(simulatedData);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
+    setFilteredData(simulatedData);
   };
 
   const handleViewByMemberId = () => {
@@ -118,9 +121,22 @@ export default function InstallmentsPaid() {
     setCurrentPage(1);
   };
 
-  const filteredData = viewOption === "memberId" && filterId
-    ? simulatedData.filter((data) => data.memberId === filterId)
-    : simulatedData;
+  const getInstallmentsByMemberId = () => {
+    if (!filterId) {
+      toast.error("Please enter a Member ID.");
+      return;
+    }
+
+    const filtered = simulatedData.filter((data) => data.memberId === filterId);
+
+    if (filtered.length === 0) {
+      toast.error("No data found for the specified Member ID.");
+      return;
+    }
+
+    setFilteredData(filtered);
+    toast.success("Installment data fetched successfully.");
+  };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -132,7 +148,7 @@ export default function InstallmentsPaid() {
           <CardTitle>VIEW INSTALLMENTS PAID</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
-        <Button
+          <Button
             className={`font-bold ${
               viewOption === "all" ? "bg-black text-white" : "border-black"
             }`}
@@ -143,12 +159,10 @@ export default function InstallmentsPaid() {
           </Button>
           <Button
             className={`font-bold ${
-              viewOption === "referralId"
-                ? "bg-black text-white"
-                : "border-black"
+              viewOption === "memberId" ? "bg-black text-white" : "border-black"
             }`}
             onClick={handleViewByMemberId}
-            variant={viewOption === "referralId" ? "solid" : "outline"}
+            variant={viewOption === "memberId" ? "solid" : "outline"}
           >
             View by Member ID ↓
           </Button>
@@ -160,6 +174,7 @@ export default function InstallmentsPaid() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
+            <Button onClick={getInstallmentsByMemberId}>Get Installments</Button>
           </CardFooter>
         )}
       </Card>
@@ -182,17 +197,28 @@ export default function InstallmentsPaid() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((data, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.installmentMonth}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.installmentPaidDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.amountPaid}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.transactionId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.paymentMethod}</td>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((data, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.EpinID}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.installmentMonth}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.installmentPaidDate}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.amountPaid}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.transactionId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.paymentMethod}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
+                  >
+                    No data
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>
