@@ -57,8 +57,8 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="flex justify-center items-center py-8 px-4 bg-gray-100 min-h-screen">
-      <div className="w-full max-w-5xl">
+    <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
+      <div className="w-full max-w-5xl mt-4">
         {/* Profile Card */}
         <Card className="shadow-lg rounded-lg overflow-hidden">
           <CardHeader className="bg-blue-600 text-white">

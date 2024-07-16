@@ -127,6 +127,12 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="lucide:home" width="24" height="24" />,
   },
   {
+    title: "My Epin",
+    path: "/user/myEpin",
+    icon: <Icon icon="lucide:mail" width="24" height="24" />,
+    submenu: false,
+  },
+  {
     title: "Profile",
     path: "/user/profile",
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
@@ -143,9 +149,9 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
+      { title: "My Re-topups", path: "/user/epins/myRetopups" },
       { title: "Used", path: "/user/epins/used" },
       { title: "Unused", path: "/user/epins/unused" },
-      { title: "My Re-topups", path: "/user/epins/myRetopups" },
     ],
   },
   {
@@ -155,7 +161,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "View All", path: "/user/myTeam/byAll" },
-      { title: "View By Level", path: "/user/myTeam/byLevel" },
+      { title: "View Count", path: "/user/myTeam/byCount" },
       { title: "Pay For Member", path: "/user/myTeam/pay" },
     ],
   },
@@ -180,7 +186,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     subMenuItems: [
       { title: "My Installments", path: "/user/installments/myInstallments" },
       {
-        title: "My Team's Installments",
+        title: "Direct Team's Installments",
         path: "/user/installments/myTeam",
       },
     ],

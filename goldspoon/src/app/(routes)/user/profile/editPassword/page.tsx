@@ -17,27 +17,34 @@ export default function ViewPassword() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return toast.error("All fields are required.");
+    }
 
     if (newPassword !== confirmPassword) {
       return toast.error("New password and confirm password do not match.");
     }
 
-    // Simulate an API call to update password
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmUpdate = async () => {
+    setIsConfirmDialogOpen(false);
     const toastId = toast.loading("Updating Password...");
     await new Promise((resolve) => setTimeout(resolve, 800));
-
     toast.success("Password updated successfully!", { id: toastId });
-
-    setIsDialogOpen(true);
+    setIsSuccessDialogOpen(true);
   };
 
   return (
-    <div className="flex justify-center items-center py-8 px-4 bg-gray-100 min-h-screen">
-      <div className="w-full max-w-5xl">
+    <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
+      <div className="w-full max-w-5xl mt-4">
         {/* Password Card */}
         <Card className="shadow-lg rounded-lg overflow-hidden">
           <CardHeader className="bg-blue-600 text-white">
@@ -57,8 +64,9 @@ export default function ViewPassword() {
                   name="oldPassword"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  type="text"
+                  type="password"
                   className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  required
                 />
               </div>
               <div className="flex items-center gap-4">
@@ -73,8 +81,9 @@ export default function ViewPassword() {
                   name="newPassword"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  type="text"
+                  type="password"
                   className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  required
                 />
               </div>
               <div className="flex items-center gap-4">
@@ -91,6 +100,7 @@ export default function ViewPassword() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
                   className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  required
                 />
               </div>
               <div className="mt-12">
@@ -102,9 +112,33 @@ export default function ViewPassword() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Confirm Update Dialog */}
       <Dialog
-        open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        open={isConfirmDialogOpen}
+        onOpenChange={(open) => setIsConfirmDialogOpen(open)}
+        className="mt-8 mb-8"
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Confirm Password Update</DialogTitle>
+          <DialogDescription>
+            <div className="mt-4 space-y-2">
+              <p>Are you sure you want to update your password?</p>
+            </div>
+          </DialogDescription>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleConfirmUpdate}>
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={isSuccessDialogOpen}
+        onOpenChange={(open) => setIsSuccessDialogOpen(open)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
@@ -114,7 +148,7 @@ export default function ViewPassword() {
               <p>Password updated successfully!</p>
             </div>
           </DialogDescription>
-          <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+          <Button onClick={() => setIsSuccessDialogOpen(false)}>Close</Button>
         </DialogContent>
       </Dialog>
     </div>
