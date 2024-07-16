@@ -165,6 +165,11 @@ export default function Report() {
     setCurrentPage(1);
   };
 
+  const handleViewByMemberId = () => {
+    setViewOption("memberId");
+    setCurrentPage(1);
+  };
+
   const getEpinByReferralId = () => {
     if (!filterId) {
       toast.error("Please enter a Referral Member ID.");
@@ -217,6 +222,17 @@ export default function Report() {
           >
             View by Referral Member ID ↓
           </Button>
+          <Button
+            className={`font-bold ${
+              viewOption === "memberId"
+                ? "bg-black text-white"
+                : "border-black"
+            }`}
+            onClick={handleViewByMemberId}
+            variant={viewOption === "memberId" ? "solid" : "outline"}
+          >
+            View by Member ID ↓
+          </Button>
         </CardContent>
         {viewOption === "referralId" && (
           <CardFooter className="flex flex-row space-x-4">
@@ -242,6 +258,9 @@ export default function Report() {
                   Epin ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Member ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Package Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -264,6 +283,9 @@ export default function Report() {
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {data.EpinID}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.memberId}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.packageName}
