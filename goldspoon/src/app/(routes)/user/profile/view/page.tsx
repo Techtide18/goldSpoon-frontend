@@ -21,16 +21,25 @@ export default function ViewProfile() {
 
   return (
     <div className="flex justify-center items-center py-8 px-4 bg-gray-100 min-h-screen">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-5xl">
         {/* Profile Card */}
         <Card className="shadow-lg rounded-lg overflow-hidden">
-          <CardHeader className="bg-blue-500 text-white">
+          <CardHeader className="bg-blue-600 text-white">
             <CardTitle className="text-2xl font-bold">VIEW PROFILE</CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
             {Object.entries(profile).map(([key, value]) => (
-              <div className="flex justify-between items-center py-2 border-b border-gray-200" key={key}>
-                <span className="font-semibold text-md capitalize">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).replace("Id", "ID")}:</span>
+              <div
+                className="flex justify-between items-center py-2 border-b border-gray-200"
+                key={key}
+              >
+                <span className="font-semibold text-md capitalize">
+                  {key
+                    .replace(/([A-Z])/g, " $1")
+                    .replace(/^./, (str) => str.toUpperCase())
+                    .replace("Id", "ID")}
+                  :
+                </span>
                 <span className="text-gray-700 text-md">{value}</span>
               </div>
             ))}
