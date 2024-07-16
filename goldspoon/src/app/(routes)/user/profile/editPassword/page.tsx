@@ -64,7 +64,6 @@ export default function ViewPassword() {
                   name="oldPassword"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  type="password"
                   className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   required
                 />
@@ -81,7 +80,6 @@ export default function ViewPassword() {
                   name="newPassword"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  type="password"
                   className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   required
                 />
