@@ -71,6 +71,9 @@ export default function ViewWithdrawalRequests() {
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Admin Charges (10%)
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -86,6 +89,9 @@ export default function ViewWithdrawalRequests() {
                       {data.amount}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {(data.amount * 0.1).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.status}
                     </td>
                   </tr>
@@ -93,7 +99,7 @@ export default function ViewWithdrawalRequests() {
               ) : (
                 <tr>
                   <td
-                    colSpan="3"
+                    colSpan="4"
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
                     No data
