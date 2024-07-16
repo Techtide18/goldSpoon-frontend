@@ -139,13 +139,13 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   },
   {
     title: "E-Pins",
-    path: "/user/epin",
+    path: "/user/epins",
     icon: <Icon icon="lucide:mail" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "Used", path: "/user/epin/used" },
-      { title: "Unused", path: "/user/epin/unused" },
-      { title: "History", path: "/user/epin/history" },
+      { title: "Used", path: "/user/epins/used" },
+      { title: "Unused", path: "/user/epins/unused" },
+      { title: "My Re-topups", path: "/user/epins/myRetopups" },
     ],
   },
   {
@@ -160,15 +160,32 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "Monthly Payout",
-    path: "/user/payout",
+    title: "Payout Details",
+    path: "/user/payoutDetails",
     icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "View Renewal Income", path: "/user/payout/renewalIncome" },
-      { title: "View Level Income", path: "/user/payout/levelIncome" },
+      {
+        title: "View Renewal Income",
+        path: "/user/payoutDetails/renewalIncome",
+      },
+      { title: "View Level Income", path: "/user/payoutDetails/levelIncome" },
     ],
   },
+  {
+    title: "Installments",
+    path: "/user/installments",
+    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "My Installments", path: "/user/installments/myInstallments" },
+      {
+        title: "My Team's Installments",
+        path: "/user/installments/myTeam",
+      },
+    ],
+  },
+
   {
     title: "Wallet",
     path: "/user/wallet",

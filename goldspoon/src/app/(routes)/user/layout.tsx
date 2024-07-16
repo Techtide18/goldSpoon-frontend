@@ -5,11 +5,14 @@ import Header from '@/components/cards/header';
 import MarginWidthWrapper from '@/components/cards/margin-width-wrapper';
 import PageWrapper from '@/components/cards/page-wrapper';
 import SideNav from '@/components/cards/side-nav';
+import { auth } from '@/auth'; // Adjust the import path as needed
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
+
   return (
     <div className="flex">
-      <SideNav />
+      <SideNav session={session} />
       <main className="flex-1">
         <MarginWidthWrapper>
           <Header />

@@ -1,14 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SIDENAV_ITEMS_ADMIN } from "../utils/sidenavRoutes";
-import { SideNavItem } from "../utils/dtos";
+import { SIDENAV_ITEMS_ADMIN, SIDENAV_ITEMS_USER } from "../utils/sidenavRoutes";
+import { SideNavItem, Session } from "../utils/dtos";
 import { Icon } from "@iconify/react";
-import { Session } from "../utils/dtos";
 
 const SideNav = ({ session }: { session: Session }) => {
+  const [sideNavItems, setSideNavItems] = useState<SideNavItem[]>([]);
+
+  useEffect(() => {
+    if (session?.user?.role === "admin") {
+      setSideNavItems(SIDENAV_ITEMS_ADMIN);
+    } else if (session?.user?.role === "user") {
+      setSideNavItems(SIDENAV_ITEMS_USER);
+    }
+    console.log("ds2",session?.user?.role);
+  }, [session]);
+
   return (
     <div className="md:w-72 bg-white h-screen flex-1 fixed border-r border-zinc-200 hidden md:flex overflow-y-auto">
       <div className="flex flex-col w-full h-full">
@@ -22,7 +32,7 @@ const SideNav = ({ session }: { session: Session }) => {
           </div>
         </div>
         <div className="flex flex-col space-y-2 mt-16 pt-6 md:px-6 flex-1 pb-4">
-          {SIDENAV_ITEMS_ADMIN.map((item, idx) => (
+          {sideNavItems.length > 0 && sideNavItems.map((item, idx) => (
             <MenuItem key={idx} item={item} />
           ))}
         </div>
@@ -30,8 +40,6 @@ const SideNav = ({ session }: { session: Session }) => {
     </div>
   );
 };
-
-export default SideNav;
 
 const MenuItem = ({ item }: { item: SideNavItem }) => {
   const pathname = usePathname();
@@ -94,3 +102,5 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
     </div>
   );
 };
+
+export default SideNav;
