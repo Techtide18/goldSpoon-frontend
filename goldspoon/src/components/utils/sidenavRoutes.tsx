@@ -11,7 +11,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
   {
     title: "E-Pins",
     path: "/admin/epins",
-    icon: <Icon icon="lucide:folder" width="24" height="24" />,
+    icon: <Icon icon="lucide:shopping-cart" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "Generate", path: "/admin/epins/generate" },
@@ -22,7 +22,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
   {
     title: "Installments",
     path: "/admin/intallments",
-    icon: <Icon icon="lucide:mail" width="24" height="24" />,
+    icon: <Icon icon="mingcute:card-pay-line" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "Add", path: "/admin/installments/add" },
@@ -33,7 +33,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
   {
     title: "Members",
     path: "/admin/members",
-    icon: <Icon icon="fa-solid:users" width="24" height="24" />,
+    icon: <Icon icon="lucide:book-user" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View", path: "/admin/members/view" },
@@ -47,7 +47,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
   {
     title: "Packages",
     path: "/admin/packages",
-    icon: <Icon icon="tabler:packages" width="24" height="24" />,
+    icon: <Icon icon="lucide:blocks" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View", path: "/admin/packages/view" },
@@ -56,9 +56,23 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     ],
   },
   {
+    title: "Groups",
+    path: "/admin/group",
+    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "Add", path: "/admin/group/add" },
+      { title: "View Groups", path: "/admin/group/allGroups" },
+      {
+        title: "View All Members In Group",
+        path: "/admin/group/allMembers",
+      },
+    ],
+  },
+  {
     title: "Payout",
     path: "/admin/payout",
-    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    icon: <Icon icon="lucide:badge-indian-rupee" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       {
@@ -74,20 +88,9 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     ],
   },
   {
-    title: "Reports",
-    path: "/admin/reports",
-    icon: <Icon icon="tabler:report" width="24" height="24" />,
-    submenu: true,
-    subMenuItems: [
-      { title: "View Directs", path: "/admin/reports/viewDirects" },
-      { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
-      { title: "View Downline", path: "/admin/reports/downline" },
-    ],
-  },
-  {
     title: "Wallet",
     path: "/admin/wallet",
-    icon: <Icon icon="heroicons:wallet" width="24" height="24" />,
+    icon: <Icon icon="lucide:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       {
@@ -105,17 +108,14 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     ],
   },
   {
-    title: "Group",
-    path: "/admin/group",
-    icon: <Icon icon="heroicons:wallet" width="24" height="24" />,
+    title: "Reports",
+    path: "/admin/reports",
+    icon: <Icon icon="tabler:report" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "Add", path: "/admin/group/add" },
-      { title: "View Groups", path: "/admin/group/allGroups" },
-      {
-        title: "View All Members In Group",
-        path: "/admin/group/allMembers",
-      },
+      { title: "View Directs", path: "/admin/reports/viewDirects" },
+      { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
+      { title: "View Downline", path: "/admin/reports/downline" },
     ],
   },
 ];
@@ -129,13 +129,13 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   {
     title: "My Epin",
     path: "/user/myEpin",
-    icon: <Icon icon="lucide:mail" width="24" height="24" />,
+    icon: <Icon icon="lucide:notebook" width="24" height="24" />,
     submenu: false,
   },
   {
     title: "Profile",
     path: "/user/profile",
-    icon: <Icon icon="lucide:mail" width="24" height="24" />,
+    icon: <Icon icon="lucide:user-round-pen" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View Profile", path: "/user/profile/view" },
@@ -144,20 +144,9 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "E-Pins",
-    path: "/user/epins",
-    icon: <Icon icon="lucide:mail" width="24" height="24" />,
-    submenu: true,
-    subMenuItems: [
-      { title: "My Re-topups", path: "/user/epins/myRetopups" },
-      { title: "Used", path: "/user/epins/used" },
-      { title: "Unused", path: "/user/epins/unused" },
-    ],
-  },
-  {
     title: "My Team",
     path: "/user/myTeam",
-    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View All", path: "/user/myTeam/byAll" },
@@ -166,9 +155,20 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
+    title: "E-Pins",
+    path: "/user/epins",
+    icon: <Icon icon="lucide:shopping-cart" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "My Re-topups", path: "/user/epins/myRetopups" },
+      { title: "Used", path: "/user/epins/used" },
+      { title: "Unused", path: "/user/epins/unused" },
+    ],
+  },
+  {
     title: "Payout Details",
     path: "/user/payoutDetails",
-    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    icon: <Icon icon="lucide:badge-indian-rupee" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       {
@@ -181,7 +181,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   {
     title: "Installments",
     path: "/user/installments",
-    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    icon: <Icon icon="mingcute:card-pay-line" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "My Installments", path: "/user/installments/myInstallments" },
@@ -195,7 +195,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
   {
     title: "Wallet",
     path: "/user/wallet",
-    icon: <Icon icon="mingcute:card-pay-fill" width="24" height="24" />,
+    icon: <Icon icon="lucide:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View Wallet Details", path: "/user/wallet/walletDetails" },

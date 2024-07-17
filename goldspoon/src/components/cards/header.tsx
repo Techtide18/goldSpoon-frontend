@@ -33,11 +33,14 @@ const Header = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-      {/* <span className="text-gray-800">Logout</span> */}
-          <Link href="/api/auth/signout" className="flex items-center space-x-2">
+          {/* <span className="text-gray-800">Logout</span> */}
+          <Link
+            href="/api/auth/signout"
+            className="flex items-center space-x-2"
+          >
             <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-center shadow-md transform transition-transform duration-200 hover:translate-x-[-8px] hover:shadow-lg">
               <Icon
-                icon="mdi:logout"
+                icon="mdi:power"
                 width="24"
                 height="24"
                 className="text-gray-800"
