@@ -1,45 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedPackages = [
-  {
-    packageName: "Basic Plan",
-    packagePrice: "1000",
-    description: "This is the basic plan.",
-    duration: "6",
-    createdDate: "2024-01-01",
-  },
-  {
-    packageName: "Premium Plan",
-    packagePrice: "2000",
-    description: "This is the premium plan.",
-    duration: "12",
-    createdDate: "2024-02-01",
-  },
-  // Add more packages for testing
-];
-
 export default function ViewPackage() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [packageName, setPackageName] = useState("");
-  const [filteredPackages, setFilteredPackages] = useState(simulatedPackages);
+  const [filteredPackages, setFilteredPackages] = useState([]);
+
+  const fetchPackages = async () => {
+    console.log("fetchPackages called");
+    try {
+      const response = await axios.get("http://localhost:8080/admin/packages", {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          "adminMemberId": 1,
+        },
+      });
+      setFilteredPackages(response.data);
+    } catch (error) {
+      console.error('Failed to fetch packages:', error);
+      toast.error("Failed to load packages.");
+    }
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
-    setFilteredPackages(simulatedPackages);
+    fetchPackages();
     setPackageName("");
   };
 
@@ -56,7 +54,7 @@ export default function ViewPackage() {
       return toast.error("Please enter a Package Name.");
     }
 
-    const packageData = simulatedPackages.filter(
+    const packageData = filteredPackages.filter(
       (pkg) => pkg.packageName.toLowerCase() === packageName.toLowerCase()
     );
 

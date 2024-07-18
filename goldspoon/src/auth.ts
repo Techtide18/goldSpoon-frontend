@@ -11,7 +11,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
       authorize: async (credentials) => {
         //api hit {
-        const user = { id: 100, name: "enz", password: "1234", role: "user" };
+        const user = { id: 100, name: "enz", password: "1234", role: "admin" };
         if (
           credentials?.memberId === user.name &&
           credentials?.password === user.password

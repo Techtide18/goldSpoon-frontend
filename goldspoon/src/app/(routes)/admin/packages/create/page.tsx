@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"; // Assuming Textarea component exists
 import { toast } from "sonner";
+import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -34,27 +35,50 @@ export default function CreatePackage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { packageName, packagePrice, description, packageDuration } = formData;
+    const { packageName, packagePrice, description, packageDuration } =
+      formData;
 
     if (!packageName || !packagePrice || !description || !packageDuration) {
       return toast.error("Please fill out all fields.");
     }
 
     const toastId = toast.loading("Creating Package...");
-    // Simulate API call to create package
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("Package created successfully!", {
-      id: toastId,
-    });
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/admin/package",
+        {
+          packageName,
+          packagePrice: parseInt(packagePrice, 10),
+          description,
+          packageDurationInMonths: parseInt(packageDuration, 10),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+            adminMemberId: 1,
+          },
+        }
+      );
 
-    setIsDialogOpen(true);
-    setFormData({
-      packageName: "",
-      packagePrice: "",
-      description: "",
-      packageDuration: "", // Reset package duration
-    });
+      toast.success("Package created successfully!", {
+        id: toastId,
+      });
+
+      setIsDialogOpen(true);
+      setFormData({
+        packageName: "",
+        packagePrice: "",
+        description: "",
+        packageDuration: "",
+      });
+    } catch (error) {
+      console.log("err", error);
+      toast.error(error.response.data.message || "Failed to create package", {
+        id: toastId,
+      });
+    }
   };
 
   return (
