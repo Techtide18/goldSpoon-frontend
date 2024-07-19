@@ -182,7 +182,7 @@ export default function GenerateEpin() {
               />
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="pinPackage">Package</Label>
+              <Label htmlFor="pinPackage">Select Package</Label>
               <Select
                 name="pinPackage"
                 value={formData.pinPackage}
