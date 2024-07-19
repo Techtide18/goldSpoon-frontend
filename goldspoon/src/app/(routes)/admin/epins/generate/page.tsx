@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,19 +35,46 @@ export default function GenerateEpin() {
     group: "",
   });
 
+  const [packages, setPackages] = useState([]);
+  const [packagesLoaded, setPackagesLoaded] = useState(false);
+  const [selectedPackageName, setSelectedPackageName] = useState("");
   const [referralMemberName, setReferralMemberName] = useState("");
   const [generatedPins, setGeneratedPins] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const fetchPackages = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/admin/packages", {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          adminMemberId: 1,
+        },
+      });
+      setPackages(response.data);
+      setPackagesLoaded(true);
+      console.log("Fetched packages:", response.data); // Debugging line
+    } catch (error) {
+      console.error("Error fetching packages:", error);
+      toast.error("Failed to fetch packages.");
+    }
+  };
+
   useEffect(() => {
+    const fetchMemberName = async (id) => {
+      try {
+        const response = await axios.get(`http://localhost:8080/member/${id}`);
+        const member = response.data;
+        setReferralMemberName(member.fullName || "");
+      } catch (error) {
+        console.error("Error fetching member details:", error);
+        setReferralMemberName("");
+        toast.error("Failed to fetch referral member details.");
+      }
+    };
+
     if (formData.referralMemberId) {
-      // Simulate an API call to fetch the referral member name
-      setTimeout(() => {
-        const randomNames = ["John Doe", "Jane Smith", "Alice Johnson"];
-        const randomName =
-          randomNames[Math.floor(Math.random() * randomNames.length)];
-        setReferralMemberName(randomName);
-      }, 500);
+      fetchMemberName(formData.referralMemberId);
     } else {
       setReferralMemberName("");
     }
@@ -58,6 +86,21 @@ export default function GenerateEpin() {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handlePackageChange = (value) => {
+    console.log("Selected package ID:", value); // Debugging line
+    const selectedPackage = packages.find(pkg => pkg.id == value);
+    console.log("selectedPackage", selectedPackage); // Debugging line
+    setFormData({
+      ...formData,
+      pinPackage: value,
+    });
+    if (selectedPackage) {
+      setSelectedPackageName(selectedPackage.packageName);
+    } else {
+      setSelectedPackageName("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -73,25 +116,47 @@ export default function GenerateEpin() {
     }
 
     const toastId = toast.loading("Generating E-PIN...");
-    // Simulate API call to generate E-PINs
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/admin/epins/generate",
+        {
+          totalEpins: numberOfPins,
+          packageId: pinPackage,
+          referralMemberId: referralMemberId,
+          automaticGroupAssign: true,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+            adminMemberId: 1,
+          },
+        }
+      );
 
-    const newPins = Array.from(
-      { length: numberOfPins },
-      (_, i) => `PIN-${Math.floor(Math.random() * 1000000)}`
-    );
-    setGeneratedPins(newPins);
-    toast.success("E-PINs generated successfully!", {
-      id: toastId,
-    });
+      const newPins = response.data || []; // Ensure it's an array
+      setGeneratedPins(newPins);
+      console.log("newPins", newPins);
+      toast.success("E-PINs generated successfully!", {
+        id: toastId,
+      });
 
-    setIsDialogOpen(true);
-    setFormData({
-      numberOfPins: "",
-      pinPackage: "",
-      referralMemberId: "",
-      group: "",
-    });
+      setIsDialogOpen(true);
+      setFormData({
+        numberOfPins: "",
+        pinPackage: "",
+        referralMemberId: "",
+        group: "",
+      });
+      setSelectedPackageName("");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data || "Failed to generate E-PINs. Please try again.";
+      console.error("Error generating E-PINs:", errorMessage); // Log the error message
+      toast.error(errorMessage, {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -121,17 +186,25 @@ export default function GenerateEpin() {
               <Select
                 name="pinPackage"
                 value={formData.pinPackage}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, pinPackage: value })
-                }
+                onValueChange={handlePackageChange}
                 required
+                onOpenChange={(open) => {
+                  if (open && !packagesLoaded) {
+                    fetchPackages();
+                  }
+                }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Package" />
+                  <SelectValue className="text-black">
+                    {selectedPackageName || "Select Package"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Package-1500">Package - 1500</SelectItem>
-                  <SelectItem value="Package-2000">Package - 2000</SelectItem>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id}>
+                      {pkg.packageName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -198,9 +271,8 @@ export default function GenerateEpin() {
             it will not be generated again.
           </DialogDescription>
           <div className="space-y-2">
-            {generatedPins.map((pin, index) => (
-              <p key={index}>{pin}</p>
-            ))}
+            {Array.isArray(generatedPins) &&
+              generatedPins.map((pin, index) => <p key={index}>{pin}</p>)}
           </div>
           <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
         </DialogContent>
