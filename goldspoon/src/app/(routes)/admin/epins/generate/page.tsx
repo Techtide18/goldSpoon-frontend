@@ -55,9 +55,7 @@ export default function GenerateEpin() {
       });
       setPackages(response.data);
       setPackagesLoaded(true);
-      console.log("Fetched packages:", response.data); // Debugging line
     } catch (error) {
-      console.error("Error fetching packages:", error);
       toast.error("Failed to fetch packages.");
     }
   };
@@ -72,9 +70,7 @@ export default function GenerateEpin() {
         },
       });
       setGroups(response.data);
-      console.log("Fetched groups:", response.data); // Debugging line
     } catch (error) {
-      console.error("Error fetching groups:", error);
       toast.error("Failed to fetch groups.");
     }
   };
@@ -89,7 +85,6 @@ export default function GenerateEpin() {
       setReferralMemberName(member.fullName || "");
       toast.success("Referral member name fetched successfully.");
     } catch (error) {
-      console.error("Error fetching member details:", error);
       setReferralMemberName("");
       toast.error("Failed to fetch referral member details.");
     }
@@ -104,19 +99,17 @@ export default function GenerateEpin() {
   };
 
   const handlePackageChange = async (value) => {
-    console.log("Selected package ID:", value); // Debugging line
     const selectedPackage = packages.find(pkg => pkg.id == value);
-    console.log("selectedPackage", selectedPackage); // Debugging line
     setFormData({
       ...formData,
       pinPackage: value,
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
-      await fetchGroups(value); // Fetch groups based on selected package ID
+      await fetchGroups(value);
     } else {
       setSelectedPackageName("");
-      setGroups([]); // Clear groups if no package is selected
+      setGroups([]);
     }
   };
 
@@ -141,12 +134,8 @@ export default function GenerateEpin() {
     e.preventDefault();
     const { numberOfPins, pinPackage, referralMemberId, group } = formData;
 
-    if (!numberOfPins || !pinPackage || !referralMemberId || !group) {
+    if (!numberOfPins || !pinPackage || !group) {
       return toast.error("Please fill out all fields.");
-    }
-
-    if (!referralMemberName) {
-      return toast.error("Please fetch the referral member name.");
     }
 
     if (numberOfPins > 50) {
@@ -154,11 +143,14 @@ export default function GenerateEpin() {
     }
 
     const requestData = {
-      totalEpins: numberOfPins,
-      packageId: pinPackage,
-      referralMemberId: referralMemberId,
+      totalEpins: parseInt(numberOfPins),
+      packageId: parseInt(pinPackage),
       automaticGroupAssign: group === "auto-assign",
     };
+
+    if (referralMemberId) {
+      requestData.referralMemberId = parseInt(referralMemberId);
+    }
 
     if (group !== "auto-assign") {
       requestData.groupId = parseInt(group);
@@ -178,9 +170,8 @@ export default function GenerateEpin() {
         }
       );
 
-      const newPins = response.data || []; // Ensure it's an array
+      const newPins = response.data || [];
       setGeneratedPins(newPins);
-      console.log("newPins", newPins);
       toast.success("E-PINs generated successfully!", {
         id: toastId,
       });
@@ -197,8 +188,7 @@ export default function GenerateEpin() {
       setSelectedGroupName("");
     } catch (error) {
       const errorMessage =
-        error.response?.data || "Failed to generate E-PINs. Please try again.";
-      console.error("Error generating E-PINs:", errorMessage); // Log the error message
+        error.response?.data?.message || "Failed to generate E-PINs. Please try again.";
       toast.error(errorMessage, {
         id: toastId,
       });
@@ -263,7 +253,6 @@ export default function GenerateEpin() {
                   placeholder="Referral Member ID"
                   value={formData.referralMemberId}
                   onChange={handleChange}
-                  required
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
                 <Button onClick={fetchMemberName} type="button" className="min-w-max">Get Member Name</Button>

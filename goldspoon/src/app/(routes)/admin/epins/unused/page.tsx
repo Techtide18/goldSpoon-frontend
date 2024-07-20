@@ -56,10 +56,12 @@ export default function Report() {
     if (!filterId) {
       toast.error("Please enter a Referral Member ID.");
       return;
+    }else{
+      filterId.trim;
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/admin/epins/unused?referralId=${filterId}`, {
+      const response = await axios.get(`http://localhost:8080/admin/epins/unused?pageNumber=0&pageSize=100&memberNumber=${filterId}`, {
         headers: {
           "Content-Type": "application/json",
           "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
@@ -82,6 +84,8 @@ export default function Report() {
     setCurrentPage(page);
     if (viewOption === "all") {
       fetchAllEpins(page);
+    } else if (viewOption === "referralId") {
+      getEpinByReferralId(page);
     }
   };
 
@@ -126,7 +130,7 @@ export default function Report() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
-            <Button onClick={getEpinByReferralId}>Get E-PINs</Button>
+            <Button onClick={() => { getEpinByReferralId(); setCurrentPage(1); }}>Get E-PINs</Button>
           </CardFooter>
         )}
       </Card>
@@ -190,7 +194,7 @@ export default function Report() {
             </tbody>
           </table>
         </CardContent>
-        {viewOption === "all" && (
+        {viewOption && (
           <CardFooter className="flex justify-center space-x-2">
             <Pagination
               count={totalPages}
