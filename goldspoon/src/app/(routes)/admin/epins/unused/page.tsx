@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import Link from "next/link";
 import {
   Card,
@@ -14,144 +15,36 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedData = [
-  {
-    EpinID: "EPN123456",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123457",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123457",
-  },
-  {
-    EpinID: "EPN123458",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123458",
-  },
-  {
-    EpinID: "EPN123459",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123459",
-  },
-  {
-    EpinID: "EPN123460",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123460",
-  },
-  {
-    EpinID: "EPN123461",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123461",
-  },
-  {
-    EpinID: "EPN123462",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123462",
-  },
-  {
-    EpinID: "EPN123463",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123463",
-  },
-  {
-    EpinID: "EPN123464",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123464",
-  },
-  {
-    EpinID: "EPN123465",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123465",
-  },
-  // Add more data to test pagination
-  {
-    EpinID: "EPN123466",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123466",
-  },
-  {
-    EpinID: "EPN123467",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123467",
-  },
-  {
-    EpinID: "EPN123468",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123468",
-  },
-  {
-    EpinID: "EPN123469",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123469",
-  },
-  {
-    EpinID: "EPN123470",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123470",
-  },
-  {
-    EpinID: "EPN123471",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123471",
-  },
-  {
-    EpinID: "EPN123472",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123472",
-  },
-  {
-    EpinID: "EPN123473",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123473",
-  },
-  {
-    EpinID: "EPN123474",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123474",
-  },
-  {
-    EpinID: "EPN123475",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123475",
-  },
-];
-
 const PAGE_SIZE = 100;
 
 export default function Report() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState(simulatedData);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const fetchAllEpins = async (pageNumber) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/epins/unused?pageNumber=${pageNumber - 1}&pageSize=${PAGE_SIZE}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      toast.success("E-PIN data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching E-PIN data:", error);
+      toast.error("Failed to fetch E-PIN data.");
+    }
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    setFilteredData(simulatedData);
+    fetchAllEpins(1);
   };
 
   const handleViewByReferralId = () => {
@@ -159,23 +52,37 @@ export default function Report() {
     setCurrentPage(1);
   };
 
-  const getEpinByReferralId = () => {
+  const getEpinByReferralId = async () => {
     if (!filterId) {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
 
-    const filtered = simulatedData.filter(
-      (data) => data.referralMemberId === filterId
-    );
-
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified Referral Member ID.");
-      return;
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/epins/unused?referralId=${filterId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      if (response.data.length === 0) {
+        toast.error("No data found for the specified Referral Member ID.");
+      } else {
+        toast.success("E-PIN data fetched successfully.");
+      }
+    } catch (error) {
+      console.error("Error fetching E-PIN data:", error);
+      toast.error("Failed to fetch E-PIN data.");
     }
+  };
 
-    setFilteredData(filtered);
-    toast.success("E-PIN data fetched successfully.");
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+    if (viewOption === "all") {
+      fetchAllEpins(page);
+    }
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -253,7 +160,7 @@ export default function Report() {
               {paginatedData.map((data, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {data.EpinID}
+                    {data.epinNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {data.packageName}
@@ -262,11 +169,11 @@ export default function Report() {
                     {data.createdDate}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.referralMemberId}
+                    {data.referredByMemberNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <Link
-                      href={`/register?epinId=${data.EpinID}`}
+                      href={`/register?epinId=${data.epinNumber}`}
                       legacyBehavior
                     >
                       <a
@@ -283,38 +190,38 @@ export default function Report() {
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 100
-          </Button>
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Next 100
-          </Button>
-        </CardFooter>
+        {viewOption === "all" && (
+          <CardFooter className="flex justify-center space-x-2">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              siblingCount={1}
+              boundaryCount={1}
+              size="large"
+              shape="rounded"
+              variant="outlined"
+              color="primary"
+              className="mt-4"
+              showFirstButton
+              showLastButton
+            />
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => handlePageChange(null, Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous 100
+            </Button>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => handlePageChange(null, Math.min(currentPage + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next 100
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

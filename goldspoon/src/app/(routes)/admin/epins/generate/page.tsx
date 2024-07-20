@@ -36,8 +36,10 @@ export default function GenerateEpin() {
   });
 
   const [packages, setPackages] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [packagesLoaded, setPackagesLoaded] = useState(false);
   const [selectedPackageName, setSelectedPackageName] = useState("");
+  const [selectedGroupName, setSelectedGroupName] = useState("");
   const [referralMemberName, setReferralMemberName] = useState("");
   const [generatedPins, setGeneratedPins] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -60,25 +62,38 @@ export default function GenerateEpin() {
     }
   };
 
-  useEffect(() => {
-    const fetchMemberName = async (id) => {
-      try {
-        const response = await axios.get(`http://localhost:8080/member/${id}`);
-        const member = response.data;
-        setReferralMemberName(member.fullName || "");
-      } catch (error) {
-        console.error("Error fetching member details:", error);
-        setReferralMemberName("");
-        toast.error("Failed to fetch referral member details.");
-      }
-    };
-
-    if (formData.referralMemberId) {
-      fetchMemberName(formData.referralMemberId);
-    } else {
-      setReferralMemberName("");
+  const fetchGroups = async (packageId) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/groups/package/${packageId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          adminMemberId: 1,
+        },
+      });
+      setGroups(response.data);
+      console.log("Fetched groups:", response.data); // Debugging line
+    } catch (error) {
+      console.error("Error fetching groups:", error);
+      toast.error("Failed to fetch groups.");
     }
-  }, [formData.referralMemberId]);
+  };
+
+  const fetchMemberName = async () => {
+    if (!formData.referralMemberId) {
+      return toast.error("Please enter a Referral Member ID.");
+    }
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${formData.referralMemberId}`);
+      const member = response.data;
+      setReferralMemberName(member.fullName || "");
+      toast.success("Referral member name fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching member details:", error);
+      setReferralMemberName("");
+      toast.error("Failed to fetch referral member details.");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -88,7 +103,7 @@ export default function GenerateEpin() {
     });
   };
 
-  const handlePackageChange = (value) => {
+  const handlePackageChange = async (value) => {
     console.log("Selected package ID:", value); // Debugging line
     const selectedPackage = packages.find(pkg => pkg.id == value);
     console.log("selectedPackage", selectedPackage); // Debugging line
@@ -98,8 +113,27 @@ export default function GenerateEpin() {
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
+      await fetchGroups(value); // Fetch groups based on selected package ID
     } else {
       setSelectedPackageName("");
+      setGroups([]); // Clear groups if no package is selected
+    }
+  };
+
+  const handleGroupChange = (value) => {
+    if (value === "auto-assign") {
+      setSelectedGroupName("Auto Assign");
+      setFormData({
+        ...formData,
+        group: "auto-assign",
+      });
+    } else {
+      const selectedGroup = groups.find(grp => grp.id == value);
+      setSelectedGroupName(selectedGroup.groupName);
+      setFormData({
+        ...formData,
+        group: value,
+      });
     }
   };
 
@@ -111,20 +145,30 @@ export default function GenerateEpin() {
       return toast.error("Please fill out all fields.");
     }
 
+    if (!referralMemberName) {
+      return toast.error("Please fetch the referral member name.");
+    }
+
     if (numberOfPins > 50) {
       return toast.error("Maximum 50 Pins Allowed At One Time.");
+    }
+
+    const requestData = {
+      totalEpins: numberOfPins,
+      packageId: pinPackage,
+      referralMemberId: referralMemberId,
+      automaticGroupAssign: group === "auto-assign",
+    };
+
+    if (group !== "auto-assign") {
+      requestData.groupId = parseInt(group);
     }
 
     const toastId = toast.loading("Generating E-PIN...");
     try {
       const response = await axios.post(
         "http://localhost:8080/admin/epins/generate",
-        {
-          totalEpins: numberOfPins,
-          packageId: pinPackage,
-          referralMemberId: referralMemberId,
-          automaticGroupAssign: true,
-        },
+        requestData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -149,6 +193,8 @@ export default function GenerateEpin() {
         group: "",
       });
       setSelectedPackageName("");
+      setReferralMemberName("");
+      setSelectedGroupName("");
     } catch (error) {
       const errorMessage =
         error.response?.data || "Failed to generate E-PINs. Please try again.";
@@ -210,15 +256,18 @@ export default function GenerateEpin() {
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="referralMemberId">Referral Member ID</Label>
-              <Input
-                id="referralMemberId"
-                name="referralMemberId"
-                placeholder="Referral Member ID"
-                value={formData.referralMemberId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
+              <div className="flex gap-4">
+                <Input
+                  id="referralMemberId"
+                  name="referralMemberId"
+                  placeholder="Referral Member ID"
+                  value={formData.referralMemberId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button onClick={fetchMemberName} type="button" className="min-w-max">Get Member Name</Button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="referralMemberName">Referral Member Name</Label>
@@ -236,18 +285,21 @@ export default function GenerateEpin() {
               <Select
                 name="group"
                 value={formData.group}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, group: value })
-                }
+                onValueChange={handleGroupChange}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Group" />
+                  <SelectValue placeholder="Select Group">
+                    {selectedGroupName || "Select Group"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="auto-assign">Auto Assign</SelectItem>
-                  <SelectItem value="g12">g12 (10 slots remaining)</SelectItem>
-                  <SelectItem value="g20">g20 (2 slots remaining)</SelectItem>
+                  {groups.map((grp) => (
+                    <SelectItem key={grp.id} value={grp.id}>
+                      {grp.groupName} ({grp.currentTokenCount}/{grp.maxTokenCapacity} tokens)
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
