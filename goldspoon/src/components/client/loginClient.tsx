@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { loginAction } from "../action/loginAction";
 import { sleep } from "@/lib/utils";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const LoginClient = ({ onSuccess }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <form
       action={async (formData) => {
@@ -35,7 +39,23 @@ const LoginClient = ({ onSuccess }) => {
       className="flex flex-col gap-4"
     >
       <Input placeholder="Member Id" name="memberId" />
-      <Input placeholder="Password" type="password" name="password" />
+      <div className="relative">
+        <Input
+          placeholder="Password"
+          type={showPassword ? "text" : "password"}
+          name="password"
+        />
+        <div
+          className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? (
+            <EyeOffIcon className="h-5 w-5 text-gray-500" />
+          ) : (
+            <EyeIcon className="h-5 w-5 text-gray-500" />
+          )}
+        </div>
+      </div>
       <Button type="submit">Login</Button>
     </form>
   );

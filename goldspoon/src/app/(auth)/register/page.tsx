@@ -262,7 +262,6 @@ export default function Register() {
                   <Input
                     id="password"
                     name="password"
-                    type="password"
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={handleChange}
