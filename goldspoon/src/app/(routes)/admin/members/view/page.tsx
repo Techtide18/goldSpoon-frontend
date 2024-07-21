@@ -1,95 +1,48 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedData = [
-  {
-    memberName: "John Doe",
-    memberId: "MEM123456",
-    phone: "1234567890",
-    email: "johndoe@example.com",
-    createdDate: "01-01-2023",
-    gender: "Male",
-    aadhaarNumber: "1234-5678-9012",
-    panNumber: "ABCDE1234F",
-    address: "123 Main St, City, State, ZIP",
-    isActive: true,
-    bankAccDetails: "XYZ Bank, Account No: 123456789",
-  },
-  {
-    memberName: "Jane Smith",
-    memberId: "MEM123457",
-    phone: "0987654321",
-    email: "janesmith@example.com",
-    createdDate: "01-02-2023",
-    gender: "Female",
-    aadhaarNumber: "1234-5678-9013",
-    panNumber: "ABCDE1234G",
-    address: "456 Elm St, City, State, ZIP",
-    isActive: false,
-    bankAccDetails: "ABC Bank, Account No: 987654321",
-  },
-  // Add more data to test pagination
-  {
-    memberName: "Alice Johnson",
-    memberId: "MEM123458",
-    phone: "1122334455",
-    email: "alicejohnson@example.com",
-    createdDate: "01-03-2023",
-    gender: "Female",
-    aadhaarNumber: "1234-5678-9014",
-    panNumber: "ABCDE1234H",
-    address: "789 Maple St, City, State, ZIP",
-    isActive: true,
-    bankAccDetails: "DEF Bank, Account No: 112233445",
-  },
-  {
-    memberName: "Bob Brown",
-    memberId: "MEM123459",
-    phone: "2233445566",
-    email: "bobbrown@example.com",
-    createdDate: "01-04-2023",
-    gender: "Male",
-    aadhaarNumber: "1234-5678-9015",
-    panNumber: "ABCDE1234I",
-    address: "321 Oak St, City, State, ZIP",
-    isActive: false,
-    bankAccDetails: "GHI Bank, Account No: 223344556",
-  },
-  {
-    memberName: "Charlie Davis",
-    memberId: "MEM123460",
-    phone: "3344556677",
-    email: "charliedavis@example.com",
-    createdDate: "01-05-2023",
-    gender: "Male",
-    aadhaarNumber: "1234-5678-9016",
-    panNumber: "ABCDE1234J",
-    address: "654 Pine St, City, State, ZIP",
-    isActive: true,
-    bankAccDetails: "JKL Bank, Account No: 334455667",
-  },
-];
-
 const PAGE_SIZE = 100;
 
+const formatDateString = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return formattedDate;
+};
+
 export default function ViewMembers() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState(simulatedData);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const fetchMembers = async (pageNumber = 0) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/members?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "adminMemberId": 1,
+        },
+      });
+      setFilteredData(response.data);
+      toast.success("Members data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching members data:", error);
+      toast.error("Failed to fetch members data.");
+    }
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    setFilteredData(simulatedData);
+    fetchMembers(0);
   };
 
   const handleViewByMemberId = () => {
@@ -97,21 +50,38 @@ export default function ViewMembers() {
     setCurrentPage(1);
   };
 
-  const getMemberByMemberId = () => {
+  const getMemberByMemberId = async () => {
     if (!filterId) {
       toast.error("Please enter a Member ID.");
       return;
     }
 
-    const filtered = simulatedData.filter((data) => data.memberId === filterId);
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${filterId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "adminMemberId": 1,
+        },
+      });
 
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified Member ID.");
-      return;
+      const data = response.data ? [response.data] : [];
+      if (data.length === 0) {
+        toast.error("No data found for the specified Member ID.");
+      } else {
+        setFilteredData(data);
+        toast.success("Member data fetched successfully.");
+      }
+    } catch (error) {
+      console.error("Error fetching member data:", error);
+      toast.error("Failed to fetch member data.");
     }
+  };
 
-    setFilteredData(filtered);
-    toast.success("Member data fetched successfully.");
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+    if (viewOption === "all") {
+      fetchMembers(page - 1);
+    }
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -169,25 +139,25 @@ export default function ViewMembers() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aadhaar Number</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PAN Number</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedData.length > 0 ? (
                   paginatedData.map((data, index) => (
                     <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.memberName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.fullName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberNumber}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.phone}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateString(data.createdDate)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.gender}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.aadhaarNumber}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.panNumber}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.addressDetails}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.bankAccDetails}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
                     </tr>
                   ))
                 ) : (
@@ -205,7 +175,7 @@ export default function ViewMembers() {
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"
