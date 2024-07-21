@@ -46,13 +46,16 @@ export default function GenerateEpin() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/admin/packages", {
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
-          adminMemberId: 1,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:8080/admin/package/all",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+            adminMemberId: 1,
+          },
+        }
+      );
       setPackages(response.data);
       setPackagesLoaded(true);
     } catch (error) {
@@ -62,13 +65,16 @@ export default function GenerateEpin() {
 
   const fetchGroups = async (packageId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/admin/groups/package/${packageId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
-          adminMemberId: 1,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:8080/admin/group/package/${packageId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+            adminMemberId: 1,
+          },
+        }
+      );
       setGroups(response.data);
     } catch (error) {
       toast.error("Failed to fetch groups.");
@@ -80,7 +86,9 @@ export default function GenerateEpin() {
       return toast.error("Please enter a Referral Member ID.");
     }
     try {
-      const response = await axios.get(`http://localhost:8080/member/${formData.referralMemberId}`);
+      const response = await axios.get(
+        `http://localhost:8080/member/${formData.referralMemberId}`
+      );
       const member = response.data;
       setReferralMemberName(member.fullName || "");
       toast.success("Referral member name fetched successfully.");
@@ -99,7 +107,7 @@ export default function GenerateEpin() {
   };
 
   const handlePackageChange = async (value) => {
-    const selectedPackage = packages.find(pkg => pkg.id == value);
+    const selectedPackage = packages.find((pkg) => pkg.id == value);
     setFormData({
       ...formData,
       pinPackage: value,
@@ -121,7 +129,7 @@ export default function GenerateEpin() {
         group: "auto-assign",
       });
     } else {
-      const selectedGroup = groups.find(grp => grp.id == value);
+      const selectedGroup = groups.find((grp) => grp.id == value);
       setSelectedGroupName(selectedGroup.groupName);
       setFormData({
         ...formData,
@@ -188,7 +196,8 @@ export default function GenerateEpin() {
       setSelectedGroupName("");
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to generate E-PINs. Please try again.";
+        error.response?.data?.message ||
+        "Failed to generate E-PINs. Please try again.";
       toast.error(errorMessage, {
         id: toastId,
       });
@@ -255,7 +264,13 @@ export default function GenerateEpin() {
                   onChange={handleChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
-                <Button onClick={fetchMemberName} type="button" className="min-w-max">Get Member Name</Button>
+                <Button
+                  onClick={fetchMemberName}
+                  type="button"
+                  className="min-w-max"
+                >
+                  Get Member Name
+                </Button>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
@@ -286,7 +301,8 @@ export default function GenerateEpin() {
                   <SelectItem value="auto-assign">Auto Assign</SelectItem>
                   {groups.map((grp) => (
                     <SelectItem key={grp.id} value={grp.id}>
-                      {grp.groupName} ({grp.currentTokenCount}/{grp.maxTokenCapacity} tokens)
+                      {grp.groupName} ({grp.currentTokenCount}/
+                      {grp.maxTokenCapacity} tokens)
                     </SelectItem>
                   ))}
                 </SelectContent>

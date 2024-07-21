@@ -97,18 +97,16 @@ const initialCardData: DashboardCardProps[] = [
 export default function Home() {
   const [cardData, setCardData] =
     useState<DashboardCardProps[]>(initialCardData);
+  const [userSalesData, setUserSalesData] = useState<SalesProps[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/admin/dashboard",
-          {
-            headers: {
-              adminMemberId: 1,
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:8080/dashboard", {
+          headers: {
+            adminMemberId: 1,
+          },
+        });
         const data = response.data;
 
         const updatedCardData: DashboardCardProps[] = [
@@ -192,7 +190,29 @@ export default function Home() {
       }
     };
 
+    const fetchRecentSales = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/dashboard/sale?pageSize=10&pageNumber=0",
+          {
+            headers: {
+              adminMemberId: 1,
+            },
+          }
+        );
+        const salesData = response.data.content.map((sale: any) => ({
+          name: "Epin: " + sale.epinNumber,
+          email: "Reffered by: " + (sale.referredByMemberNumber || "None"),
+          saleAmount: `+₹${sale.packagePrice}`,
+        }));
+        setUserSalesData(salesData);
+      } catch (error) {
+        console.error("Error fetching recent sales data:", error);
+      }
+    };
+
     fetchDashboardData();
+    fetchRecentSales();
   }, []);
 
   return (
@@ -213,7 +233,7 @@ export default function Home() {
         <section>
           <p>Recent Sales</p>
           <p className="text-sm text-gray-400">
-            You made 265 sales this month.
+            Last 10 epin sales this month.
           </p>
         </section>
         {userSalesData.map((d, i) => (
@@ -228,31 +248,3 @@ export default function Home() {
     </div>
   );
 }
-
-const userSalesData: SalesProps[] = [
-  {
-    name: "Olivia Martin",
-    email: "olivia.martin@email.com",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    name: "Jackson Lee",
-    email: "jackson.lee@email.com",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    name: "Isabella Nguyen",
-    email: "isabella.nguyen@email.com",
-    saleAmount: "+₹39.00",
-  },
-  {
-    name: "William Kim",
-    email: "will@email.com",
-    saleAmount: "+₹299.00",
-  },
-  {
-    name: "Sofia Davis",
-    email: "sofia.davis@email.com",
-    saleAmount: "+₹39.00",
-  },
-];
