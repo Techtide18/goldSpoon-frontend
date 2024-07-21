@@ -16,13 +16,13 @@ const Header = () => {
       className={cn(
         `sticky inset-x-0 top-0 z-30 w-full transition-all border-b`,
         {
-          "bg-white/75 backdrop-blur-lg": scrolled,
-          "bg-white": selectedLayout || !scrolled,
+          "bg-white/75 backdrop-blur-lg": scrolled, //yellow-100
+          "bg-white": selectedLayout || !scrolled, //yellow-100
         }
       )}
     >
       <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4">
           <Link
             href="/"
             className="flex flex-row space-x-3 items-center justify-center md:hidden"
@@ -31,9 +31,7 @@ const Header = () => {
             <span className="font-bold text-xl">Logo</span>
           </Link>
         </div>
-
         <div className="hidden md:flex items-center space-x-4">
-          {/* <span className="text-gray-800">Logout</span> */}
           <Link
             href="/api/auth/signout"
             className="flex items-center space-x-2"

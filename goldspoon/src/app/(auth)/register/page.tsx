@@ -27,6 +27,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import axios from "axios";
 
 export default function Register() {
   const searchParams = useSearchParams();
@@ -68,40 +69,79 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { epinId, password, confirmPassword } = formData;
+    const {
+      epinId,
+      firstName,
+      lastName,
+      phone,
+      email,
+      aadhaarNumber,
+      panNumber,
+      addressDetails,
+      password,
+      confirmPassword,
+    } = formData;
 
     if (!epinId || !password || !confirmPassword) {
       return toast.error(
         "Please fill out the Epin ID, Password, and Confirm Password fields."
       );
     }
+
     if (password !== confirmPassword) {
       return toast.error("Passwords do not match!");
     }
 
-    const toastId = toast.loading("Registering new member...");
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    toast.success("Member created!", {
-      id: toastId,
-    });
+    if (!/[A-Za-z]/.test(password.trim())) {
+      return toast.error("Password must contain at least one letter.");
+    }
 
-    const generatedMemberNumber = `LS-${Math.floor(Math.random() * 1000000)}`; // Simulated member number generation
-    setMemberNumber(generatedMemberNumber);
-    setIsDialogOpen(true);
-    setFormData({
-      epinId: "",
-      firstName: "",
-      lastName: "",
-      gender: "",
-      phone: "",
-      email: "",
-      aadhaarNumber: "",
-      panNumber: "",
-      addressDetails: "",
-      password: "",
-      confirmPassword: "",
-    });
+    const fullName = `${firstName} ${lastName}`;
+    const requestData = {
+      epinNumber: epinId,
+      fullName,
+      phone,
+      email,
+      aadhaarNumber: aadhaarNumber ? parseInt(aadhaarNumber) : null,
+      panNumber: panNumber ? parseInt(panNumber) : null,
+      addressDetails,
+      password,
+    };
+
+    const toastId = toast.loading("Registering new member...");
+
+    try {
+      const response = await axios.put(
+        "http://localhost:8080/member/register",
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const generatedMemberNumber = response.data.memberNumber;
+      toast.success("Member created!", { id: toastId });
+      setMemberNumber(generatedMemberNumber);
+      setIsDialogOpen(true);
+      setFormData({
+        epinId: "",
+        firstName: "",
+        lastName: "",
+        gender: "",
+        phone: "",
+        email: "",
+        aadhaarNumber: "",
+        panNumber: "",
+        addressDetails: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data || "Failed to register member. Please try again.";
+      toast.error(errorMessage, { id: toastId });
+    }
   };
 
   return (
@@ -318,5 +358,4 @@ export default function Register() {
       </div>
     </div>
   );
-  
 }

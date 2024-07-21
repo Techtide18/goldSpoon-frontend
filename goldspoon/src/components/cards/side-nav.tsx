@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SIDENAV_ITEMS_ADMIN, SIDENAV_ITEMS_USER } from "../utils/sidenavRoutes";
+import {
+  SIDENAV_ITEMS_ADMIN,
+  SIDENAV_ITEMS_USER,
+} from "../utils/sidenavRoutes";
 import { SideNavItem, Session } from "../utils/dtos";
 import { Icon } from "@iconify/react";
 
@@ -16,15 +19,20 @@ const SideNav = ({ session }: { session: Session }) => {
     } else if (session?.user?.role === "user") {
       setSideNavItems(SIDENAV_ITEMS_USER);
     }
-    console.log("ds2",session?.user?.role);
   }, [session]);
 
   return (
     <div className="md:w-72 bg-white h-screen flex-1 fixed border-r border-zinc-200 hidden md:flex overflow-y-auto">
-      <div className="flex flex-col w-full h-full">
-        <div className="fixed top-0 left-0 w-72 bg-white z-10 border-b border-zinc-200">
+      <div className="flex flex-col w-full h-full"> 
+        {/* yellow-100 */}
+        <div className="fixed top-0 left-0 w-72 bg-white z-10 border-b border-zinc-200"> 
           <div className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 h-16 w-full">
-            <div className="flex flex-col">
+            <div className="flex items-center space-x-4">
+              <img
+                src="https://goldspoon.co.in/template/images/logo.svg"
+                alt="Logo"
+                className="h-10 w-10"
+              />
               <span className="font-bold text-xl hidden md:flex">
                 {session?.user?.name}
               </span>
@@ -32,9 +40,8 @@ const SideNav = ({ session }: { session: Session }) => {
           </div>
         </div>
         <div className="flex flex-col space-y-2 mt-16 pt-6 md:px-6 flex-1 pb-4">
-          {sideNavItems.length > 0 && sideNavItems.map((item, idx) => (
-            <MenuItem key={idx} item={item} />
-          ))}
+          {sideNavItems.length > 0 &&
+            sideNavItems.map((item, idx) => <MenuItem key={idx} item={item} />)}
         </div>
       </div>
     </div>

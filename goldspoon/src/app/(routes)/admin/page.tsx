@@ -19,168 +19,172 @@ import RecentSalesCard, {
   SalesProps,
 } from "@/components/cards/recentSalesCard";
 
-const simulatedCardData: DashboardCardProps[] = [
+const initialCardData: DashboardCardProps[] = [
   {
     label: "Today's Members",
-    amount: "33", // Example data
-    description: "+20.1% from last month",
+    amount: "...",
+    description: "New members joined today",
     icon: Users,
   },
   {
     label: "Total Members",
-    amount: "6822", // Example data
-    description: "+180.1% from last month",
+    amount: "...",
+    description: "Total members in the system",
     icon: Users,
   },
   {
     label: "Blocked Members",
-    amount: "127", // Example data
-    description: "+201 since last hour",
+    amount: "...",
+    description: "Members currently blocked",
     icon: Users,
   },
   {
     label: "Active E-PINs",
-    amount: "6971", // Example data
-    description: "+20.1% from last month",
+    amount: "...",
+    description: "E-PINs currently active",
     icon: ShoppingCart,
   },
   {
     label: "Inactive E-PINs",
-    amount: "260", // Example data
-    description: "+180.1% from last month",
+    amount: "...",
+    description: "E-PINs currently inactive",
     icon: ShoppingCart,
   },
   {
     label: "Total E-PINs",
-    amount: "7231", // Example data
-    description: "+19% from last month",
+    amount: "...",
+    description: "Total E-PINs generated",
     icon: ShoppingCart,
   },
   {
     label: "Total Level Income History",
-    amount: "₹5,053,650", // Example data
-    description: "+20.1% from last month",
+    amount: "...",
+    description: "Total income from levels",
     icon: DollarSign,
   },
   {
     label: "Total Direct Income History",
-    amount: "₹271,800", // Example data
-    description: "+180.1% from last month",
+    amount: "...",
+    description: "Total direct income earned",
     icon: DollarSign,
   },
   {
     label: "Total Withdrawals Count",
-    amount: "₹271,800", // Example data
-    description: "+180.1% from last month",
+    amount: "...",
+    description: "Total withdrawals made",
     icon: ArrowBigDownDashIcon,
   },
   {
     label: "Total Withdrawals Amount",
-    amount: "₹271,800", // Example data
-    description: "+180.1% from last month",
+    amount: "...",
+    description: "Total amount withdrawn",
     icon: DollarSign,
   },
   {
     label: "Total Packages",
-    amount: "1", // Example data
-    description: "Total 1 package",
+    amount: "...",
+    description: "Total available packages",
     icon: Package,
   },
   {
     label: "Total Groups",
-    amount: "60", // Example data
-    description: "Total 60 groups present",
+    amount: "...",
+    description: "Total groups present",
     icon: PersonStanding,
   },
 ];
 
-const userSalesData: SalesProps[] = [
-  {
-    name: "Olivia Martin",
-    email: "olivia.martin@email.com",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    name: "Jackson Lee",
-    email: "jackson.lee@email.com",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    name: "Isabella Nguyen",
-    email: "isabella.nguyen@email.com",
-    saleAmount: "+₹39.00",
-  },
-  {
-    name: "William Kim",
-    email: "will@email.com",
-    saleAmount: "+₹299.00",
-  },
-  {
-    name: "Sofia Davis",
-    email: "sofia.davis@email.com",
-    saleAmount: "+₹39.00",
-  },
-];
-
 export default function Home() {
-  const [cardData, setCardData] = useState<DashboardCardProps[]>(simulatedCardData);
+  const [cardData, setCardData] =
+    useState<DashboardCardProps[]>(initialCardData);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/admin/dashboard", {
-          headers: {
-            adminMemberId: 1,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:8080/admin/dashboard",
+          {
+            headers: {
+              adminMemberId: 1,
+            },
+          }
+        );
         const data = response.data;
 
-        const updatedCardData = simulatedCardData.map((simulatedCard) => {
-          switch (simulatedCard.label) {
-            case "Today's Members":
-              return {
-                ...simulatedCard,
-                amount: data.membersToday.toString(),
-              };
-            case "Total Members":
-              return {
-                ...simulatedCard,
-                amount: data.totalMember.toString(),
-              };
-            case "Blocked Members":
-              return {
-                ...simulatedCard,
-                amount: data.blockedMembers.toString(),
-              };
-            case "Active E-PINs":
-              return {
-                ...simulatedCard,
-                amount: data.activeEpins.toString(),
-              };
-            case "Inactive E-PINs":
-              return {
-                ...simulatedCard,
-                amount: data.inactiveEpins.toString(),
-              };
-            case "Total E-PINs":
-              return {
-                ...simulatedCard,
-                amount: data.totalEpins.toString(),
-              };
-            case "Total Level Income History":
-              return {
-                ...simulatedCard,
-                amount: `₹${data.totalLevelIncome}`,
-              };
-            case "Total Direct Income History":
-              return {
-                ...simulatedCard,
-                amount: `₹${data.totalDirectIncome}`,
-              };
-            default:
-              return simulatedCard;
-          }
-        });
+        const updatedCardData: DashboardCardProps[] = [
+          {
+            label: "Today's Members",
+            amount: data.membersToday.toString(),
+            description: "New members joined today",
+            icon: Users,
+          },
+          {
+            label: "Total Members",
+            amount: data.totalMember.toString(),
+            description: "Total members in the system",
+            icon: Users,
+          },
+          {
+            label: "Blocked Members",
+            amount: data.blockedMembers.toString(),
+            description: "Members currently blocked",
+            icon: Users,
+          },
+          {
+            label: "Active E-PINs",
+            amount: data.activeEpins.toString(),
+            description: "E-PINs currently active",
+            icon: ShoppingCart,
+          },
+          {
+            label: "Inactive E-PINs",
+            amount: data.inactiveEpins.toString(),
+            description: "E-PINs currently inactive",
+            icon: ShoppingCart,
+          },
+          {
+            label: "Total E-PINs",
+            amount: data.totalEpins.toString(),
+            description: "Total E-PINs generated",
+            icon: ShoppingCart,
+          },
+          {
+            label: "Total Level Income History",
+            amount: `₹${data.totalLevelIncome}`,
+            description: "Total income from levels",
+            icon: DollarSign,
+          },
+          {
+            label: "Total Direct Income History",
+            amount: `₹${data.totalDirectIncome}`,
+            description: "Total direct income earned",
+            icon: DollarSign,
+          },
+          {
+            label: "Total Withdrawals Count",
+            amount: data.totalWithdrawals.toString(),
+            description: "Total withdrawals made",
+            icon: ArrowBigDownDashIcon,
+          },
+          {
+            label: "Total Withdrawals Amount",
+            amount: `₹${data.totalAmountWithdrawals}`,
+            description: "Total amount withdrawn",
+            icon: DollarSign,
+          },
+          {
+            label: "Total Packages",
+            amount: data.totalPackages.toString(),
+            description: "Total available packages",
+            icon: Package,
+          },
+          {
+            label: "Total Groups",
+            amount: data.totalGroups.toString(),
+            description: "Total groups present",
+            icon: PersonStanding,
+          },
+        ];
 
         setCardData(updatedCardData);
       } catch (error) {
@@ -224,3 +228,31 @@ export default function Home() {
     </div>
   );
 }
+
+const userSalesData: SalesProps[] = [
+  {
+    name: "Olivia Martin",
+    email: "olivia.martin@email.com",
+    saleAmount: "+₹1,999.00",
+  },
+  {
+    name: "Jackson Lee",
+    email: "jackson.lee@email.com",
+    saleAmount: "+₹1,999.00",
+  },
+  {
+    name: "Isabella Nguyen",
+    email: "isabella.nguyen@email.com",
+    saleAmount: "+₹39.00",
+  },
+  {
+    name: "William Kim",
+    email: "will@email.com",
+    saleAmount: "+₹299.00",
+  },
+  {
+    name: "Sofia Davis",
+    email: "sofia.davis@email.com",
+    saleAmount: "+₹39.00",
+  },
+];
