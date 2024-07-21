@@ -2,7 +2,13 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
@@ -21,16 +27,23 @@ export default function ViewMembers() {
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchMembers = async (pageNumber = 0) => {
     try {
-      const response = await axios.get(`http://localhost:8080/admin/members?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
+      const response = await axios.get(`http://localhost:8080/member/all`, {
         headers: {
           "Content-Type": "application/json",
           "adminMemberId": 1,
         },
+        params: {
+          pageNumber,
+          pageSize: PAGE_SIZE,
+        },
       });
-      setFilteredData(response.data);
+      const data = response.data;
+      setFilteredData(data.content);
+      setTotalItems(data.pagination.totalItems);
       toast.success("Members data fetched successfully.");
     } catch (error) {
       console.error("Error fetching members data:", error);
@@ -47,6 +60,7 @@ export default function ViewMembers() {
 
   const handleViewByMemberId = () => {
     setViewOption("memberId");
+    setFilterId(""); // Clear text input
     setCurrentPage(1);
   };
 
@@ -81,11 +95,13 @@ export default function ViewMembers() {
     setCurrentPage(page);
     if (viewOption === "all") {
       fetchMembers(page - 1);
+    } else if (viewOption === "memberId" && filterId) {
+      getMemberByMemberId();
     }
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const paginatedData = filteredData;
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -171,36 +187,38 @@ export default function ViewMembers() {
             </table>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 100
-          </Button>
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next 100
-          </Button>
-        </CardFooter>
+        {viewOption && totalPages > 1 && (
+          <CardFooter className="flex justify-center space-x-2">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              siblingCount={1}
+              boundaryCount={1}
+              size="large"
+              shape="rounded"
+              variant="outlined"
+              color="primary"
+              className="mt-4"
+              showFirstButton
+              showLastButton
+            />
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => handlePageChange(null, Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous 100
+            </Button>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => handlePageChange(null, Math.min(currentPage + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next 100
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

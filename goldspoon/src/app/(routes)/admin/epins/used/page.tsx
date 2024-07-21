@@ -46,11 +46,13 @@ export default function Report() {
 
   const handleViewByReferralId = () => {
     setViewOption("referralId");
+    setFilterId(""); // Clear text input
     setCurrentPage(1);
   };
 
   const handleViewByMemberId = () => {
     setViewOption("memberId");
+    setFilterId(""); // Clear text input
     setCurrentPage(1);
   };
 
@@ -59,7 +61,7 @@ export default function Report() {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
-    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, isRefferal: true, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const getEpinByMemberId = () => {
@@ -67,7 +69,7 @@ export default function Report() {
       toast.error("Please enter a Member ID.");
       return;
     }
-    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, isRefferal: false, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handlePageChange = (event, page) => {
@@ -77,9 +79,11 @@ export default function Report() {
       fetchEpins('http://localhost:8080/epins/used', params);
     } else if (viewOption === "referralId") {
       params.memberNumber = filterId;
+      params.isRefferal = true;
       fetchEpins('http://localhost:8080/epins/used', params);
     } else if (viewOption === "memberId") {
-      params.memberId = filterId;
+      params.memberNumber = filterId;
+      params.isRefferal = false;
       fetchEpins('http://localhost:8080/epins/used', params);
     }
   };

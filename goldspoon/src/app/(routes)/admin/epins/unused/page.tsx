@@ -22,17 +22,21 @@ export default function Report() {
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const fetchAllEpins = async (pageNumber) => {
+  const fetchEpins = async (url, params) => {
     try {
-      const response = await axios.get(`http://localhost:8080/admin/epins/unused?pageNumber=${pageNumber - 1}&pageSize=${PAGE_SIZE}`, {
+      const response = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
           "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
           adminMemberId: 1,
         },
+        params,
       });
-      setFilteredData(response.data);
+      const data = response.data;
+      setFilteredData(data.content);
+      setTotalItems(data.pagination.totalItems);
       toast.success("E-PIN data fetched successfully.");
     } catch (error) {
       console.error("Error fetching E-PIN data:", error);
@@ -44,64 +48,55 @@ export default function Report() {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    fetchAllEpins(1);
+    fetchEpins("http://localhost:8080/epins/unused", {
+      pageNumber: 0,
+      pageSize: PAGE_SIZE,
+    });
   };
 
   const handleViewByReferralId = () => {
     setViewOption("referralId");
+    setFilterId(""); // Clear text input
     setCurrentPage(1);
   };
 
-  const getEpinByReferralId = async () => {
+  const getEpinByReferralId = () => {
     if (!filterId) {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
-
-    try {
-      const response = await axios.get(`http://localhost:8080/admin/epins/unused?pageNumber=0&pageSize=100&memberNumber=${filterId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
-          adminMemberId: 1,
-        },
-      });
-      setFilteredData(response.data);
-      if (response.data.length === 0) {
-        toast.error("No data found for the specified Referral Member ID.");
-      } else {
-        toast.success("E-PIN data fetched successfully.");
-      }
-    } catch (error) {
-      console.error("Error fetching E-PIN data:", error);
-      toast.error("Failed to fetch E-PIN data.");
-    }
+    fetchEpins("http://localhost:8080/epins/unused", {
+      memberNumber: filterId,
+      isRefferal: true,
+      pageNumber: 0,
+      pageSize: PAGE_SIZE,
+    });
   };
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
+    const params = { pageNumber: page - 1, pageSize: PAGE_SIZE };
     if (viewOption === "all") {
-      fetchAllEpins(page);
+      fetchEpins("http://localhost:8080/epins/unused", params);
     } else if (viewOption === "referralId") {
-      getEpinByReferralId(page);
+      params.memberNumber = filterId;
+      params.isRefferal = true;
+      fetchEpins("http://localhost:8080/epins/unused", params);
     }
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const paginatedData = filteredData;
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -138,7 +133,14 @@ export default function Report() {
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
-            <Button onClick={() => { getEpinByReferralId(); setCurrentPage(1); }}>Get E-PINs</Button>
+            <Button
+              onClick={() => {
+                getEpinByReferralId();
+                setCurrentPage(1);
+              }}
+            >
+              Get E-PINs
+            </Button>
           </CardFooter>
         )}
       </Card>
@@ -155,6 +157,9 @@ export default function Report() {
                   Epin ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Member ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Package Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -164,41 +169,67 @@ export default function Report() {
                   Referral Member ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Group
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Token Number (In Group)
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((data, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {data.epinNumber}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.packageName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(data.createdDate)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.referredByMemberNumber}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <Link
-                      href={`/register?epinId=${data.epinNumber}`}
-                      legacyBehavior
-                    >
-                      <a
-                        className="text-blue-600 hover:text-blue-900"
-                        target="_blank"
-                        rel="noopener noreferrer"
+              {paginatedData.length > 0 ? (
+                paginatedData.map((data, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {data.epinNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.memberNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.packageName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(data.createdDate)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.referredByMemberNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.groupName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.tokenNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <Link
+                        href={`/register?epinId=${data.epinNumber}`}
+                        legacyBehavior
                       >
-                        Register E-PIN
-                      </a>
-                    </Link>
+                        <a
+                          className="text-blue-600 hover:text-blue-900"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Register E-PIN
+                        </a>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="8"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
+                  >
+                    No data
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>
@@ -220,14 +251,18 @@ export default function Report() {
             />
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => handlePageChange(null, Math.max(currentPage - 1, 1))}
+              onClick={() =>
+                handlePageChange(null, Math.max(currentPage - 1, 1))
+              }
               disabled={currentPage === 1}
             >
               Previous 100
             </Button>
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => handlePageChange(null, Math.min(currentPage + 1, totalPages))}
+              onClick={() =>
+                handlePageChange(null, Math.min(currentPage + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               Next 100
