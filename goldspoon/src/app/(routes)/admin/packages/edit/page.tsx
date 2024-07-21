@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,6 +24,7 @@ import {
 export default function EditPackage() {
   const [packageName, setPackageName] = useState("");
   const [packageDetails, setPackageDetails] = useState({
+    id: null,
     name: "",
     price: "",
     description: "",
@@ -40,21 +42,27 @@ export default function EditPackage() {
       return toast.error("Please enter a Package Name.");
     }
 
-    // Simulate an API call to fetch package details
-    const toastId = toast.loading("Fetching Package Details...");
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/package/name/${packageName}`, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    // Simulate fetched data
-    const fetchedData = {
-      name: packageName,
-      price: "1500",
-      description: "This is a sample package description.",
-      duration: "12",
-    };
+      const fetchedData = response.data;
 
-    setPackageDetails(fetchedData);
-    setOriginalDetails(fetchedData); // Save original details for comparison
-    toast.success("Package details fetched successfully!", { id: toastId });
+      setPackageDetails({
+        id: fetchedData.id,
+        name: fetchedData.packageName,
+        price: fetchedData.packagePrice,
+        description: fetchedData.description,
+        duration: fetchedData.packageDurationInMonths,
+      });
+      setOriginalDetails(fetchedData); // Save original details for comparison
+      toast.success("Package details fetched successfully!");
+    } catch (error) {
+      toast.error("Failed to fetch package details. Please try again.");
+    }
   };
 
   const handleChange = (e) => {
@@ -75,15 +83,26 @@ export default function EditPackage() {
       );
     }
 
-    const toastId = toast.loading("Updating Package Details...");
-    // Simulate API call to update package details
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const updatedDetails = {
+      id: packageDetails.id,
+      packageName: packageDetails.name,
+      packagePrice: packageDetails.price,
+      description: packageDetails.description,
+      packageDurationInMonths: packageDetails.duration,
+    };
 
-    toast.success("Package details updated successfully!", {
-      id: toastId,
-    });
+    try {
+      await axios.put("http://localhost:8080/admin/package", updatedDetails, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    setIsDialogOpen(true);
+      toast.success("Package details updated successfully!");
+      setIsDialogOpen(true);
+    } catch (error) {
+      toast.error("Failed to update package details. Please try again.");
+    }
   };
 
   return (

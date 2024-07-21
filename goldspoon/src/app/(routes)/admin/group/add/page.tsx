@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,10 +31,42 @@ export default function AddNewGroup() {
   const [formData, setFormData] = useState({
     groupName: "",
     maxTokenCount: "",
-    packageName: "",
+    packageId: "",
   });
 
+  const [packages, setPackages] = useState([]);
+  const [packagesLoaded, setPackagesLoaded] = useState(false);
+  const [selectedPackageName, setSelectedPackageName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const fetchPackages = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/admin/packages", {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
+          adminMemberId: 1,
+        },
+      });
+      setPackages(response.data);
+      setPackagesLoaded(true);
+    } catch (error) {
+      toast.error("Failed to fetch packages.");
+    }
+  };
+
+  const handlePackageChange = (value) => {
+    const selectedPackage = packages.find(pkg => pkg.id == value);
+    setFormData({
+      ...formData,
+      packageId: value,
+    });
+    if (selectedPackage) {
+      setSelectedPackageName(selectedPackage.packageName);
+    } else {
+      setSelectedPackageName("");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,9 +78,9 @@ export default function AddNewGroup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { groupName, maxTokenCount, packageName } = formData;
+    const { groupName, maxTokenCount, packageId } = formData;
 
-    if (!groupName || !maxTokenCount || !packageName) {
+    if (!groupName || !maxTokenCount || !packageId) {
       return toast.error("Please fill out all fields.");
     }
 
@@ -55,20 +88,41 @@ export default function AddNewGroup() {
       return toast.error("Max Token Count must be a positive number.");
     }
 
+    const newGroup = {
+      groupName,
+      maxTokenCapacity: parseInt(maxTokenCount, 10),
+      packageId: parseInt(packageId, 10),
+    };
+
     const toastId = toast.loading("Adding New Group...");
-    // Simulate API call to add new group
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("New Group added successfully!", {
-      id: toastId,
-    });
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/admin/group/create",
+        newGroup,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
 
-    setIsDialogOpen(true);
-    setFormData({
-      groupName: "",
-      maxTokenCount: "",
-      packageName: "",
-    });
+      toast.success("New Group added successfully!", {
+        id: toastId,
+      });
+
+      setIsDialogOpen(true);
+      setFormData({
+        groupName: "",
+        maxTokenCount: "",
+        packageId: "",
+      });
+      setSelectedPackageName("");
+    } catch (error) {
+      toast.error("Failed to add new group. Please try again.", {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -105,26 +159,34 @@ export default function AddNewGroup() {
               />
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="packageName">Package Name</Label>
+              <Label htmlFor="packageId">Package Name</Label>
               <Select
-                name="packageName"
-                value={formData.packageName}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, packageName: value })
-                }
+                name="packageId"
+                value={formData.packageId}
+                onValueChange={handlePackageChange}
                 required
+                onOpenChange={(open) => {
+                  if (open && !packagesLoaded) {
+                    fetchPackages();
+                  }
+                }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Package" />
+                  <SelectValue placeholder="Select Package">
+                    {selectedPackageName || "Select Package"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Package-1500">Package - 1500</SelectItem>
-                  <SelectItem value="Package-2000">Package - 2000</SelectItem>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id}>
+                      {pkg.packageName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Button className="w-full" type="submit" variant="destructive">
+              <Button className="w-full" type="submit">
                 Add Group
               </Button>
             </div>
@@ -133,7 +195,7 @@ export default function AddNewGroup() {
       </Card>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(open)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">

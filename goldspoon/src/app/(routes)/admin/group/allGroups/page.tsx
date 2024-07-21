@@ -1,49 +1,42 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
-
-// Simulated Data
-const simulatedGroupData = [
-  {
-    id: 1,
-    groupName: "G12",
-    createdDate: "01-01-2024",
-    maxTokenCapacity: 100,
-    currentTokenCount: 98,
-    isFilled: false,
-    packageName: "Package - 1500",
-    filledDate: "",
-  },
-  {
-    id: 2,
-    groupName: "G20",
-    createdDate: "02-01-2024",
-    maxTokenCapacity: 100,
-    currentTokenCount: 100,
-    isFilled: true,
-    packageName: "Package - 2000",
-    filledDate: "10-01-2024",
-  },
-  // Add more data as needed
-];
+import { toast } from "sonner";
 
 const PAGE_SIZE = 100;
 
 export default function ViewGroups() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterGroupName, setFilterGroupName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState(simulatedGroupData);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const fetchGroups = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/admin/groups/all", {
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      toast.success("Groups data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching groups data:", error);
+      toast.error("Failed to fetch groups data.");
+    }
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterGroupName("");
     setCurrentPage(1);
-    setFilteredData(simulatedGroupData);
+    fetchGroups();
   };
 
   const handleViewByGroupName = () => {
@@ -53,12 +46,23 @@ export default function ViewGroups() {
 
   const handleSubmit = () => {
     if (filterGroupName) {
-      const filtered = simulatedGroupData.filter((data) => data.groupName === filterGroupName);
+      const filtered = filteredData.filter((data) => data.groupName === filterGroupName);
       setFilteredData(filtered);
     } else {
-      setFilteredData(simulatedGroupData);
+      fetchGroups();
     }
     setCurrentPage(1);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -121,12 +125,12 @@ export default function ViewGroups() {
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.createdDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.createdDate)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.maxTokenCapacity}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.currentTokenCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isFilled ? "Yes" : "No"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.completed ? "Yes" : "No"}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.filledDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFilledDate)}</td>
                 </tr>
               ))}
             </tbody>
