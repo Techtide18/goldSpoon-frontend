@@ -43,7 +43,7 @@ export default function EditPackage() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/admin/package/name/${packageName}`, {
+      const response = await axios.get(`http://localhost:8080/package/name/${packageName}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -92,7 +92,7 @@ export default function EditPackage() {
     };
 
     try {
-      await axios.put("http://localhost:8080/admin/package", updatedDetails, {
+      await axios.put("http://localhost:8080/package", updatedDetails, {
         headers: {
           adminMemberId: 1,
         },
@@ -101,7 +101,8 @@ export default function EditPackage() {
       toast.success("Package details updated successfully!");
       setIsDialogOpen(true);
     } catch (error) {
-      toast.error("Failed to update package details. Please try again.");
+      console.log("err", error);
+      toast.error(error.response.data || "Failed to update package details. Please try again.");
     }
   };
 

@@ -46,7 +46,7 @@ export default function CreatePackage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/admin/package",
+        "http://localhost:8080/package",
         {
           packageName,
           packagePrice: parseInt(packagePrice, 10),
@@ -75,7 +75,7 @@ export default function CreatePackage() {
       });
     } catch (error) {
       console.log("err", error);
-      toast.error(error.response.data.message || "Failed to create package", {
+      toast.error(error.response.data || "Failed to create package", {
         id: toastId,
       });
     }
