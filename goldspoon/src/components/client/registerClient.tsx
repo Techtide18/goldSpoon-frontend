@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from "react";
@@ -10,13 +11,13 @@ const RegisterForm = () => {
 
   const handleRegisterRedirect = (event: React.FormEvent) => {
     event.preventDefault(); // Prevent the default form submission
-    toast.info("Please enter your E-PIN and details to continue with registration.", {duration: 10000});
+    toast.info("Please enter your E-PIN and details to continue with registration.", { duration: 5000 });
     router.push("/register"); // Use router.push for client-side navigation
   };
 
   return (
-    <form onSubmit={handleRegisterRedirect}>
-      <Button type="submit" variant={"outline"}>
+    <form onSubmit={handleRegisterRedirect} className="w-full">
+      <Button type="submit" variant={"outline"} className="w-full">
         Register With Epin
       </Button>
     </form>

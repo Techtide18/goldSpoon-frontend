@@ -39,30 +39,47 @@ const Login = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-black flex items-center justify-center">
-      <img
+      <div className="w-1/2 bg-black flex flex-col items-center justify-center relative">
+        <img
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
-          className="w-48"
+          className="w-48 mb-4"
         />
+        <div className="absolute bottom-4 text-center text-white text-sm px-4">
+          By clicking continue, you agree to our{" "}
+          <a href="/terms" className="underline">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="/privacy" className="underline">
+            Privacy Policy
+          </a>
+          .
+        </div>
       </div>
-      <div className="w-1/2 flex items-center justify-center">
-        <Card className="w-96">
+      <div className="w-1/2 bg-yellow-100 flex items-center justify-center">
+        <Card className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
           <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>
-              Enter your memberId and password to login to account
+            <CardTitle className="text-3xl font-semibold text-gray-800 text-center">
+              Login
+            </CardTitle>
+            <CardDescription className="text-gray-600 text-center">
+              Enter your memberId and password to login to your account
             </CardDescription>
           </CardHeader>
           <CardContent>
             <LoginClient onSuccess={handleLoginSuccess} />
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <span>Or</span>
+          <CardFooter className="flex flex-col gap-4 items-center">
+          <div className="flex items-center w-full">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="mx-4 text-gray-600">OR</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
             <RegisterForm />
           </CardFooter>
         </Card>
-        {loading && <div>Loading...</div>}
+        {loading}
       </div>
     </div>
   );

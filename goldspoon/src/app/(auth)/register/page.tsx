@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +30,7 @@ import {
 
 export default function Register() {
   const searchParams = useSearchParams();
-  const epinId = searchParams.get('epinId');
+  const epinId = searchParams.get("epinId");
 
   const [formData, setFormData] = useState({
     epinId: "",
@@ -105,193 +105,219 @@ export default function Register() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen py-8 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Register With Epin</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="epinId">Epin ID *</Label>
-              <Input
-                id="epinId"
-                name="epinId"
-                placeholder="E Pin"
-                value={formData.epinId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  placeholder="Enter your first name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Enter your last name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="addressDetails">Address Details</Label>
-              <Input
-                id="addressDetails"
-                name="addressDetails"
-                placeholder="Enter your address"
-                value={formData.addressDetails}
-                onChange={handleChange}
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  placeholder="Enter your telephone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select
-                  name="gender"
-                  value={formData.gender}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, gender: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="others">Others</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
-                <Input
-                  id="aadhaarNumber"
-                  name="aadhaarNumber"
-                  placeholder="Enter your Aadhaar Number"
-                  value={formData.aadhaarNumber}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="panNumber">PAN Number</Label>
-                <Input
-                  id="panNumber"
-                  name="panNumber"
-                  placeholder="Enter your PAN Number"
-                  value={formData.panNumber}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="text"
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Button className="w-full" type="submit">
-                Register Now
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center flex-col">
-          <p>
-            Already have an account?
-            <a className="text-blue-500" href="/login">
-              {" "}
+    <div className="flex h-screen">
+      <div className="w-1/2 bg-black flex flex-col items-center justify-center relative">
+        <img
+          src="https://goldspoon.co.in/template/images/logo.svg"
+          alt="Logo"
+          className="w-48 mb-4"
+        />
+        <div className="text-white text-bold mb-4">
+          <p className="text-white font-bold">
+            Already have an account?{" "}
+            <a className="text-blue-500 underline" href="/login">
               Login
             </a>
           </p>
-        </CardFooter>
-      </Card>
-      <Dialog
-        open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
-      >
-        <DialogContent>
-          <DialogTitle>Registration Successful</DialogTitle>
-          <DialogDescription>
-            Your member number is <strong>{memberNumber}</strong>. Please keep
-            it safely as it will not be generated again.
-          </DialogDescription>
-          <DialogClose asChild>
-            <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button onClick={() => (window.location.href = "/login")}>
-              Go to Login page
-            </Button>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
+        </div>
+        <div className="absolute bottom-4 text-center text-white text-sm px-4">
+          By clicking continue, you agree to our{" "}
+          <a href="/terms" className="underline">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="/privacy" className="underline">
+            Privacy Policy
+          </a>
+          .
+        </div>
+      </div>
+      <div className="w-1/2 bg-yellow-100 flex items-center justify-center overflow-y-auto pt-24 pb-2">
+        <Card className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
+          <CardHeader>
+            <CardTitle className="text-3xl font-semibold text-gray-800 text-center">
+              Register With Epin
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="epinId">Epin ID *</Label>
+                <Input
+                  id="epinId"
+                  name="epinId"
+                  placeholder="E Pin"
+                  value={formData.epinId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Enter your first name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Enter your last name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="addressDetails">Address Details</Label>
+                <Input
+                  id="addressDetails"
+                  name="addressDetails"
+                  placeholder="Enter your address"
+                  value={formData.addressDetails}
+                  onChange={handleChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    placeholder="Enter your telephone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select
+                    name="gender"
+                    value={formData.gender}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, gender: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="others">Others</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                  <Input
+                    id="aadhaarNumber"
+                    name="aadhaarNumber"
+                    placeholder="Enter your Aadhaar Number"
+                    value={formData.aadhaarNumber}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="panNumber">PAN Number</Label>
+                  <Input
+                    id="panNumber"
+                    name="panNumber"
+                    placeholder="Enter your PAN Number"
+                    value={formData.panNumber}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Button className="w-full" type="submit">
+                  Register Now
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center flex-col items-center">
+          </CardFooter>
+        </Card>
+        {isDialogOpen && (
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => open && setIsDialogOpen(true)}
+          >
+            <DialogContent>
+              <DialogTitle>Registration Successful</DialogTitle>
+              <DialogDescription>
+                Your member number is <strong>{memberNumber}</strong>. Please keep
+                it safely as it will not be generated again.
+              </DialogDescription>
+              <DialogClose asChild>
+                <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button onClick={() => (window.location.href = "/login")}>
+                  Go to Login page
+                </Button>
+              </DialogClose>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
     </div>
   );
+  
 }
