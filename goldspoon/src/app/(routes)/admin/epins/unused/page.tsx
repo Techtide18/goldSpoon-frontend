@@ -56,8 +56,6 @@ export default function Report() {
     if (!filterId) {
       toast.error("Please enter a Referral Member ID.");
       return;
-    }else{
-      filterId.trim;
     }
 
     try {
@@ -87,6 +85,16 @@ export default function Report() {
     } else if (viewOption === "referralId") {
       getEpinByReferralId(page);
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -170,7 +178,7 @@ export default function Report() {
                     {data.packageName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.createdDate}
+                    {formatDate(data.createdDate)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {data.referredByMemberNumber}

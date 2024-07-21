@@ -1,119 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedData = [
-  {
-    EpinID: "EPN123456",
-    memberId: "MEM123456",
-    installmentMonth: "1",
-    installmentPaidDate: "01-02-2024",
-    amountPaid: "1500",
-    transactionId: "TXN1234567890",
-    paymentMethod: "GPay",
-  },
-  {
-    EpinID: "EPN123457",
-    memberId: "MEM123457",
-    installmentMonth: "2",
-    installmentPaidDate: "01-03-2024",
-    amountPaid: "2000",
-    transactionId: "TXN1234567891",
-    paymentMethod: "UPI",
-  },
-  {
-    EpinID: "EPN123458",
-    memberId: "MEM123458",
-    installmentMonth: "3",
-    installmentPaidDate: "01-04-2024",
-    amountPaid: "1500",
-    transactionId: "TXN1234567892",
-    paymentMethod: "Cheque",
-  },
-  {
-    EpinID: "EPN123459",
-    memberId: "MEM123459",
-    installmentMonth: "3",
-    installmentPaidDate: "01-05-2024",
-    amountPaid: "2000",
-    transactionId: "TXN1234567893",
-    paymentMethod: "GPay",
-  },
-  {
-    EpinID: "EPN123460",
-    memberId: "MEM123460",
-    installmentMonth: "3",
-    installmentPaidDate: "01-06-2024",
-    amountPaid: "1500",
-    transactionId: "TXN1234567894",
-    paymentMethod: "UPI",
-  },
-  {
-    EpinID: "EPN123461",
-    memberId: "MEM123461",
-    installmentMonth: "5",
-    installmentPaidDate: "01-07-2024",
-    amountPaid: "2000",
-    transactionId: "TXN1234567895",
-    paymentMethod: "Cheque",
-  },
-  {
-    EpinID: "EPN123462",
-    memberId: "MEM123462",
-    installmentMonth: "5",
-    installmentPaidDate: "01-08-2024",
-    amountPaid: "1500",
-    transactionId: "TXN1234567896",
-    paymentMethod: "GPay",
-  },
-  {
-    EpinID: "EPN123463",
-    memberId: "MEM123463",
-    installmentMonth: "7",
-    installmentPaidDate: "01-09-2024",
-    amountPaid: "2000",
-    transactionId: "TXN1234567897",
-    paymentMethod: "UPI",
-  },
-  {
-    EpinID: "EPN123464",
-    memberId: "MEM123464",
-    installmentMonth: "7",
-    installmentPaidDate: "01-10-2024",
-    amountPaid: "1500",
-    transactionId: "TXN1234567898",
-    paymentMethod: "Cheque",
-  },
-  {
-    EpinID: "EPN123465",
-    memberId: "MEM123465",
-    installmentMonth: "15",
-    installmentPaidDate: "01-11-2024",
-    amountPaid: "2000",
-    transactionId: "TXN1234567899",
-    paymentMethod: "GPay",
-  },
-];
-
 const PAGE_SIZE = 100;
 
 export default function InstallmentsPaid() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState(simulatedData);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const fetchData = async (url) => {
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      toast.success("Installment data fetched successfully.");
+    } catch (error) {
+      toast.error("Failed to fetch data. Please try again.");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (viewOption === "all") {
+      const url = `http://localhost:8080/admin/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
+      fetchData(url);
+    } else if (viewOption === "memberId" && filterId) {
+      const url = `http://localhost:8080/admin/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+      fetchData(url);
+    }
+  }, [viewOption, filterId, currentPage]);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    setFilteredData(simulatedData);
   };
 
   const handleViewByMemberId = () => {
@@ -126,16 +57,9 @@ export default function InstallmentsPaid() {
       toast.error("Please enter a Member ID.");
       return;
     }
-
-    const filtered = simulatedData.filter((data) => data.memberId === filterId);
-
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified Member ID.");
-      return;
-    }
-
-    setFilteredData(filtered);
-    toast.success("Installment data fetched successfully.");
+    setCurrentPage(1);
+    const url = `http://localhost:8080/admin/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+    fetchData(url);
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -149,18 +73,14 @@ export default function InstallmentsPaid() {
         </CardHeader>
         <CardContent className="flex flex-row space-x-4">
           <Button
-            className={`font-bold ${
-              viewOption === "all" ? "bg-black text-white" : "border-black"
-            }`}
+            className={`font-bold ${viewOption === "all" ? "bg-black text-white" : "border-black"}`}
             onClick={handleViewAll}
             variant={viewOption === "all" ? "solid" : "outline"}
           >
             View All
           </Button>
           <Button
-            className={`font-bold ${
-              viewOption === "memberId" ? "bg-black text-white" : "border-black"
-            }`}
+            className={`font-bold ${viewOption === "memberId" ? "bg-black text-white" : "border-black"}`}
             onClick={handleViewByMemberId}
             variant={viewOption === "memberId" ? "solid" : "outline"}
           >
@@ -191,7 +111,7 @@ export default function InstallmentsPaid() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Installment Month</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Installment Paid Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Paid (Rupees) </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Paid (Rupees)</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
               </tr>
@@ -211,10 +131,7 @@ export default function InstallmentsPaid() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="7"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
+                  <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
                     No data
                   </td>
                 </tr>

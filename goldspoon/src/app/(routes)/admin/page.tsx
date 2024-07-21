@@ -1,3 +1,7 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DashboardTitle from "@/components/cards/dashboardTitle";
 import {
   Users,
@@ -15,7 +19,7 @@ import RecentSalesCard, {
   SalesProps,
 } from "@/components/cards/recentSalesCard";
 
-const cardData: DashboardCardProps[] = [
+const simulatedCardData: DashboardCardProps[] = [
   {
     label: "Today's Members",
     amount: "33", // Example data
@@ -71,7 +75,7 @@ const cardData: DashboardCardProps[] = [
     icon: ArrowBigDownDashIcon,
   },
   {
-    label: "Total Withdrawals Ammont",
+    label: "Total Withdrawals Amount",
     amount: "₹271,800", // Example data
     description: "+180.1% from last month",
     icon: DollarSign,
@@ -119,6 +123,74 @@ const userSalesData: SalesProps[] = [
 ];
 
 export default function Home() {
+  const [cardData, setCardData] = useState<DashboardCardProps[]>(simulatedCardData);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/admin/dashboard", {
+          headers: {
+            adminMemberId: 1,
+          },
+        });
+        const data = response.data;
+
+        const updatedCardData = simulatedCardData.map((simulatedCard) => {
+          switch (simulatedCard.label) {
+            case "Today's Members":
+              return {
+                ...simulatedCard,
+                amount: data.membersToday.toString(),
+              };
+            case "Total Members":
+              return {
+                ...simulatedCard,
+                amount: data.totalMember.toString(),
+              };
+            case "Blocked Members":
+              return {
+                ...simulatedCard,
+                amount: data.blockedMembers.toString(),
+              };
+            case "Active E-PINs":
+              return {
+                ...simulatedCard,
+                amount: data.activeEpins.toString(),
+              };
+            case "Inactive E-PINs":
+              return {
+                ...simulatedCard,
+                amount: data.inactiveEpins.toString(),
+              };
+            case "Total E-PINs":
+              return {
+                ...simulatedCard,
+                amount: data.totalEpins.toString(),
+              };
+            case "Total Level Income History":
+              return {
+                ...simulatedCard,
+                amount: `₹${data.totalLevelIncome}`,
+              };
+            case "Total Direct Income History":
+              return {
+                ...simulatedCard,
+                amount: `₹${data.totalDirectIncome}`,
+              };
+            default:
+              return simulatedCard;
+          }
+        });
+
+        setCardData(updatedCardData);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
     <div className="flex flex-col gap-5 w-full px-4 mt-4">
       <DashboardTitle title="Dashboard" />

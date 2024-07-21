@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -54,28 +54,35 @@ export default function EditProfile() {
       return toast.error("Please enter a Member ID.");
     }
 
-    // Simulate an API call to fetch member details
     const toastId = toast.loading("Fetching Member Details...");
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Simulate fetched data
-    const fetchedData = {
-      fullName: "John Doe",
-      phone: "1234567890",
-      email: "johndoe@example.com",
-      gender: "Male",
-      aadhaarNumber: "1234-5678-9012",
-      panNumber: "ABCDE1234F",
-      addressDetails: "123 Main St, City, State, ZIP",
-      accountNumber: "123456789",
-      accountName: "John Doe",
-      bankName: "XYZ Bank",
-      bankBranch: "City Branch",
-    };
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${memberId}`, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    setProfileData(fetchedData);
-    setMemberName(fetchedData.fullName);
-    toast.success("Member details fetched successfully!", { id: toastId });
+      const fetchedData = response.data;
+
+      setProfileData({
+        fullName: fetchedData.fullName,
+        phone: fetchedData.phone,
+        email: fetchedData.email,
+        gender: fetchedData.gender,
+        aadhaarNumber: fetchedData.aadhaarNumber,
+        panNumber: fetchedData.panNumber,
+        addressDetails: fetchedData.addressDetails,
+        accountNumber: fetchedData.accountNumber,
+        accountName: fetchedData.accountName,
+        bankName: fetchedData.bankName,
+        bankBranch: fetchedData.bankBranch,
+      });
+      setMemberName(fetchedData.fullName);
+      toast.success("Member details fetched successfully!", { id: toastId });
+    } catch (error) {
+      toast.error("Failed to fetch member details. Please try again.", { id: toastId });
+    }
   };
 
   const handleChange = (e) => {
@@ -89,29 +96,28 @@ export default function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const {
-      fullName,
-      phone,
-      email,
-      gender,
-      aadhaarNumber,
-      panNumber,
-      addressDetails,
-      accountNumber,
-      accountName,
-      bankName,
-      bankBranch,
-    } = profileData;
-
     const toastId = toast.loading("Updating Member Details...");
-    // Simulate API call to update member details
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("Member details updated successfully!", {
-      id: toastId,
-    });
+    try {
+      await axios.put(`http://localhost:8080/member/${memberId}`, {
+        fullName: profileData.fullName,
+        phone: profileData.phone,
+        email: profileData.email,
+        aadhaarNumber: profileData.aadhaarNumber,
+        panNumber: profileData.panNumber,
+        addressDetails: profileData.addressDetails,
+        bankAccDetails: `${profileData.accountNumber}, ${profileData.accountName}, ${profileData.bankName}, ${profileData.bankBranch}`,
+      }, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    setIsDialogOpen(true);
+      toast.success("Member details updated successfully!", { id: toastId });
+      setIsDialogOpen(true);
+    } catch (error) {
+      toast.error("Failed to update member details. Please try again.", { id: toastId });
+    }
   };
 
   return (

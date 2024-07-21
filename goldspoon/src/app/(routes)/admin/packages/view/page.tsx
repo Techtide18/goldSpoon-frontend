@@ -65,6 +65,16 @@ export default function ViewPackage() {
     setFilteredPackages(packageData);
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+  };
+
   return (
     <div className="flex justify-center items-center py-8 px-4">
       <div className="w-full max-w-7xl space-y-8">
@@ -129,7 +139,7 @@ export default function ViewPackage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.packagePrice}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.duration}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.createdDate}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(pkg.createdDate)}</td>
                   </tr>
                 ))}
               </tbody>

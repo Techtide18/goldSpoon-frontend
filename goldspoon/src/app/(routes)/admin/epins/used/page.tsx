@@ -65,7 +65,7 @@ export default function Report() {
       toast.error("Please enter a Member ID.");
       return;
     }
-    fetchEpins('http://localhost:8080/admin/epins/used', { memberId: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/admin/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handlePageChange = (event, page) => {
@@ -80,6 +80,16 @@ export default function Report() {
       params.memberId = filterId;
       fetchEpins('http://localhost:8080/admin/epins/used', params);
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -194,7 +204,7 @@ export default function Report() {
                       {data.packageName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.createdDate}
+                      {formatDate(data.createdDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.referredByMemberNumber}

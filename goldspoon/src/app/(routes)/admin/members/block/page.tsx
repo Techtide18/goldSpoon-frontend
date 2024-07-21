@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,13 +31,21 @@ export default function BlockMember() {
 
   useEffect(() => {
     if (formData.memberId) {
-      // Simulate an API call to fetch the member name
-      setTimeout(() => {
-        const randomNames = ["John Doe", "Jane Smith", "Alice Johnson"];
-        const randomName =
-          randomNames[Math.floor(Math.random() * randomNames.length)];
-        setMemberName(randomName);
-      }, 500);
+      // Fetch member name from the API
+      const fetchMemberName = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
+            headers: {
+              adminMemberId: 1,
+            },
+          });
+          setMemberName(response.data.fullName);
+        } catch (error) {
+          console.error("Error fetching member name:", error);
+          setMemberName("Unknown");
+        }
+      };
+      fetchMemberName();
     } else {
       setMemberName("");
     }
@@ -65,17 +74,28 @@ export default function BlockMember() {
     setIsConfirmDialogOpen(false);
 
     const toastId = toast.loading("Blocking member...");
-    // Simulate API call to block the member
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      await axios.put(`http://localhost:8080/member/${formData.memberId}`, {
+        isBlocked: true,
+      }, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    toast.success("Member blocked successfully!", {
-      id: toastId,
-    });
+      toast.success("Member blocked successfully!", {
+        id: toastId,
+      });
 
-    setIsDialogOpen(true);
-    setFormData({
-      memberId: "",
-    });
+      setIsDialogOpen(true);
+      setFormData({
+        memberId: "",
+      });
+    } catch (error) {
+      toast.error("Failed to block member. Please try again.", {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -140,7 +160,7 @@ export default function BlockMember() {
       {/* Success Dialog */}
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(true)}
       >
         <DialogContent className="max-h-screen overflow-y-auto">
           <DialogTitle>Member Blocked</DialogTitle>
