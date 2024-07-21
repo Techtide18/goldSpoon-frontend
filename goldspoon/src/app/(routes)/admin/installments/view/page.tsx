@@ -15,6 +15,7 @@ export default function InstallmentsPaid() {
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchData = async (url) => {
     try {
@@ -23,7 +24,8 @@ export default function InstallmentsPaid() {
           adminMemberId: 1,
         },
       });
-      setFilteredData(response.data);
+      setFilteredData(response.data.content || []);
+      setTotalItems(response.data.pagination.totalItems || 0);
       toast.success("Installment data fetched successfully.");
     } catch (error) {
       toast.error("Failed to fetch data. Please try again.");
@@ -33,10 +35,10 @@ export default function InstallmentsPaid() {
 
   useEffect(() => {
     if (viewOption === "all") {
-      const url = `http://localhost:8080/admin/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
+      const url = `http://localhost:8080/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
       fetchData(url);
     } else if (viewOption === "memberId" && filterId) {
-      const url = `http://localhost:8080/admin/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+      const url = `http://localhost:8080/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
       fetchData(url);
     }
   }, [viewOption, filterId, currentPage]);
@@ -49,6 +51,7 @@ export default function InstallmentsPaid() {
 
   const handleViewByMemberId = () => {
     setViewOption("memberId");
+    setFilterId("");
     setCurrentPage(1);
   };
 
@@ -58,11 +61,11 @@ export default function InstallmentsPaid() {
       return;
     }
     setCurrentPage(1);
-    const url = `http://localhost:8080/admin/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+    const url = `http://localhost:8080/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
     fetchData(url);
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
   const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
@@ -139,36 +142,24 @@ export default function InstallmentsPaid() {
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 100
-          </Button>
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next 100
-          </Button>
-        </CardFooter>
+        {totalPages > 1 && (
+          <CardFooter className="flex justify-end space-x-2">
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous 100
+            </Button>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next 100
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

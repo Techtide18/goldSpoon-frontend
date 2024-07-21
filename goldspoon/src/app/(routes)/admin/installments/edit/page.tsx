@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -42,9 +42,23 @@ export default function EditInstallment() {
     setMemberId(e.target.value);
   };
 
+  const getMemberDetails = async () => {
+    if (!memberId) {
+      return toast.error("Please enter Member ID.");
+    }
+
+    // Simulate an API call to fetch member details
+    const toastId = toast.loading("Fetching Member Details...");
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Simulate fetched data
+    setMemberName("John Doe");
+    toast.success("Member details fetched successfully!", { id: toastId });
+  };
+
   const getInstallmentDetails = async () => {
-    if (!memberId || !installmentMonth) {
-      return toast.error("Please enter Member ID and select Installment Month.");
+    if (!installmentMonth) {
+      return toast.error("Please select Installment Month.");
     }
 
     // Simulate an API call to fetch installment details
@@ -60,7 +74,6 @@ export default function EditInstallment() {
     };
 
     setInstallmentData(fetchedData);
-    setMemberName("John Doe");
     toast.success("Installment details fetched successfully!", { id: toastId });
   };
 
@@ -114,6 +127,31 @@ export default function EditInstallment() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="memberName">Member Name</Label>
+                <Input
+                  id="memberName"
+                  name="memberName"
+                  placeholder="Auto Generated"
+                  value={memberName}
+                  readOnly
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <Button className="w-full" onClick={getMemberDetails}>
+                Get Member Details
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Second Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Edit Installment - Step 2</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 items-center">
                 <Label htmlFor="installmentMonth">Installment Month</Label>
                 <Select
                   name="installmentMonth"
@@ -132,28 +170,17 @@ export default function EditInstallment() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
-                <Label htmlFor="memberName">Member Name</Label>
-                <Input
-                  id="memberName"
-                  name="memberName"
-                  placeholder="Auto Generated"
-                  value={memberName}
-                  readOnly
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
               <Button className="w-full" onClick={getInstallmentDetails}>
-                Get Installment Details for Member
+                Get Installment Details
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Second Card */}
+        {/* Third Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Edit Installment - Step 2</CardTitle>
+            <CardTitle>Edit Installment - Step 3</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,24 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"; // Assuming Textarea component exists
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -39,21 +34,60 @@ export default function AddInstallment() {
   });
 
   const [memberName, setMemberName] = useState("");
+  const [packages, setPackages] = useState([]);
+  const [selectedPackageDuration, setSelectedPackageDuration] = useState(0);
+  const [selectedPackageName, setSelectedPackageName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (formData.memberId) {
-      // Simulate an API call to fetch the member name
-      setTimeout(() => {
-        const randomNames = ["John Doe", "Jane Smith", "Alice Johnson"];
-        const randomName =
-          randomNames[Math.floor(Math.random() * randomNames.length)];
-        setMemberName(randomName);
-      }, 500);
-    } else {
-      setMemberName("");
+    fetchPackages();
+  }, []);
+
+  const fetchMemberName = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/member/${formData.memberId}`,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
+      setMemberName(response.data.fullName);
+    } catch (error) {
+      console.error("Error fetching member name:", error);
+      setMemberName("Unknown");
     }
-  }, [formData.memberId]);
+  };
+
+  const fetchPackages = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/package/all", {
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+      setPackages(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch packages.");
+    }
+  };
+
+  const handlePackageChange = (value) => {
+    const selectedPackage = packages.find((pkg) => pkg.id === parseInt(value));
+    setFormData({
+      ...formData,
+      pinPackage: value,
+    });
+    if (selectedPackage) {
+      setSelectedPackageDuration(selectedPackage.packageDurationInMonths);
+      setSelectedPackageName(selectedPackage.packageName);
+    } else {
+      setSelectedPackageDuration(0);
+      setSelectedPackageName("");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,30 +114,49 @@ export default function AddInstallment() {
       !pinPackage ||
       !amountReceived ||
       !paymentMethod ||
-      !transactionId ||
       !installmentMonth
     ) {
       return toast.error("Please fill out all fields.");
     }
 
+    const requestData = {
+      memberNumber: memberId,
+      amountPaid: parseInt(amountReceived),
+      transactionId,
+      paymentMethod,
+      installmentMonth: parseInt(installmentMonth),
+    };
+
     const toastId = toast.loading("Adding Installment...");
-    // Simulate API call to add installment
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      await axios.put("http://localhost:8080/installments/add", requestData, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
 
-    toast.success("Installment added successfully!", {
-      id: toastId,
-    });
+      toast.success("Installment added successfully!", {
+        id: toastId,
+      });
 
-    setIsDialogOpen(true);
-    setFormData({
-      memberId: "",
-      pinPackage: "",
-      amountReceived: "",
-      paymentMethod: "",
-      transactionId: "",
-      installmentMonth: "",
-      remarks: "",
-    });
+      setIsDialogOpen(true);
+      setFormData({
+        memberId: "",
+        pinPackage: "",
+        amountReceived: "",
+        paymentMethod: "",
+        transactionId: "",
+        installmentMonth: "",
+        remarks: "",
+      });
+      setSelectedPackageName("");
+      setSelectedPackageDuration(0);
+      setMemberName("");
+    } catch (error) {
+      toast.error("Failed to add installment. Please try again.", {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -116,15 +169,24 @@ export default function AddInstallment() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
-              <Input
-                id="memberId"
-                name="memberId"
-                placeholder="Member ID"
-                value={formData.memberId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
+              <div className="flex gap-4">
+                <Input
+                  id="memberId"
+                  name="memberId"
+                  placeholder="Member ID"
+                  value={formData.memberId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button
+                  onClick={fetchMemberName}
+                  type="button"
+                  className="min-w-max"
+                >
+                  Get Member Name
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
@@ -142,17 +204,20 @@ export default function AddInstallment() {
               <Select
                 name="pinPackage"
                 value={formData.pinPackage}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, pinPackage: value })
-                }
+                onValueChange={handlePackageChange}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Package" />
+                  <SelectValue
+                    placeholder={selectedPackageName || "Select Package"}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Package-1500">Package - 1500</SelectItem>
-                  <SelectItem value="Package-2000">Package - 2000</SelectItem>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                      {pkg.packageName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -193,7 +258,7 @@ export default function AddInstallment() {
                   </SelectItem>
                   <SelectItem value="Money Order">Money Order</SelectItem>
                   <SelectItem value="Demand Draft">Demand Draft</SelectItem>
-                  <SelectItem value="Others">Demand Draft</SelectItem>
+                  <SelectItem value="Others">Others</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -205,7 +270,6 @@ export default function AddInstallment() {
                 placeholder="Payment Transaction ID"
                 value={formData.transactionId}
                 onChange={handleChange}
-                required
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -223,8 +287,8 @@ export default function AddInstallment() {
                   <SelectValue placeholder="Select Installment Month" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 15 }, (_, i) => (
-                    <SelectItem key={i + 1} value={`Month-${i + 1}`}>
+                  {Array.from({ length: selectedPackageDuration }, (_, i) => (
+                    <SelectItem key={i + 1} value={(i + 1).toString()}>
                       Month - {i + 1}
                     </SelectItem>
                   ))}
@@ -253,7 +317,7 @@ export default function AddInstallment() {
       </Card>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(true)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
