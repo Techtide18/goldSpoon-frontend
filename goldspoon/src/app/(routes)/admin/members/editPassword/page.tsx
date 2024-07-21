@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -35,20 +35,24 @@ export default function EditPassword() {
       return toast.error("Please enter a Member ID.");
     }
 
-    // Simulate an API call to fetch member password
     const toastId = toast.loading("Fetching Member Password...");
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Simulate fetched data
-    const fetchedData = {
-      memberName: "John Doe",
-      password: "password123",
-    };
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${memberId}`, {
+        headers: {
+          "adminMemberId": 1,
+        },
+      });
 
-    setMemberName(fetchedData.memberName);
-    setPassword(fetchedData.password);
-    setConfirmPassword(""); // Clear confirm password field
-    toast.success("Member password fetched successfully!", { id: toastId });
+      const fetchedData = response.data;
+
+      setMemberName(fetchedData.fullName);
+      setPassword(fetchedData.password);
+      setConfirmPassword(""); // Clear confirm password field
+      toast.success("Member password fetched successfully!", { id: toastId });
+    } catch (error) {
+      toast.error("Failed to fetch member password. Please try again.", { id: toastId });
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -71,14 +75,29 @@ export default function EditPassword() {
     }
 
     const toastId = toast.loading("Updating Member Password...");
-    // Simulate API call to update member password
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("Member password updated successfully!", {
-      id: toastId,
-    });
+    try {
+      await axios.put(`http://localhost:8080/member/${memberId}`, {
+        password: password,
+      }, {
+        headers: {
+          "adminMemberId": 1,
+        },
+      });
 
-    setIsDialogOpen(true);
+      toast.success("Member password updated successfully!", {
+        id: toastId,
+      });
+
+      setIsDialogOpen(true);
+      // Clear all fields
+      setMemberId("");
+      setMemberName("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      toast.error("Failed to update member password. Please try again.", { id: toastId });
+    }
   };
 
   return (

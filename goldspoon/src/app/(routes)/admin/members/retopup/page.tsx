@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -32,7 +26,8 @@ export default function RetopUpMember() {
     memberId: "",
     pinPackage: "",
   });
-
+  const [selectedPackageName, setSelectedPackageName] = useState("");
+  const [selectedPackageId, setSelectedPackageId] = useState("");
   const [memberName, setMemberName] = useState("");
   const [generatedEpin, setGeneratedEpin] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -41,11 +36,14 @@ export default function RetopUpMember() {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/admin/packages", {
-          headers: {
-            adminMemberId: 1,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:8080/admin/packages",
+          {
+            headers: {
+              adminMemberId: 1,
+            },
+          }
+        );
         setPackages(response.data);
       } catch (error) {
         toast.error("Failed to fetch packages.");
@@ -59,11 +57,14 @@ export default function RetopUpMember() {
     const fetchMemberName = async () => {
       if (formData.memberId) {
         try {
-          const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
-            headers: {
-              adminMemberId: 1,
-            },
-          });
+          const response = await axios.get(
+            `http://localhost:8080/member/${formData.memberId}`,
+            {
+              headers: {
+                adminMemberId: 1,
+              },
+            }
+          );
           setMemberName(response.data.fullName || "");
         } catch (error) {
           toast.error("Failed to fetch member details.");
@@ -82,6 +83,16 @@ export default function RetopUpMember() {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handlePackageChange = (value) => {
+    const selectedPackage = packages.find((pkg) => pkg.id === parseInt(value));
+    setSelectedPackageName(selectedPackage.packageName);
+    setSelectedPackageId(value);
+    setFormData({
+      ...formData,
+      pinPackage: value,
     });
   };
 
@@ -108,6 +119,8 @@ export default function RetopUpMember() {
       memberId: "",
       pinPackage: "",
     });
+    setSelectedPackageName("");
+    setSelectedPackageId("");
   };
 
   return (
@@ -134,18 +147,18 @@ export default function RetopUpMember() {
               <Label htmlFor="pinPackage">Package</Label>
               <Select
                 name="pinPackage"
-                value={formData.pinPackage}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, pinPackage: value })
-                }
+                value={selectedPackageId}
+                onValueChange={handlePackageChange}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Package" />
+                  <SelectValue placeholder="Select Package">
+                    {selectedPackageName || "Select Package"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {packages.map((pkg) => (
-                    <SelectItem key={pkg.id} value={pkg.id}>
+                    <SelectItem key={pkg.id} value={pkg.id.toString()}>
                       {pkg.packageName}
                     </SelectItem>
                   ))}
@@ -181,7 +194,7 @@ export default function RetopUpMember() {
           <DialogDescription>
             <div className="mt-4 space-y-2">
               <p>
-                <strong>New package:</strong> package {formData.pinPackage}
+                <strong>New package:</strong> {selectedPackageName}
               </p>
               <p>
                 <strong>New group assigned:</strong> G12

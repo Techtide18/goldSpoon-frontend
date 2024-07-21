@@ -1,27 +1,58 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
-// Simulated Data
-const simulatedData = [
-  { memberId: "MEM123456", memberName: "John Doe", password: "password123" },
-  { memberId: "MEM123457", memberName: "Jane Smith", password: "password456" },
-  { memberId: "MEM123458", memberName: "Alice Johnson", password: "password789" },
-  // Add more data as needed
-];
+const PAGE_SIZE = 100;
 
 export default function ViewPasswords() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
-  const [filteredData, setFilteredData] = useState(simulatedData);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const fetchAllMembers = async (pageNumber = 0) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/admin/members?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
+        headers: {
+          "adminMemberId": 1,
+        },
+      });
+      setFilteredData(response.data);
+      toast.success("Members data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching members data:", error);
+      toast.error("Failed to fetch members data.");
+    }
+  };
+
+  const fetchMemberById = async () => {
+    if (!filterId) {
+      return toast.error("Please enter a Member ID.");
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${filterId}`, {
+        headers: {
+          "adminMemberId": 1,
+        },
+      });
+      const filtered = [response.data];
+      setFilteredData(filtered);
+      toast.success("Member data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching member data:", error);
+      toast.error("Failed to fetch member data.");
+    }
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
-    setFilteredData(simulatedData);
+    fetchAllMembers();
   };
 
   const handleViewByMemberId = () => {
@@ -29,8 +60,7 @@ export default function ViewPasswords() {
   };
 
   const handleGetPassword = () => {
-    const filtered = simulatedData.filter(data => data.memberId === filterId);
-    setFilteredData(filtered);
+    fetchMemberById();
   };
 
   return (
@@ -85,8 +115,8 @@ export default function ViewPasswords() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredData.map((data, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.memberId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.memberNumber}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.fullName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.password}</td>
                 </tr>
               ))}
