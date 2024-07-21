@@ -195,7 +195,7 @@ export default function AddNewGroup() {
       </Card>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => setIsDialogOpen(open)}
+        onOpenChange={(open) => open && setIsDialogOpen(true)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
