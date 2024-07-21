@@ -18,7 +18,7 @@ export default function ViewGroups() {
 
   const fetchGroups = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/admin/groups/all", {
+      const response = await axios.get("http://localhost:8080/group/all", {
         headers: {
           "Content-Type": "application/json",
           adminMemberId: 1,
@@ -116,8 +116,9 @@ export default function ViewGroups() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Token Capacity</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Token Count</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Filled</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filled Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Completed</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -128,9 +129,10 @@ export default function ViewGroups() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.createdDate)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.maxTokenCapacity}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.currentTokenCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.completed ? "Yes" : "No"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupFilledDate ? "Yes" : "No"}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFilledDate)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isCompleted ? "Yes" : "No"}</td>
                 </tr>
               ))}
             </tbody>
