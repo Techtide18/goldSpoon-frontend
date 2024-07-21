@@ -38,23 +38,32 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-dvh">
-      <Card>
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>
-            Enter your memberId and password to login to account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LoginClient onSuccess={handleLoginSuccess} />
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <span>Or</span>
-          <RegisterForm />
-        </CardFooter>
-      </Card>
-      {loading}
+    <div className="flex h-screen">
+      <div className="w-1/2 bg-black flex items-center justify-center">
+      <img
+          src="https://goldspoon.co.in/template/images/logo.svg"
+          alt="Logo"
+          className="w-48"
+        />
+      </div>
+      <div className="w-1/2 flex items-center justify-center">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Login</CardTitle>
+            <CardDescription>
+              Enter your memberId and password to login to account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoginClient onSuccess={handleLoginSuccess} />
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <span>Or</span>
+            <RegisterForm />
+          </CardFooter>
+        </Card>
+        {loading && <div>Loading...</div>}
+      </div>
     </div>
   );
 };
