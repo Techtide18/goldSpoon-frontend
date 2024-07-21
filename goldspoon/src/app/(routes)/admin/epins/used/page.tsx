@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,7 @@ export default function Report() {
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchEpins = async (url, params) => {
     try {
@@ -27,7 +27,9 @@ export default function Report() {
         },
         params,
       });
-      setFilteredData(response.data);
+      const data = response.data;
+      setFilteredData(data.content);
+      setTotalItems(data.pagination.totalItems);
       toast.success("E-PIN data fetched successfully.");
     } catch (error) {
       console.error("Error fetching E-PIN data:", error);
@@ -39,7 +41,7 @@ export default function Report() {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    fetchEpins('http://localhost:8080/admin/epins/used', { pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/epins/used', { pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handleViewByReferralId = () => {
@@ -57,7 +59,7 @@ export default function Report() {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
-    fetchEpins('http://localhost:8080/admin/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const getEpinByMemberId = () => {
@@ -65,20 +67,20 @@ export default function Report() {
       toast.error("Please enter a Member ID.");
       return;
     }
-    fetchEpins('http://localhost:8080/admin/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins('http://localhost:8080/epins/used', { memberNumber: filterId, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
     const params = { pageNumber: page - 1, pageSize: PAGE_SIZE };
     if (viewOption === "all") {
-      fetchEpins('http://localhost:8080/admin/epins/used', params);
+      fetchEpins('http://localhost:8080/epins/used', params);
     } else if (viewOption === "referralId") {
       params.memberNumber = filterId;
-      fetchEpins('http://localhost:8080/admin/epins/used', params);
+      fetchEpins('http://localhost:8080/epins/used', params);
     } else if (viewOption === "memberId") {
       params.memberId = filterId;
-      fetchEpins('http://localhost:8080/admin/epins/used', params);
+      fetchEpins('http://localhost:8080/epins/used', params);
     }
   };
 
@@ -92,11 +94,8 @@ export default function Report() {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const paginatedData = filteredData;
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">

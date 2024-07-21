@@ -47,7 +47,7 @@ export default function GenerateEpin() {
   const fetchPackages = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/admin/package/all",
+        "http://localhost:8080/package/all",
         {
           headers: {
             "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function GenerateEpin() {
   const fetchGroups = async (packageId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/admin/group/package/${packageId}`,
+        `http://localhost:8080/group/package/${packageId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function GenerateEpin() {
     const toastId = toast.loading("Generating E-PIN...");
     try {
       const response = await axios.post(
-        "http://localhost:8080/admin/epins/generate",
+        "http://localhost:8080/epins/generate",
         requestData,
         {
           headers: {
