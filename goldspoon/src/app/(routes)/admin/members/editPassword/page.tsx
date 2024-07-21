@@ -1,28 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
+  DialogClose,
 } from "@/components/ui/dialog";
+
+const PAGE_SIZE = 100;
 
 export default function EditPassword() {
   const [memberId, setMemberId] = useState("");
   const [memberName, setMemberName] = useState("");
-  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -47,7 +46,8 @@ export default function EditPassword() {
       const fetchedData = response.data;
 
       setMemberName(fetchedData.fullName);
-      setPassword(fetchedData.password);
+      setOldPassword(fetchedData.password);
+      setNewPassword(""); // Clear new password field
       setConfirmPassword(""); // Clear confirm password field
       toast.success("Member password fetched successfully!", { id: toastId });
     } catch (error) {
@@ -55,8 +55,8 @@ export default function EditPassword() {
     }
   };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+  const handleNewPasswordChange = (e) => {
+    setNewPassword(e.target.value);
   };
 
   const handleConfirmPasswordChange = (e) => {
@@ -66,19 +66,23 @@ export default function EditPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!password || !confirmPassword) {
-      return toast.error("Please fill both password fields.");
+    if (!newPassword || !confirmPassword) {
+      return toast.error("Please fill both new password fields.");
     }
 
-    if (password !== confirmPassword) {
-      return toast.error("Passwords do not match.");
+    if (newPassword !== confirmPassword) {
+      return toast.error("New passwords do not match.");
+    }
+
+    if (!/[a-zA-Z]/.test(newPassword)) {
+      return toast.error("New password must contain at least one letter.");
     }
 
     const toastId = toast.loading("Updating Member Password...");
 
     try {
       await axios.put(`http://localhost:8080/member/${memberId}`, {
-        password: password,
+        password: newPassword,
       }, {
         headers: {
           "adminMemberId": 1,
@@ -93,7 +97,8 @@ export default function EditPassword() {
       // Clear all fields
       setMemberId("");
       setMemberName("");
-      setPassword("");
+      setOldPassword("");
+      setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
       toast.error("Failed to update member password. Please try again.", { id: toastId });
@@ -147,13 +152,24 @@ export default function EditPassword() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4 items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="oldPassword">Old Password</Label>
                 <Input
-                  id="password"
-                  name="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={handlePasswordChange}
+                  id="oldPassword"
+                  name="oldPassword"
+                  placeholder="Old Password"
+                  value={oldPassword}
+                  readOnly
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={handleNewPasswordChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>

@@ -12,16 +12,19 @@ const PAGE_SIZE = 100;
 export default function ViewPasswords() {
   const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchAllMembers = async (pageNumber = 0) => {
     try {
-      const response = await axios.get(`http://localhost:8080/admin/members?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
+      const response = await axios.get(`http://localhost:8080/member/all?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
         headers: {
           "adminMemberId": 1,
         },
       });
-      setFilteredData(response.data);
+      setFilteredData(response.data.content);
+      setTotalItems(response.data.pagination.totalItems);
       toast.success("Members data fetched successfully.");
     } catch (error) {
       console.error("Error fetching members data:", error);
@@ -52,16 +55,39 @@ export default function ViewPasswords() {
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
-    fetchAllMembers();
+    setCurrentPage(1);
+    fetchAllMembers(0);
   };
 
   const handleViewByMemberId = () => {
     setViewOption("memberId");
+    setFilterId("");
   };
 
   const handleGetPassword = () => {
     fetchMemberById();
   };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    if (viewOption === "all") {
+      fetchAllMembers(page - 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(totalItems / PAGE_SIZE)) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -123,6 +149,24 @@ export default function ViewPasswords() {
             </tbody>
           </table>
         </CardContent>
+        {viewOption === "all" && totalPages > 1 && (
+          <CardFooter className="flex justify-end space-x-2">
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              Previous 100
+            </Button>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Next 100
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

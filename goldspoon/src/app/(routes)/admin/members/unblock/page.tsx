@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,27 +29,23 @@ export default function UnblockMember() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
-  useEffect(() => {
-    if (formData.memberId) {
-      // Fetch member name from the API
-      const fetchMemberName = async () => {
-        try {
-          const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
-            headers: {
-              adminMemberId: 1,
-            },
-          });
-          setMemberName(response.data.fullName);
-        } catch (error) {
-          console.error("Error fetching member name:", error);
-          setMemberName("Unknown");
-        }
-      };
-      fetchMemberName();
-    } else {
-      setMemberName("");
+  const fetchMemberName = async () => {
+    if (!formData.memberId) {
+      return toast.error("Please enter a Member ID.");
     }
-  }, [formData.memberId]);
+    try {
+      const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
+        headers: {
+          adminMemberId: 1,
+        },
+      });
+      setMemberName(response.data.fullName || "");
+      toast.success("Member name fetched successfully.");
+    } catch (error) {
+      setMemberName("Unknown");
+      toast.error("Failed to fetch member details.");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,6 +87,7 @@ export default function UnblockMember() {
       setFormData({
         memberId: "",
       });
+      setMemberName("");
     } catch (error) {
       toast.error("Failed to unblock member. Please try again.", {
         id: toastId,
@@ -108,15 +105,24 @@ export default function UnblockMember() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
-              <Input
-                id="memberId"
-                name="memberId"
-                placeholder="Member ID"
-                value={formData.memberId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
+              <div className="flex gap-4">
+                <Input
+                  id="memberId"
+                  name="memberId"
+                  placeholder="Member ID"
+                  value={formData.memberId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button
+                  onClick={fetchMemberName}
+                  type="button"
+                  className="min-w-max"
+                >
+                  Get Member Name
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
