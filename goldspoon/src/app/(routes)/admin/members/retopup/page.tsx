@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,19 +36,45 @@ export default function RetopUpMember() {
   const [memberName, setMemberName] = useState("");
   const [generatedEpin, setGeneratedEpin] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [packages, setPackages] = useState([]);
 
   useEffect(() => {
-    if (formData.memberId) {
-      // Simulate an API call to fetch the member name
-      setTimeout(() => {
-        const randomNames = ["John Doe", "Jane Smith", "Alice Johnson"];
-        const randomName =
-          randomNames[Math.floor(Math.random() * randomNames.length)];
-        setMemberName(randomName);
-      }, 500);
-    } else {
-      setMemberName("");
-    }
+    const fetchPackages = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/admin/packages", {
+          headers: {
+            adminMemberId: 1,
+          },
+        });
+        setPackages(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch packages.");
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  useEffect(() => {
+    const fetchMemberName = async () => {
+      if (formData.memberId) {
+        try {
+          const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
+            headers: {
+              adminMemberId: 1,
+            },
+          });
+          setMemberName(response.data.fullName || "");
+        } catch (error) {
+          toast.error("Failed to fetch member details.");
+          setMemberName("");
+        }
+      } else {
+        setMemberName("");
+      }
+    };
+
+    fetchMemberName();
   }, [formData.memberId]);
 
   const handleChange = (e) => {
@@ -117,8 +144,11 @@ export default function RetopUpMember() {
                   <SelectValue placeholder="Select Package" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Package-1500">Package - 1500</SelectItem>
-                  <SelectItem value="Package-2000">Package - 2000</SelectItem>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id}>
+                      {pkg.packageName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

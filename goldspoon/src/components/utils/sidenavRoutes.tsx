@@ -39,6 +39,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "View", path: "/admin/members/view" },
       { title: "Edit", path: "/admin/members/edit" },
       { title: "Block", path: "/admin/members/block" },
+      { title: "Unblock", path: "/admin/members/unblock" },
       { title: "Re-topup", path: "/admin/members/retopup" },
       { title: "View Passwords", path: "/admin/members/viewPassword" },
       { title: "Edit Passwords", path: "/admin/members/editPassword" },
