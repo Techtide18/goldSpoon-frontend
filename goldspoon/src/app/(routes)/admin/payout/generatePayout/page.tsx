@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,6 +10,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function GeneratePayout() {
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -22,7 +24,7 @@ export default function GeneratePayout() {
     const dayOfMonth = currentDate.getDate();
 
     // Check if the date is between 15th and end of the month
-    if (dayOfMonth >= 10) {
+    if (dayOfMonth >= 15) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);
@@ -51,11 +53,29 @@ export default function GeneratePayout() {
     setIsLoading(true);
     setIsDialogOpen(true);
 
-    // Simulate API call to generate payout
+    // Simulate API call to generate payout with a delay
     await new Promise((resolve) => setTimeout(resolve, 7000));
 
-    setIsLoading(false);
-    setMessage("This month's payout has been generated successfully!");
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/admin/job/generate/levelIncome"
+      );
+
+      if (response.status === 200) {
+        setMessage("This month's payout has been generated successfully!");
+        toast.success("This month's payout has been generated successfully!");
+      } else {
+        setMessage("Failed to generate payout. Please try again.");
+        toast.error("Failed to generate payout. Please try again.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to generate payout. Please try again.";
+      setMessage(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
