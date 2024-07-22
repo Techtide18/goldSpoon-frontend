@@ -1,130 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
+import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-
-// Simulated Data for Installments
-const simulatedInstallmentsData = [
-  {
-    paidOnDate: "2024-07-13",
-    installmentMonthCount: "Month - 1",
-    paymentMethod: "Cash Deposit",
-    transactionId: "TXN123456",
-    epinNumber: "MEM123456",
-    groupId: "Group A",
-    tokenId: "TID123",
-    packageName: "Package - 1500",
-  },
-  {
-    paidOnDate: "2024-08-13",
-    installmentMonthCount: "Month - 2",
-    paymentMethod: "Paytm",
-    transactionId: "TXN123457",
-    epinNumber: "MEM123457",
-    groupId: "Group B",
-    tokenId: "TID124",
-    packageName: "Package - 2000",
-  },
-  {
-    paidOnDate: "2024-09-13",
-    installmentMonthCount: "Month - 3",
-    paymentMethod: "Google Pay",
-    transactionId: "TXN123458",
-    epinNumber: "MEM123458",
-    groupId: "Group C",
-    tokenId: "TID125",
-    packageName: "Package - 1500",
-  },
-  {
-    paidOnDate: "2024-10-13",
-    installmentMonthCount: "Month - 4",
-    paymentMethod: "Phone Pay",
-    transactionId: "TXN123459",
-    epinNumber: "MEM123459",
-    groupId: "Group D",
-    tokenId: "TID126",
-    packageName: "Package - 2000",
-  },
-  {
-    paidOnDate: "2024-11-13",
-    installmentMonthCount: "Month - 5",
-    paymentMethod: "Cheque",
-    transactionId: "TXN123460",
-    epinNumber: "MEM123460",
-    groupId: "Group E",
-    tokenId: "TID127",
-    packageName: "Package - 1500",
-  },
-  {
-    paidOnDate: "2024-12-13",
-    installmentMonthCount: "Month - 6",
-    paymentMethod: "Internet Banking",
-    transactionId: "TXN123461",
-    epinNumber: "MEM123461",
-    groupId: "Group F",
-    tokenId: "TID128",
-    packageName: "Package - 2000",
-  },
-  {
-    paidOnDate: "2025-01-13",
-    installmentMonthCount: "Month - 7",
-    paymentMethod: "Money Order",
-    transactionId: "TXN123462",
-    epinNumber: "MEM123462",
-    groupId: "Group G",
-    tokenId: "TID129",
-    packageName: "Package - 1500",
-  },
-  {
-    paidOnDate: "2025-02-13",
-    installmentMonthCount: "Month - 8",
-    paymentMethod: "Demand Draft",
-    transactionId: "TXN123463",
-    epinNumber: "MEM123463",
-    groupId: "Group H",
-    tokenId: "TID130",
-    packageName: "Package - 2000",
-  },
-  {
-    paidOnDate: "2025-03-13",
-    installmentMonthCount: "Month - 9",
-    paymentMethod: "Cash Deposit",
-    transactionId: "TXN123464",
-    epinNumber: "MEM123464",
-    groupId: "Group I",
-    tokenId: "TID131",
-    packageName: "Package - 1500",
-  },
-  {
-    paidOnDate: "2025-04-13",
-    installmentMonthCount: "Month - 10",
-    paymentMethod: "Paytm",
-    transactionId: "TXN123465",
-    epinNumber: "MEM123465",
-    groupId: "Group J",
-    tokenId: "TID132",
-    packageName: "Package - 2000",
-  },
-  // Add more data to test pagination
-];
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
 export default function InstallmentsReport() {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(simulatedInstallmentsData.length / PAGE_SIZE);
-  const paginatedData = simulatedInstallmentsData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const [totalPages, setTotalPages] = useState(0);
+  const [installmentsData, setInstallmentsData] = useState([]);
+
+  useEffect(() => {
+    const fetchInstallments = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error('You must be logged in to view this information.');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8080/installments/${session.user.name}/directs`, {
+          params: {
+            pageNumber: currentPage - 1,
+            pageSize: PAGE_SIZE,
+          },
+        });
+
+        if (response.data && response.data.content) {
+          setInstallmentsData(response.data.content);
+          setTotalPages(Math.ceil(response.data.totalElements / PAGE_SIZE));
+        } else {
+          setInstallmentsData([]);
+          toast.error('No data returned from the server.');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch installments data.');
+        console.error("Failed to fetch installments data:", error);
+      }
+    };
+
+    fetchInstallments();
+  }, [currentPage]);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -154,8 +75,8 @@ export default function InstallmentsReport() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((data, index) => (
+              {installmentsData.length > 0 ? (
+                installmentsData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {data.paidOnDate}
@@ -177,7 +98,7 @@ export default function InstallmentsReport() {
               ) : (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="5"
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
                     No data
@@ -187,21 +108,7 @@ export default function InstallmentsReport() {
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
+        <CardFooter className="flex justify-end space-x-2">
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -218,6 +125,22 @@ export default function InstallmentsReport() {
           >
             Next 10
           </Button>
+        </CardFooter>
+        <CardFooter className="flex justify-end w-full space-x-2">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, page) => setCurrentPage(page)}
+            siblingCount={1}
+            boundaryCount={1}
+            size="large"
+            shape="rounded"
+            variant="outlined"
+            color="primary"
+            className="mt-4"
+            showFirstButton
+            showLastButton
+          />
         </CardFooter>
       </Card>
     </div>
