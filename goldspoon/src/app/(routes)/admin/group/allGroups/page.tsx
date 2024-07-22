@@ -129,8 +129,8 @@ export default function ViewGroups() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.createdDate)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.maxTokenCapacity}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.currentTokenCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupFilledDate ? "Yes" : "No"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFilledDate)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupFullDate ? "Yes" : "No"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFullDate)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isCompleted ? "Yes" : "No"}</td>
                 </tr>
