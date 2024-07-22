@@ -1,23 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
 
-// Simulated Data
-const simulatedProfile = {
-  memberName: "John Doe",
-  memberId: "123456",
-  phone: "123-456-7890",
-  email: "john.doe@example.com",
-  aadhaarNumber: "1234-5678-9012",
-  panNumber: "ABCDE1234F",
-  address: "123 Main St, City, Country",
-  isActive: "Yes",
-  bankAccDetails: "Bank Name: ABC Bank, Acc No: 1234567890",
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
 export default function ViewProfile() {
-  const [profile] = useState(simulatedProfile);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error('You must be logged in to view this information.');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8080/member/${session.user.name}`, {
+        });
+
+        if (response.data) {
+          setProfile(response.data);
+        } else {
+          toast.error('No profile data returned from the server.');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch profile data.');
+        console.error("Failed to fetch profile data:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (!profile) {
+    return <div></div>;
+  }
+
+  const profileFields = [
+    { label: "Full Name", value: profile.fullName },
+    { label: "Member ID", value: profile.memberNumber },
+    { label: "Phone", value: profile.phone },
+    { label: "Email", value: profile.email },
+    { label: "Aadhaar Number", value: profile.aadhaarNumber },
+    { label: "PAN Number", value: profile.panNumber },
+    { label: "Address", value: profile.addressDetails },
+    { label: "Bank Account Details", value: profile.bankAccDetails },
+    { label: "Created Date", value: formatDate( profile.createdDate) },
+  ];
 
   return (
     <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
@@ -28,17 +71,13 @@ export default function ViewProfile() {
             <CardTitle className="text-2xl font-bold">VIEW PROFILE</CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
-            {Object.entries(profile).map(([key, value]) => (
+            {profileFields.map(({ label, value }) => (
               <div
                 className="flex justify-between items-center py-2 border-b border-gray-200"
-                key={key}
+                key={label}
               >
                 <span className="font-semibold text-md capitalize">
-                  {key
-                    .replace(/([A-Z])/g, " $1")
-                    .replace(/^./, (str) => str.toUpperCase())
-                    .replace("Id", "ID")}
-                  :
+                  {label}:
                 </span>
                 <span className="text-gray-700 text-md">{value}</span>
               </div>

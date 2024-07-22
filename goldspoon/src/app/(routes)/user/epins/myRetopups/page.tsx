@@ -30,7 +30,6 @@ export default function ReTopupReport() {
     try {
       const response = await axios.get(`http://localhost:8080/member/retopup?memberId=${session.user.name}`, {
         headers: {
-          Authorization: `Bearer ${session.accessToken}`, // Assuming your JWT is stored as accessToken
           'Content-Type': 'application/json',
         }
       });
@@ -51,12 +50,6 @@ export default function ReTopupReport() {
       <Card className="w-full max-w-7xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">VIEW RETOPUPS</CardTitle>
-          <Button
-            onClick={fetchData}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Get My ReTopup History
-          </Button>
         </CardHeader>
         <CardContent>
           <table className="min-w-full divide-y divide-gray-200">

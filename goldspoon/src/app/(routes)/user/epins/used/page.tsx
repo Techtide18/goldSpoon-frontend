@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -10,70 +12,54 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
+import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
 
-// Simulated Data for Used EPINs
-const usedEpinData = [
-  {
-    epinId: "EPN123456",
-    memberId: "MEM123456",
-    packageName: "Package - 1500",
-    createdDate: "14-07-2024",
-    referralMemberId: "REF123456",
-    group: "G12",
-    reTopupDate: "14-07-2024",
-  },
-  {
-    epinId: "EPN123457",
-    memberId: "MEM123457",
-    packageName: "Package - 2000",
-    createdDate: "15-07-2024",
-    referralMemberId: "REF123457",
-    group: "G14",
-    reTopupDate: "15-07-2024",
-  },
-  // Add more data as needed (total 50 entries)
-  {
-    epinId: "EPN123458",
-    memberId: "MEM123458",
-    packageName: "Package - 1500",
-    createdDate: "16-07-2024",
-    referralMemberId: "REF123458",
-    group: "G15",
-    reTopupDate: "16-07-2024",
-  },
-  {
-    epinId: "EPN123459",
-    memberId: "MEM123459",
-    packageName: "Package - 2000",
-    createdDate: "17-07-2024",
-    referralMemberId: "REF123459",
-    group: "G16",
-    reTopupDate: "17-07-2024",
-  },
-  // Repeat for 50 entries
-];
-
-for (let i = 460; i < 506; i++) {
-  usedEpinData.push({
-    epinId: `EPN123${i}`,
-    memberId: `MEM123${i}`,
-    packageName: `Package - ${i % 2 === 0 ? "1500" : "2000"}`,
-    createdDate: `14-07-2024`,
-    referralMemberId: `REF123${i}`,
-    group: `G${12 + (i % 5)}`,
-    reTopupDate: `14-07-2024`,
-  });
-}
-
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 50;
 
 export default function UsedEpinReport() {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(usedEpinData.length / PAGE_SIZE);
-  const paginatedData = usedEpinData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const [totalItems, setTotalItems] = useState(0);
+  const [epinData, setEpinData] = useState([]);
+
+  const fetchEpins = async (params) => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to view this information.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:8080/epin/used`, {
+        params: {
+          ...params,
+          memberId: session.user.name,
+          referral: true,
+        },
+      });
+
+      if (response.data && response.data.epins) {
+        setEpinData(response.data.epins);
+        setTotalItems(response.data.pagination.totalItems);
+      } else {
+        setEpinData([]);
+        toast.error('No data returned from the server.');
+      }
+    } catch (error) {
+      toast.error('Failed to fetch EPIN data.');
+      console.error("Failed to fetch EPIN data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEpins({ pageNumber: currentPage - 1, pageSize: PAGE_SIZE });
+  }, [currentPage]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+    fetchEpins({ pageNumber: page - 1, pageSize: PAGE_SIZE });
+  };
+
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -109,8 +95,8 @@ export default function UsedEpinReport() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((data, index) => (
+              {epinData.length > 0 ? (
+                epinData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {data.epinId}
@@ -141,18 +127,18 @@ export default function UsedEpinReport() {
                     colSpan="7"
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
-                    No data
+                    No data available
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
+        <CardFooter className="flex justify-end space-x-2">
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"
@@ -168,7 +154,7 @@ export default function UsedEpinReport() {
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            Previous 10
+            Previous
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
@@ -177,7 +163,7 @@ export default function UsedEpinReport() {
             }
             disabled={currentPage === totalPages}
           >
-            Next 10
+            Next
           </Button>
         </CardFooter>
       </Card>

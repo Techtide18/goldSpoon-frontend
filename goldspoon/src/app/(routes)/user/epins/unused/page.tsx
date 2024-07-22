@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Card,
@@ -9,150 +11,62 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
+import { Pagination } from "@/components/ui/pagination";
 
-// Simulated Data
-const simulatedData = [
-  {
-    EpinID: "EPN123456",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123457",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123458",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123459",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123460",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123461",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123462",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123463",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123464",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123465",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123466",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123467",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123468",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123469",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123470",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123471",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123472",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123473",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123474",
-    packageName: "Package - 1500",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-  {
-    EpinID: "EPN123475",
-    packageName: "Package - 2000",
-    createdDate: "13-07-2024",
-    referralMemberId: "REF123456",
-  },
-];
-
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 50;  // Updated page size to 50
 
 export default function EpinReport() {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(simulatedData.length / PAGE_SIZE);
-  const paginatedData = simulatedData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const [totalItems, setTotalItems] = useState(0);
+  const [epinData, setEpinData] = useState([]);
+
+  const fetchEpins = async (params) => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to view this information.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:8080/epin/unused`, {
+        params: {
+          ...params,
+          memberId: session.user.name,
+          referral: true,
+        },
+      });
+
+      if (response.data && response.data.epins) {
+        setEpinData(response.data.epins);
+        setTotalItems(response.data.pagination.totalItems);
+      } else {
+        setEpinData([]);
+        toast.error('No data returned from the server.');
+      }
+    } catch (error) {
+      toast.error('Failed to fetch EPIN data.');
+      console.error("Failed to fetch EPIN data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEpins({ pageNumber: currentPage - 1, pageSize: PAGE_SIZE });
+  }, [currentPage]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+    fetchEpins({ pageNumber: page - 1, pageSize: PAGE_SIZE });
+  };
+
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            VIEW UNUSED EPINs
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">VIEW UNUSED EPINs</CardTitle>
         </CardHeader>
         <CardContent>
           <table className="min-w-full divide-y divide-gray-200">
@@ -176,8 +90,8 @@ export default function EpinReport() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((data, index) => (
+              {epinData.length > 0 ? (
+                epinData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {data.EpinID}
@@ -213,18 +127,18 @@ export default function EpinReport() {
                     colSpan="5"
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
-                    No data
+                    No data available
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
+        <CardFooter className="flex justify-end space-x-2">
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"
@@ -237,19 +151,17 @@ export default function EpinReport() {
           />
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => handlePageChange(null, Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
           >
-            Previous 10
+            Previous
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => handlePageChange(null, Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            Next 10
+            Next
           </Button>
         </CardFooter>
       </Card>

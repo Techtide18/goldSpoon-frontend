@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,22 +20,33 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Simulated Data
-const initialProfile = {
-  memberName: "John Doe",
-  memberId: "123456",
-  phone: "123-456-7890",
-  email: "john.doe@example.com",
-  aadhaarNumber: "1234-5678-9012",
-  panNumber: "ABCDE1234F",
-  address: "123 Main St, City, Country",
-  isActive: "Yes",
-  bankAccDetails: "Bank Name: ABC Bank, Acc No: 1234567890",
-};
-
 export default function EditProfile() {
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error('You must be logged in to view this information.');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8080/member/${session.user.name}`);
+        if (response.data) {
+          setProfile(response.data);
+        } else {
+          toast.error('No profile data returned from the server.');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch profile data.');
+        console.error("Failed to fetch profile data:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,14 +59,46 @@ export default function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simulate an API call to update profile details
-    const toastId = toast.loading("Updating Profile Details...");
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to update this information.');
+      return;
+    }
 
-    toast.success("Profile details updated successfully!", { id: toastId });
+    try {
+      const toastId = toast.loading("Updating Profile Details...");
+      await axios.put(`http://localhost:8080/member/${session.user.name}`, {
+        fullName: profile.fullName,
+        phone: profile.phone,
+        email: profile.email,
+        aadhaarNumber: profile.aadhaarNumber,
+        panNumber: profile.panNumber,
+        addressDetails: profile.addressDetails,
+        bankAccDetails: profile.bankAccDetails,
+      });
 
-    setIsDialogOpen(true);
+      toast.success("Profile details updated successfully!", { id: toastId });
+      setIsDialogOpen(true);
+    } catch (error) {
+      toast.error('Failed to update profile details.');
+      console.error("Failed to update profile details:", error);
+    }
   };
+
+  if (!profile) {
+    return <div></div>;
+  }
+
+  // Filter out the fields that should not be displayed
+  const displayFields = [
+    "fullName",
+    "phone",
+    "email",
+    "aadhaarNumber",
+    "panNumber",
+    "addressDetails",
+    "bankAccDetails",
+  ];
 
   return (
     <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
@@ -66,7 +110,7 @@ export default function EditProfile() {
           </CardHeader>
           <CardContent className="p-8 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {Object.entries(profile).map(([key, value]) => (
+              {displayFields.map((key) => (
                 <div className="flex items-center gap-4" key={key}>
                   <Label
                     htmlFor={key}
@@ -81,9 +125,8 @@ export default function EditProfile() {
                   <Input
                     id={key}
                     name={key}
-                    value={value}
+                    value={profile[key]}
                     onChange={handleChange}
-                    readOnly={key === "memberId"}
                     className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                 </div>
