@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const PAGE_SIZE = 10;
 
 export default function InstallmentsReport() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [installmentsData, setInstallmentsData] = useState([]);
 
@@ -26,7 +26,7 @@ export default function InstallmentsReport() {
       try {
         const response = await axios.get(`http://localhost:8080/installments`, {
           params: {
-            pageNumber: currentPage - 1,
+            pageNumber: currentPage,
             pageSize: PAGE_SIZE,
             memberNumber: session.user.name,
           },
@@ -119,17 +119,17 @@ export default function InstallmentsReport() {
           <div className="flex space-x-2">
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+              disabled={currentPage === 0}
             >
               Previous 10
             </Button>
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
               onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
               }
-              disabled={currentPage === totalPages}
+              disabled={currentPage >= totalPages - 1}
             >
               Next 10
             </Button>
@@ -138,8 +138,8 @@ export default function InstallmentsReport() {
         <CardFooter className="flex justify-end space-x-2">
           <Pagination
             count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            page={currentPage + 1}
+            onChange={(e, page) => setCurrentPage(page - 1)}
             siblingCount={1}
             boundaryCount={1}
             size="large"
