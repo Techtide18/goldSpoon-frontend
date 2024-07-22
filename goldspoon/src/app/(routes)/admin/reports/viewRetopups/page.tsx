@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -13,34 +14,37 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedReTopups = [
-  { memberId: "M001", oldEpin: "E12345", newEpin: "E67890", oldPackage: "Basic", newPackage: "Premium", retopupDate: "2024-06-15" },
-  { memberId: "M002", oldEpin: "E23456", newEpin: "E78901", oldPackage: "Standard", newPackage: "Gold", retopupDate: "2024-07-01" },
-  { memberId: "M003", oldEpin: "E34567", newEpin: "E89012", oldPackage: "Gold", newPackage: "Platinum", retopupDate: "2024-07-10" },
-  { memberId: "M004", oldEpin: "E45678", newEpin: "E90123", oldPackage: "Basic", newPackage: "Standard", retopupDate: "2024-07-15" },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewReTopups() {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
-  const [filteredData, setFilteredData] = useState(simulatedReTopups);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    if (viewOption === "all") {
-      setFilteredData(simulatedReTopups);
+  const fetchReTopups = async (memberId = null) => {
+    try {
+      const response = await axios.get("http://localhost:8080/member/retopups", {
+        params: memberId ? { memberId } : {},
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      setCurrentPage(1);
+      toast.success("Re-topups data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching re-topups data:", error);
+      toast.error("Failed to fetch re-topups data.");
     }
-  }, [viewOption]);
+  };
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    setFilteredData(simulatedReTopups);
+    fetchReTopups();
   };
 
   const handleViewByMemberId = () => {
@@ -53,15 +57,7 @@ export default function ViewReTopups() {
       return toast.error("Please enter a Member ID.");
     }
 
-    const filtered = simulatedReTopups.filter((data) => data.memberId === filterId);
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified Member ID.");
-      return;
-    }
-
-    setFilteredData(filtered);
-    setCurrentPage(1);
-    toast.success("Data fetched successfully.");
+    fetchReTopups(filterId);
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -13,23 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedDirects = [
-  { memberId: "M001", memberName: "John Doe", directCount: 5 },
-  { memberId: "M002", memberName: "Jane Smith", directCount: 10 },
-  { memberId: "M003", memberName: "Alice Johnson", directCount: 7 },
-  { memberId: "M004", memberName: "Bob Brown", directCount: 3 },
-  { memberId: "M005", memberName: "Charlie Davis", directCount: 12 },
-  { memberId: "M006", memberName: "Dave Wilson", directCount: 8 },
-  { memberId: "M007", memberName: "Eva Green", directCount: 6 },
-  { memberId: "M008", memberName: "Frank Harris", directCount: 11 },
-  { memberId: "M009", memberName: "Grace Lee", directCount: 9 },
-  { memberId: "M010", memberName: "Hank Miller", directCount: 4 },
-  { memberId: "M011", memberName: "Ivy Walker", directCount: 20 },
-  { memberId: "M012", memberName: "Jack Young", directCount: 25 },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewDirects() {
@@ -38,47 +22,44 @@ export default function ViewDirects() {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const fetchDirects = async (minDirects, maxDirects) => {
+    try {
+      const response = await axios.get("http://localhost:8080/directs", {
+        params: { minDirects, maxDirects },
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+      setFilteredData(response.data);
+      setCurrentPage(1);
+      toast.success("Directs data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching directs data:", error);
+      toast.error("Failed to fetch directs data.");
+    }
+  };
+
   const handleView5Directs = () => {
     setViewOption("5directs");
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= 5 && data.directCount < 10
-    );
-    setFilteredData(filtered);
-    setCurrentPage(1);
+    fetchDirects(5, 10);
   };
 
   const handleView10Directs = () => {
     setViewOption("10directs");
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= 10 && data.directCount < 20
-    );
-    setFilteredData(filtered);
-    setCurrentPage(1);
+    fetchDirects(10, 20);
   };
 
   const handleView20Directs = () => {
     setViewOption("20directs");
-    const filtered = simulatedDirects.filter((data) => data.directCount >= 20);
-    setFilteredData(filtered);
-    setCurrentPage(1);
+    fetchDirects(20, null);
   };
 
   const handleViewCustomDirects = () => {
     if (!customDirectCount || customDirectCount <= 0) {
       return toast.error("Please enter a valid number of directs.");
     }
-
-    const filtered = simulatedDirects.filter(
-      (data) => data.directCount >= customDirectCount
-    );
-    if (filtered.length === 0) {
-      toast.error("No directs found for the specified count.");
-      return;
-    }
-
-    setFilteredData(filtered);
-    setCurrentPage(1);
-    toast.success("Directs fetched successfully.");
+    fetchDirects(customDirectCount, null);
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);

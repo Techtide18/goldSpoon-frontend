@@ -12,6 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Simulated Data
 const simulatedWithdrawalRequests = [
@@ -61,10 +68,12 @@ const simulatedWithdrawalRequests = [
 const PAGE_SIZE = 100;
 
 export default function ViewWithdrawalRequests() {
-  const [viewOption, setViewOption] = useState("pending");
+  const [viewOption, setViewOption] = useState("");
   const [filterId, setFilterId] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   useEffect(() => {
     if (viewOption !== "memberId") {
@@ -109,6 +118,27 @@ export default function ViewWithdrawalRequests() {
     }
 
     filterData();
+  };
+
+  const approveRequest = (request) => {
+    setSelectedRequest(request);
+    setIsApproveDialogOpen(true);
+  };
+
+  const handleApprove = () => {
+    // Simulate API call to approve request
+    toast.success(
+      `Request for amount ${selectedRequest.amountRequested} for member ID ${selectedRequest.memberId} approved.`
+    );
+    setIsApproveDialogOpen(false);
+    // Update the status to 'approved'
+    setFilteredData((prevData) =>
+      prevData.map((data) =>
+        data.requestId === selectedRequest.requestId
+          ? { ...data, status: "approved" }
+          : data
+      )
+    );
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
@@ -178,7 +208,9 @@ export default function ViewWithdrawalRequests() {
       {/* Card 2 */}
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
-          <CardTitle className="text-lg font-bold">Withdrawal Requests Report</CardTitle>
+          <CardTitle className="text-lg font-bold">
+            Withdrawal Requests Report
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -206,6 +238,11 @@ export default function ViewWithdrawalRequests() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Group Name
                   </th>
+                  {viewOption === "pending" && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Approve Request
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -233,12 +270,22 @@ export default function ViewWithdrawalRequests() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.groupName}
                       </td>
+                      {viewOption === "pending" && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <Button
+                            onClick={() => approveRequest(data)}
+                            className="bg-green-500 text-white"
+                          >
+                            Approve
+                          </Button>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="7"
+                      colSpan={viewOption === "pending" ? 8 : 7}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No data
@@ -284,6 +331,28 @@ export default function ViewWithdrawalRequests() {
           </div>
         </CardFooter>
       </Card>
+
+      {/* Approve Request Dialog */}
+      <Dialog
+        open={isApproveDialogOpen}
+        // onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => open && setIsApproveDialogOpen(true)}
+      >
+        <DialogContent>
+          <DialogTitle>Approve Request</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to approve the request for amount{" "}
+            <strong>{selectedRequest?.amountRequested}</strong> for member ID{" "}
+            <strong>{selectedRequest?.memberId}</strong>?
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={() => setIsApproveDialogOpen(false)}>No</Button>
+            <Button onClick={handleApprove} className="bg-green-500 text-white">
+              Yes, Approve
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

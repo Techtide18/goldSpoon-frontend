@@ -1,17 +1,17 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DashboardTitle from "@/components/cards/dashboardTitle";
 import {
   Users,
   DollarSign,
   ShoppingCart,
-  ArrowBigDownDashIcon,
   PersonStanding,
   Package,
-  ArrowBigDown,
-  Package2,
   Fingerprint,
   Braces,
   CreditCard,
-  PersonStandingIcon,
 } from "lucide-react";
 import DashboardCard, {
   DashboardCardContent,
@@ -21,104 +21,122 @@ import RecentWithdrawalsCard, {
   WithdrawalsProps,
 } from "@/components/cards/recentWithdrawalsCard";
 
-const cardData: DashboardCardProps[] = [
+const initialCardData: DashboardCardProps[] = [
   {
     label: "Epin Id",
-    amount: "2342353534", // Example data
+    amount: "...",
     description: "My current epin",
     icon: Fingerprint,
   },
   {
     label: "Current Group",
-    amount: "G12", // Example data
+    amount: "...",
     description: "My current group",
     icon: Users,
   },
   {
     label: "Token Number",
-    amount: "67", // Example data
+    amount: "...",
     description: "My token number in group",
     icon: Braces,
   },
   {
     label: "Current Package",
-    amount: "Package - 1500", // Example data
+    amount: "...",
     description: "My current package",
     icon: Package,
   },
   {
     label: "Total Renewal Income History",
-    amount: "₹260", // Example data
+    amount: "...",
     description: "Total renewal income generated",
     icon: DollarSign,
   },
   {
     label: "Total Level Income History",
-    amount: "₹7,231", // Example data
+    amount: "...",
     description: "Total level income generated",
     icon: DollarSign,
   },
   {
     label: "Total Wallet Balance",
-    amount: "₹271,800", // Example data
+    amount: "...",
     description: "Total balance in wallet",
     icon: DollarSign,
   },
   {
     label: "Approved Wallet Balance",
-    amount: "₹171,800", // Example data
+    amount: "...",
     description: "Total approved balance in wallet",
     icon: DollarSign,
   },
   {
     label: "My Status",
-    amount: "Active", // Example data
+    amount: "...",
     description: "My epin status",
     icon: PersonStanding,
   },
   {
     label: "Total Withdrawals Count",
-    amount: "60", // Example data
-    description: "Total 60 groups present",
+    amount: "...",
+    description: "Total withdrawal operations",
     icon: CreditCard,
   },
   {
-    label: "Total Withdrawals Ammount",
-    amount: "₹32,430", // Example data
-    description: "Total 60 groups present",
+    label: "Total Withdrawals Amount",
+    amount: "...",
+    description: "Total amount withdrawn",
     icon: CreditCard,
-  },
-];
-
-const userSalesData: WithdrawalsProps[] = [
-  {
-    epin: "4234234234",
-    date: "27-04-24",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    epin: "4234234234",
-    date: "27-09-24",
-    saleAmount: "+₹1,999.00",
-  },
-  {
-    epin: "4234234234",
-    date: "27-11-24",
-    saleAmount: "+₹39.00",
-  },
-  {
-    epin: "4234234234",
-    date: "27-03-24",
-    saleAmount: "+₹299.00",
-  },
-  {
-    epin: "4234234234",
-    date: "27-03-24",
-    saleAmount: "+₹39.00",
   },
 ];
 
 export default function Home() {
+  const [cardData, setCardData] = useState<DashboardCardProps[]>(initialCardData);
+  const [withdrawalsData, setWithdrawalsData] = useState<WithdrawalsProps[]>([]);
+
+  useEffect(() => {
+    const fetchCardData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/dashboard/member", {
+          headers: {
+            adminMemberId: 1, 
+          },
+        });
+        const data = response.data;
+        const updatedCardData = data.map(card => ({
+          label: card.label,
+          amount: card.amount.toString(),
+          description: card.description,
+          icon: eval(card.icon),  // Adjust based on your icon handling strategy
+        }));
+        setCardData(updatedCardData);
+      } catch (error) {
+        console.error("Error fetching card data:", error);
+      }
+    };
+
+    const fetchRecentWithdrawals = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/dashboard/recentWithdrawal", {
+          headers: {
+            adminMemberId: 1,
+          },
+        });
+        const withdrawals = response.data.map(wd => ({
+          epin: wd.epinNumber,
+          date: wd.withdrawalDate,
+          saleAmount: `+₹${wd.withdrawalAmount}`,
+        }));
+        setWithdrawalsData(withdrawals);
+      } catch (error) {
+        console.error("Error fetching recent withdrawals data:", error);
+      }
+    };
+
+    fetchCardData();
+    fetchRecentWithdrawals();
+  }, []);
+
   return (
     <div className="flex flex-col gap-5 w-full px-4 mt-4">
       <DashboardTitle title="Dashboard" />
@@ -140,7 +158,7 @@ export default function Home() {
             You made these withdrawals recently.
           </p>
         </section>
-        {userSalesData.map((d, i) => (
+        {withdrawalsData.map((d, i) => (
           <RecentWithdrawalsCard
             key={i}
             date={d.date}

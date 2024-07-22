@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -14,35 +15,6 @@ import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
-// Simulated Data
-const simulatedDownlines = [
-  {
-    memberId: "D001",
-    memberName: "Downline 1",
-    level: 1,
-    lastInstallmentPaid: "2024-06-15",
-  },
-  {
-    memberId: "D002",
-    memberName: "Downline 2",
-    level: 2,
-    lastInstallmentPaid: "2024-07-01",
-  },
-  {
-    memberId: "D003",
-    memberName: "Downline 3",
-    level: 1,
-    lastInstallmentPaid: "2024-07-10",
-  },
-  {
-    memberId: "D004",
-    memberName: "Downline 4",
-    level: 3,
-    lastInstallmentPaid: "2024-07-15",
-  },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewDownline() {
@@ -51,20 +23,33 @@ export default function ViewDownline() {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getDownline = () => {
+  const getDownline = async () => {
     if (!filterId) {
       return toast.error("Please enter a Member ID.");
     }
 
-    // Simulate fetching downline data from backend based on the entered Member ID
-    // and setting the memberName and filteredData
-    const member = { memberName: "John Doe" }; // Simulated member name
-    const filtered = simulatedDownlines; // Simulated downline data
+    try {
+      // Fetch downline data from the backend based on the entered Member ID
+      const response = await axios.get(
+        `http://localhost:8080/downline/${filterId}`, // Adjust the endpoint accordingly
+        {
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        }
+      );
 
-    setMemberName(member.memberName);
-    setFilteredData(filtered);
-    setCurrentPage(1);
-    toast.success("Downline data fetched successfully.");
+      const { memberName, downlines } = response.data;
+
+      setMemberName(memberName);
+      setFilteredData(downlines);
+      setCurrentPage(1);
+      toast.success("Downline data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching downline data:", error);
+      toast.error("Failed to fetch downline data.");
+    }
   };
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
