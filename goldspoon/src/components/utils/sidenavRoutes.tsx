@@ -28,7 +28,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "Add", path: "/admin/installments/add" },
       // { title: "Edit", path: "/admin/installments/edit" },
       { title: "View", path: "/admin/installments/view" },
-      { title: "Remove", path: "/admin/installments/remove" },
+      // { title: "Remove", path: "/admin/installments/remove" },
     ],
   },
   {

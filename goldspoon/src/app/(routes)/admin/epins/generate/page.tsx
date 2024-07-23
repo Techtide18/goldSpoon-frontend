@@ -115,9 +115,11 @@ export default function GenerateEpin() {
     setFormData({
       ...formData,
       pinPackage: value,
+      group: "", // Reset group to default when a new package is selected
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
+      setSelectedGroupName(""); // Reset selected group name
       await fetchGroups(value);
     } else {
       setSelectedPackageName("");

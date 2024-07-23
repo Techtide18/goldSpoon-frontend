@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -13,59 +14,61 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedLevelIncome = [
-  {
-    memberId: "M001",
-    dateTime: "2024-06-15 10:00:00",
-    receivedMoneyFor: "M002",
-    level: "2",
-    amountReceived: "500",
-  },
-  {
-    memberId: "M003",
-    dateTime: "2024-06-20 14:30:00",
-    receivedMoneyFor: "M004",
-    level: "1",
-    amountReceived: "300",
-  },
-  // Add more data to test pagination
-  {
-    memberId: "M004",
-    dateTime: "2024-07-01 12:00:00",
-    receivedMoneyFor: "M005",
-    level: "7",
-    amountReceived: "200",
-  },
-  {
-    memberId: "M006",
-    dateTime: "2024-07-02 15:45:00",
-    receivedMoneyFor: "M007",
-    level: "2",
-    amountReceived: "150",
-  },
-  {
-    memberId: "M008",
-    dateTime: "2024-07-05 10:30:00",
-    receivedMoneyFor: "M009",
-    level: "2",
-    amountReceived: "100",
-  },
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewLevelIncome() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
-  const [filteredData, setFilteredData] = useState(simulatedLevelIncome);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchLevelIncome = async (pageNumber = 0, memberNumber = null) => {
+    try {
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+        incomeType: "level",
+      };
+
+      if (memberNumber) {
+        params.memberNumber = memberNumber;
+      }
+
+      const response = await axios.get("http://localhost:8080/payout", {
+        params,
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+
+      const payoutData = response.data.content.map((payout) => ({
+        memberId: payout.receivingMemberNumber,
+        dateTime: formatDate(payout.receivedDate),
+        receivedMoneyFor: payout.receivedFromMemberNumber,
+        level: payout.level,
+        amountReceived: payout.receivedAmount,
+      }));
+
+      setFilteredData(payoutData);
+      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
+      toast.success("Level income data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching level income:", error);
+      toast.error("Failed to fetch level income data.");
+    }
+  };
+
+  useEffect(() => {
+    fetchLevelIncome(0);
+  }, []);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
-    setFilteredData(simulatedLevelIncome);
     setCurrentPage(1);
+    fetchLevelIncome(0);
   };
 
   const handleViewByMemberId = () => {
@@ -77,22 +80,40 @@ export default function ViewLevelIncome() {
     if (!filterId) {
       return toast.error("Please enter a Member ID.");
     }
-
-    const filtered = simulatedLevelIncome.filter(
-      (data) => data.memberId === filterId
-    );
-
-    if (filtered.length === 0) {
-      toast.error("No level income found for the specified member.");
-      return;
-    }
-
-    setFilteredData(filtered);
+    fetchLevelIncome(0, filterId);
     setCurrentPage(1);
-    toast.success("Level income details fetched successfully.");
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      fetchLevelIncome(
+        currentPage - 2,
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      fetchLevelIncome(
+        currentPage,
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+  };
+
   const paginatedData = filteredData.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
@@ -155,7 +176,7 @@ export default function ViewLevelIncome() {
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
+                    Payout Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Received Money For (Member ID)
@@ -192,7 +213,7 @@ export default function ViewLevelIncome() {
                 ) : (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="5"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No level income details found.
@@ -204,38 +225,20 @@ export default function ViewLevelIncome() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <div className="flex space-x-2">
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous 100
-            </Button>
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next 100
-            </Button>
-          </div>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+          >
+            Previous 100
+          </Button>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next 100
+          </Button>
         </CardFooter>
       </Card>
     </div>

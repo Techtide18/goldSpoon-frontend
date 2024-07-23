@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { toast } from "sonner";
 const PAGE_SIZE = 100;
 
 export default function ViewPasswords() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
@@ -51,6 +51,12 @@ export default function ViewPasswords() {
       toast.error("Failed to fetch member data.");
     }
   };
+
+  useEffect(() => {
+    if (viewOption === "all") {
+      fetchAllMembers(0);
+    }
+  }, [viewOption]);
 
   const handleViewAll = () => {
     setViewOption("all");

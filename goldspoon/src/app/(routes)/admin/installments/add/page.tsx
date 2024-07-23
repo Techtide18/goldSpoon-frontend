@@ -25,23 +25,14 @@ import {
 export default function AddInstallment() {
   const [formData, setFormData] = useState({
     memberId: "",
-    pinPackage: "",
     amountReceived: "",
     paymentMethod: "",
     transactionId: "",
-    installmentMonth: "",
     remarks: "",
   });
 
   const [memberName, setMemberName] = useState("");
-  const [packages, setPackages] = useState([]);
-  const [selectedPackageDuration, setSelectedPackageDuration] = useState(0);
-  const [selectedPackageName, setSelectedPackageName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
 
   const fetchMemberName = async () => {
     try {
@@ -60,35 +51,6 @@ export default function AddInstallment() {
     }
   };
 
-  const fetchPackages = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/package/all", {
-        headers: {
-          "Content-Type": "application/json",
-          adminMemberId: 1,
-        },
-      });
-      setPackages(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch packages.");
-    }
-  };
-
-  const handlePackageChange = (value) => {
-    const selectedPackage = packages.find((pkg) => pkg.id === parseInt(value));
-    setFormData({
-      ...formData,
-      pinPackage: value,
-    });
-    if (selectedPackage) {
-      setSelectedPackageDuration(selectedPackage.packageDurationInMonths);
-      setSelectedPackageName(selectedPackage.packageName);
-    } else {
-      setSelectedPackageDuration(0);
-      setSelectedPackageName("");
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -99,23 +61,10 @@ export default function AddInstallment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {
-      memberId,
-      pinPackage,
-      amountReceived,
-      paymentMethod,
-      transactionId,
-      installmentMonth,
-      remarks,
-    } = formData;
+    const { memberId, amountReceived, paymentMethod, transactionId, remarks } =
+      formData;
 
-    if (
-      !memberId ||
-      !pinPackage ||
-      !amountReceived ||
-      !paymentMethod ||
-      !installmentMonth
-    ) {
+    if (!memberId || !amountReceived || !paymentMethod || !transactionId) {
       return toast.error("Please fill out all fields.");
     }
 
@@ -124,7 +73,7 @@ export default function AddInstallment() {
       amountPaid: parseInt(amountReceived),
       transactionId,
       paymentMethod,
-      installmentMonth: parseInt(installmentMonth),
+      remarks,
     };
 
     const toastId = toast.loading("Adding Installment...");
@@ -142,15 +91,11 @@ export default function AddInstallment() {
       setIsDialogOpen(true);
       setFormData({
         memberId: "",
-        pinPackage: "",
         amountReceived: "",
         paymentMethod: "",
         transactionId: "",
-        installmentMonth: "",
         remarks: "",
       });
-      setSelectedPackageName("");
-      setSelectedPackageDuration(0);
       setMemberName("");
     } catch (error) {
       toast.error("Failed to add installment. Please try again.", {
@@ -198,28 +143,6 @@ export default function AddInstallment() {
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="pinPackage">Package</Label>
-              <Select
-                name="pinPackage"
-                value={formData.pinPackage}
-                onValueChange={handlePackageChange}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={selectedPackageName || "Select Package"}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {packages.map((pkg) => (
-                    <SelectItem key={pkg.id} value={pkg.id.toString()}>
-                      {pkg.packageName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="amountReceived">Amount Received</Label>
@@ -270,30 +193,9 @@ export default function AddInstallment() {
                 placeholder="Payment Transaction ID"
                 value={formData.transactionId}
                 onChange={handleChange}
+                required
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="installmentMonth">Installment Month</Label>
-              <Select
-                name="installmentMonth"
-                value={formData.installmentMonth}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, installmentMonth: value })
-                }
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Installment Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: selectedPackageDuration }, (_, i) => (
-                    <SelectItem key={i + 1} value={(i + 1).toString()}>
-                      Month - {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="remarks">Remarks</Label>
@@ -324,14 +226,7 @@ export default function AddInstallment() {
           <DialogTitle>Installment Added</DialogTitle>
           <DialogDescription>
             <div className="mt-4 space-y-2">
-              <p>
-                Installment added for <strong>{formData.memberId}</strong> in
-                group <strong>G12</strong> for the installment of{" "}
-                <strong>{formData.installmentMonth}</strong>, for which group
-                level installment is running at{" "}
-                <strong>{formData.installmentMonth}</strong> for package{" "}
-                <strong>{formData.pinPackage}</strong>.
-              </p>
+              <p>Successfully added installment for the member.</p>
             </div>
           </DialogDescription>
           <Button onClick={() => setIsDialogOpen(false)}>Close</Button>

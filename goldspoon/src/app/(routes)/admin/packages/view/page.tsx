@@ -14,12 +14,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export default function ViewPackage() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [packageName, setPackageName] = useState("");
+  const [packages, setPackages] = useState([]);
   const [filteredPackages, setFilteredPackages] = useState([]);
 
   const fetchPackages = async () => {
-    console.log("fetchPackages called");
     try {
       const response = await axios.get("http://localhost:8080/package/all", {
         headers: {
@@ -28,41 +28,41 @@ export default function ViewPackage() {
           "adminMemberId": 1,
         },
       });
+      setPackages(response.data);
       setFilteredPackages(response.data);
+      toast.success("Packages fetched successfully.");
     } catch (error) {
       console.error('Failed to fetch packages:', error);
       toast.error("Failed to load packages.");
     }
   };
 
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
   const handleViewAll = () => {
     setViewOption("all");
-    fetchPackages();
     setPackageName("");
+    setFilteredPackages(packages);
   };
 
   const handleViewByName = () => {
     setViewOption("byName");
+    setPackageName("");
   };
 
   const handlePackageNameChange = (e) => {
-    setPackageName(e.target.value);
-  };
+    const searchValue = e.target.value;
+    setPackageName(searchValue);
 
-  const getPackageByName = () => {
-    if (!packageName) {
-      return toast.error("Please enter a Package Name.");
+    if (searchValue === "") {
+      setFilteredPackages(packages);
+    } else {
+      const regex = new RegExp(searchValue, 'i');
+      const filtered = packages.filter((pkg) => regex.test(pkg.packageName));
+      setFilteredPackages(filtered);
     }
-
-    const packageData = filteredPackages.filter(
-      (pkg) => pkg.packageName.toLowerCase() === packageName.toLowerCase()
-    );
-
-    if (packageData.length === 0) {
-      return toast.error("Package not found.");
-    }
-
-    setFilteredPackages(packageData);
   };
 
   const formatDate = (dateString) => {
@@ -110,7 +110,6 @@ export default function ViewPackage() {
                   onChange={handlePackageNameChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
-                <Button onClick={getPackageByName}>Get Package</Button>
               </div>
             )}
           </CardContent>

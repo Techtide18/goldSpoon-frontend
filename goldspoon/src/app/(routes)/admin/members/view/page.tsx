@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Card,
@@ -18,16 +18,22 @@ const PAGE_SIZE = 100;
 
 const formatDateString = (dateString) => {
   const date = new Date(dateString);
-  const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  const formattedDate = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.getFullYear()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   return formattedDate;
 };
 
 export default function ViewMembers() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    if (viewOption === "all") {
+      fetchMembers(0);
+    }
+  }, [viewOption]);
 
   const fetchMembers = async (pageNumber = 0) => {
     try {

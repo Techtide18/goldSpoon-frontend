@@ -1,19 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-const PAGE_SIZE = 100;
-
 export default function ViewGroups() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterGroupName, setFilterGroupName] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [groups, setGroups] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
   const fetchGroups = async () => {
@@ -24,6 +21,7 @@ export default function ViewGroups() {
           adminMemberId: 1,
         },
       });
+      setGroups(response.data);
       setFilteredData(response.data);
       toast.success("Groups data fetched successfully.");
     } catch (error) {
@@ -32,26 +30,32 @@ export default function ViewGroups() {
     }
   };
 
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
   const handleViewAll = () => {
     setViewOption("all");
     setFilterGroupName("");
-    setCurrentPage(1);
-    fetchGroups();
+    setFilteredData(groups);
   };
 
   const handleViewByGroupName = () => {
     setViewOption("groupName");
-    setCurrentPage(1);
+    setFilterGroupName("");
   };
 
-  const handleSubmit = () => {
-    if (filterGroupName) {
-      const filtered = filteredData.filter((data) => data.groupName === filterGroupName);
-      setFilteredData(filtered);
+  const handleGroupNameChange = (e) => {
+    const searchValue = e.target.value;
+    setFilterGroupName(searchValue);
+
+    if (searchValue === "") {
+      setFilteredData(groups);
     } else {
-      fetchGroups();
+      const regex = new RegExp(searchValue, 'i');
+      const filtered = groups.filter((group) => regex.test(group.groupName));
+      setFilteredData(filtered);
     }
-    setCurrentPage(1);
   };
 
   const formatDate = (dateString) => {
@@ -64,9 +68,6 @@ export default function ViewGroups() {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
-
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -95,9 +96,8 @@ export default function ViewGroups() {
             <Input
               placeholder="Group Name"
               value={filterGroupName}
-              onChange={(e) => setFilterGroupName(e.target.value)}
+              onChange={handleGroupNameChange}
             />
-            <Button onClick={handleSubmit}>Submit</Button>
           </CardFooter>
         )}
       </Card>
@@ -122,7 +122,7 @@ export default function ViewGroups() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((data, index) => (
+              {filteredData.map((data, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupName}</td>
@@ -138,36 +138,6 @@ export default function ViewGroups() {
             </tbody>
           </table>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 100
-          </Button>
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next 100
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

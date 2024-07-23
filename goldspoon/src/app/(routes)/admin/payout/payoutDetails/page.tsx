@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -10,72 +11,82 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "tailwindcss/tailwind.css"; // Ensure Tailwind CSS is imported
-
-// Simulated Data
-const simulatedPayouts = [
-  {
-    memberId: "M001",
-    dateTime: "2024-06-15 10:00:00",
-    receivedMoneyFor: "M002",
-    amountReceived: "500",
-    level: "2",
-    incomeType: "Referral Income",
-  },
-  {
-    memberId: "M003",
-    dateTime: "2024-06-20 14:30:00",
-    receivedMoneyFor: "M004",
-    amountReceived: "300",
-    level: "1",
-    incomeType: "Level Income",
-  },
-  // Add more payouts for testing
-  {
-    memberId: "M004",
-    dateTime: "2024-07-01 12:00:00",
-    receivedMoneyFor: "M005",
-    amountReceived: "200",
-    level: "6",
-    incomeType: "Referral Income",
-  },
-  {
-    memberId: "M006",
-    dateTime: "2024-07-02 15:45:00",
-    receivedMoneyFor: "M007",
-    amountReceived: "150",
-    level: "7",
-    incomeType: "Level Income",
-  },
-  {
-    memberId: "M008",
-    dateTime: "2024-07-05 10:30:00",
-    receivedMoneyFor: "M009",
-    amountReceived: "100",
-    level: "3",
-    incomeType: "Referral Income",
-  },
-];
 
 const PAGE_SIZE = 100;
 
 export default function ViewMonthlyPayout() {
   const [viewOption, setViewOption] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const [filteredPayouts, setFilteredPayouts] = useState(simulatedPayouts);
+  const [filteredPayouts, setFilteredPayouts] = useState([]);
   const [showPayoutDetails, setShowPayoutDetails] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+  };
+
+  const fetchPayouts = async (pageNumber = 0, month = null) => {
+    try {
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+      };
+
+      if (month) {
+        params.month = month;
+      }
+
+      const response = await axios.get("http://localhost:8080/payout", {
+        params,
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+
+      const payoutData = response.data.content.map((payout) => ({
+        memberId: payout.receivingMemberNumber,
+        dateTime: formatDate(payout.receivedDate),
+        receivedMoneyFor: payout.receivedFromMemberNumber,
+        amountReceived: payout.receivedAmount,
+        level: payout.level,
+        incomeType: payout.isDirectIncome
+          ? "Direct Income"
+          : payout.isLevelIncome
+          ? "Level Income"
+          : "Unknown",
+      }));
+
+      setFilteredPayouts(payoutData);
+      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
+      toast.success("Payout data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching payouts:", error);
+      toast.error("Failed to fetch payouts data.");
+    }
+  };
+
+  useEffect(() => {
+    fetchPayouts(0);
+  }, []);
 
   const handleViewAll = () => {
     setViewOption("all");
-    setFilteredPayouts(simulatedPayouts);
     setSelectedMonth(null);
     setShowPayoutDetails(true);
     setCurrentPage(1);
+    fetchPayouts(0);
   };
 
   const handleViewByMonth = () => {
@@ -93,34 +104,44 @@ export default function ViewMonthlyPayout() {
       return toast.error("Please select a month.");
     }
 
-    const month = selectedMonth.getMonth() + 1; // getMonth() returns 0-11
-    const year = selectedMonth.getFullYear();
+    const month = `${selectedMonth.getFullYear()}-${String(
+      selectedMonth.getMonth() + 1
+    ).padStart(2, "0")}`;
 
-    const payoutData = simulatedPayouts.filter((payout) => {
-      const payoutDate = new Date(payout.dateTime);
-      return (
-        payoutDate.getMonth() + 1 === month && payoutDate.getFullYear() === year
-      );
-    });
-
-    if (payoutData.length === 0) {
-      toast.error("No payout details found for the selected month.");
-      setShowPayoutDetails(true); // Ensure the card remains visible
-      setFilteredPayouts([]);
-      return;
-    }
-
-    setFilteredPayouts(payoutData);
+    fetchPayouts(0, month);
     setShowPayoutDetails(true);
     setCurrentPage(1);
     toast.success("Payout details fetched successfully.");
   };
 
-  const totalPages = Math.ceil(filteredPayouts.length / PAGE_SIZE);
   const paginatedPayouts = filteredPayouts.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      fetchPayouts(
+        currentPage - 2,
+        selectedMonth && `${selectedMonth.getFullYear()}-${String(
+          selectedMonth.getMonth() + 1
+        ).padStart(2, "0")}`
+      );
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      fetchPayouts(
+        currentPage,
+        selectedMonth && `${selectedMonth.getFullYear()}-${String(
+          selectedMonth.getMonth() + 1
+        ).padStart(2, "0")}`
+      );
+    }
+  };
 
   return (
     <div className="flex justify-center items-center py-8 px-4">
@@ -204,7 +225,7 @@ export default function ViewMonthlyPayout() {
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
+                    Payout Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Received Money For (Member ID)
@@ -247,7 +268,7 @@ export default function ViewMonthlyPayout() {
                 ) : (
                   <tr>
                     <td
-                      colSpan="5"
+                      colSpan="6"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No payout details found for the selected month.
@@ -258,38 +279,20 @@ export default function ViewMonthlyPayout() {
             </table>
           </CardContent>
           <CardFooter className="flex justify-end space-x-2">
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={(e, page) => setCurrentPage(page)}
-              siblingCount={1}
-              boundaryCount={1}
-              size="large"
-              shape="rounded"
-              variant="outlined"
-              color="primary"
-              className="mt-4"
-              showFirstButton
-              showLastButton
-            />
-            <div className="flex space-x-2">
-              <Button
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                Previous 100
-              </Button>
-              <Button
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              >
-                Next 100
-              </Button>
-            </div>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              Previous 100
+            </Button>
+            <Button
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Next 100
+            </Button>
           </CardFooter>
         </Card>
       </div>

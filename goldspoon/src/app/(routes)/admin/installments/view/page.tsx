@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const PAGE_SIZE = 100;
 
 export default function InstallmentsPaid() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
@@ -37,11 +37,8 @@ export default function InstallmentsPaid() {
     if (viewOption === "all") {
       const url = `http://localhost:8080/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
       fetchData(url);
-    } else if (viewOption === "memberId" && filterId) {
-      const url = `http://localhost:8080/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
-      fetchData(url);
     }
-  }, [viewOption, filterId, currentPage]);
+  }, [viewOption, currentPage]);
 
   const handleViewAll = () => {
     setViewOption("all");

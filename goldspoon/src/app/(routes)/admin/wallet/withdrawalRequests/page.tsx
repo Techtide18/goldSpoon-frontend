@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
+import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -20,96 +21,75 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-// Simulated Data
-const simulatedWithdrawalRequests = [
-  {
-    requestId: "W001",
-    requestDate: "2024-06-15",
-    memberId: "M001",
-    memberName: "John Doe",
-    epinId: "E12345",
-    amountRequested: 100,
-    groupName: "G12",
-    status: "pending",
-  },
-  {
-    requestId: "W002",
-    requestDate: "2024-07-01",
-    memberId: "M002",
-    memberName: "Jane Smith",
-    epinId: "E23456",
-    amountRequested: 200,
-    groupName: "G12",
-    status: "approved",
-  },
-  {
-    requestId: "W003",
-    requestDate: "2024-07-10",
-    memberId: "M003",
-    memberName: "Alice Johnson",
-    epinId: "E34567",
-    amountRequested: 300,
-    groupName: "G20",
-    status: "rejected",
-  },
-  {
-    requestId: "W004",
-    requestDate: "2024-07-15",
-    memberId: "M004",
-    memberName: "Bob Brown",
-    epinId: "E45678",
-    amountRequested: 150,
-    groupName: "G12",
-    status: "pending",
-  },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewWithdrawalRequests() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("pending");
   const [filterId, setFilterId] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  useEffect(() => {
-    if (viewOption !== "memberId") {
-      filterData();
+  const fetchWithdrawalRequests = async (
+    pageNumber = 0,
+    status = "PENDING",
+    memberNumber = null
+  ) => {
+    try {
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+        status,
+      };
+
+      if (memberNumber) {
+        params.memberNumber = memberNumber;
+      }
+
+      const response = await axios.get(
+        "http://localhost:8080/payout/withdrawalDetails",
+        {
+          params,
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        }
+      );
+
+      const requestData = response.data.content.map((request) => ({
+        requestId: request.id,
+        requestDate: formatDate(request.requestDate),
+        memberId: request.receivingMemberNumber,
+        memberName: request.memberName,
+        epinId: request.epinId,
+        amountRequested: request.receivedAmount,
+        groupName: request.groupName,
+        status: request.status.toLowerCase(),
+      }));
+
+      setFilteredData(requestData);
+      setTotalPages(
+        Math.ceil(response.data.pagination.totalItems / PAGE_SIZE)
+      );
+      toast.success("Data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching withdrawal requests:", error);
+      toast.error("Failed to fetch data.");
     }
-  }, [viewOption]);
+  };
+
+  useEffect(() => {
+    fetchWithdrawalRequests();
+  }, []);
 
   const handleViewOption = (option) => {
     setViewOption(option);
     setFilterId("");
     setCurrentPage(1);
-    if (option !== "memberId") {
-      filterData(option);
-    }
-  };
-
-  const filterData = (option = viewOption) => {
-    let filtered = [];
-    if (option === "memberId" && filterId) {
-      filtered = simulatedWithdrawalRequests.filter(
-        (data) => data.memberId === filterId
-      );
-    } else {
-      filtered = simulatedWithdrawalRequests.filter(
-        (data) => data.status === option
-      );
-    }
-
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified filter.");
-    } else {
-      toast.success("Data fetched successfully.");
-    }
-
-    setFilteredData(filtered);
-    setCurrentPage(1);
+    fetchWithdrawalRequests(0, option.toUpperCase());
   };
 
   const getByMemberId = () => {
@@ -117,7 +97,8 @@ export default function ViewWithdrawalRequests() {
       return toast.error("Please enter a Member ID.");
     }
 
-    filterData();
+    fetchWithdrawalRequests(0, null, filterId);
+    setCurrentPage(1);
   };
 
   const approveRequest = (request) => {
@@ -141,11 +122,35 @@ export default function ViewWithdrawalRequests() {
     );
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      fetchWithdrawalRequests(
+        currentPage - 2,
+        viewOption.toUpperCase(),
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      fetchWithdrawalRequests(
+        currentPage,
+        viewOption.toUpperCase(),
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -246,8 +251,8 @@ export default function ViewWithdrawalRequests() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((data, index) => (
+                {filteredData.length > 0 ? (
+                  filteredData.map((data, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {(currentPage - 1) * PAGE_SIZE + index + 1}
@@ -297,46 +302,27 @@ export default function ViewWithdrawalRequests() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
-          <div className="flex space-x-2">
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous 100
-            </Button>
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next 100
-            </Button>
-          </div>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+          >
+            Previous 100
+          </Button>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next 100
+          </Button>
         </CardFooter>
       </Card>
 
       {/* Approve Request Dialog */}
       <Dialog
         open={isApproveDialogOpen}
-        // onOpenChange={(open) => open && setIsDialogOpen(true)}
-        onOpenChange={(open) => open && setIsApproveDialogOpen(true)}
+        onOpenChange={(open) => setIsApproveDialogOpen(open)}
       >
         <DialogContent>
           <DialogTitle>Approve Request</DialogTitle>

@@ -71,9 +71,10 @@ export default function UnblockMember() {
 
     const toastId = toast.loading("Unblocking member...");
     try {
-      await axios.put(`http://localhost:8080/member/${formData.memberId}`, {
-        isBlocked: false,
-      }, {
+      await axios.post(`http://localhost:8080/epins/unblock`, null, {
+        params: {
+          memberNumber: formData.memberId
+        },
         headers: {
           adminMemberId: 1,
         },

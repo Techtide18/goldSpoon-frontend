@@ -16,50 +16,49 @@ export default function GeneratePayout() {
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [message, setMessage] = useState("New payout is generating...");
 
   useEffect(() => {
     const currentDate = new Date();
     const dayOfMonth = currentDate.getDate();
 
-    // Check if the date is between 15th and end of the month
-    if (dayOfMonth >= 15) {
-      setIsButtonEnabled(true);
-    } else {
-      setIsButtonEnabled(false);
-    }
+    // Check the date condition
+    const isDateConditionMet = dayOfMonth >= 15;
 
-    // Check if the button has been clicked this month
-    const lastClicked = localStorage.getItem("lastClicked");
-    if (lastClicked) {
-      const lastClickedDate = new Date(lastClicked);
-      if (
-        lastClickedDate.getMonth() === currentDate.getMonth() &&
-        lastClickedDate.getFullYear() === currentDate.getFullYear()
-      ) {
-        setIsButtonClicked(true);
-        setIsButtonEnabled(false);
+    // Call the check API
+    const checkPayoutStatus = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/admin/job/check",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              adminMemberId: 1,
+            },
+          }
+        );
+        // Enable the button only if the date condition is met and the API returns false
+        setIsButtonEnabled(isDateConditionMet && !response.data);
+      } catch (error) {
+        console.error("Error checking payout status:", error);
       }
-    }
+    };
+
+    checkPayoutStatus();
   }, []);
 
   const handleClick = async () => {
-    const currentDate = new Date();
-   // localStorage.setItem("lastClicked", currentDate.toString());
-    setIsButtonClicked(true);
     setIsButtonEnabled(false);
-
     setIsLoading(true);
     setIsDialogOpen(true);
-
-    // Simulate API call to generate payout with a delay
-    await new Promise((resolve) => setTimeout(resolve, 7000));
 
     try {
       const response = await axios.post(
         "http://localhost:8080/admin/job/generate/levelIncome"
       );
+
+      // Simulate 5-second delay
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
       if (response.status === 200) {
         setMessage("This month's payout has been generated successfully!");
@@ -70,7 +69,8 @@ export default function GeneratePayout() {
       }
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to generate payout. Please try again.";
+        error.response?.data?.message ||
+        "Failed to generate payout. Please try again.";
       setMessage(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -97,25 +97,20 @@ export default function GeneratePayout() {
           <Button
             className="w-full"
             onClick={handleClick}
-            disabled={!isButtonEnabled || isButtonClicked}
+            disabled={!isButtonEnabled}
             variant="destructive"
           >
             Generate Payout
           </Button>
           {!isButtonEnabled && (
             <p className="text-red-500 text-center">
-              Button can be used only between 15th and end of the month
-            </p>
-          )}
-          {isButtonClicked && (
-            <p className="text-red-500 text-center">
-              Payout has already been generated this month
+              Button can be used only between 15th and end of the month or the
+              payout has already been generated.
             </p>
           )}
         </CardContent>
       </Card>
 
-      {/* Success Dialog */}
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open) => setIsDialogOpen(true)}

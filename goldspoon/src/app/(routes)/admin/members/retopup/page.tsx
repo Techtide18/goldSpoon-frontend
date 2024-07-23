@@ -31,7 +31,7 @@ export default function RetopUpMember() {
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [memberName, setMemberName] = useState("");
-  const [generatedEpin, setGeneratedEpin] = useState("");
+  const [generatedEpinDetails, setGeneratedEpinDetails] = useState({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [packages, setPackages] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -55,30 +55,26 @@ export default function RetopUpMember() {
     fetchPackages();
   }, []);
 
-  useEffect(() => {
-    const fetchMemberName = async () => {
-      if (formData.memberId) {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/member/${formData.memberId}`,
-            {
-              headers: {
-                adminMemberId: 1,
-              },
-            }
-          );
-          setMemberName(response.data.fullName || "");
-        } catch (error) {
-          toast.error("Failed to fetch member details.");
-          setMemberName("");
-        }
-      } else {
+  const fetchMemberName = async () => {
+    if (formData.memberId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/member/${formData.memberId}`,
+          {
+            headers: {
+              adminMemberId: 1,
+            },
+          }
+        );
+        setMemberName(response.data.fullName || "");
+      } catch (error) {
+        toast.error("Failed to fetch member details.");
         setMemberName("");
       }
-    };
-
-    fetchMemberName();
-  }, [formData.memberId]);
+    } else {
+      setMemberName("");
+    }
+  };
 
   const fetchGroups = async (packageId) => {
     try {
@@ -111,9 +107,11 @@ export default function RetopUpMember() {
     setFormData({
       ...formData,
       pinPackage: value,
+      group: "", // Reset group to default when a new package is selected
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
+      setSelectedGroupName(""); // Reset selected group name
       await fetchGroups(value);
     } else {
       setSelectedPackageName("");
@@ -170,8 +168,8 @@ export default function RetopUpMember() {
         }
       );
 
-      const newEpin = response.data.epin;
-      setGeneratedEpin(newEpin);
+      const newEpinDetails = response.data;
+      setGeneratedEpinDetails(newEpinDetails);
 
       toast.success("E-PIN generated successfully!", {
         id: toastId,
@@ -203,13 +201,29 @@ export default function RetopUpMember() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
+              <div className="flex items-center space-x-4">
+                <Input
+                  id="memberId"
+                  name="memberId"
+                  placeholder="Member ID"
+                  value={formData.memberId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button type="button" onClick={fetchMemberName}>
+                  Get Member Details
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="memberName">Member Name</Label>
               <Input
-                id="memberId"
-                name="memberId"
-                placeholder="Member ID"
-                value={formData.memberId}
-                onChange={handleChange}
-                required
+                id="memberName"
+                name="memberName"
+                placeholder="Auto Generated"
+                value={memberName}
+                readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -263,17 +277,6 @@ export default function RetopUpMember() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="memberName">Member Name</Label>
-              <Input
-                id="memberName"
-                name="memberName"
-                placeholder="Auto Generated"
-                value={memberName}
-                readOnly
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">
                 Re-Topup Member
@@ -292,13 +295,19 @@ export default function RetopUpMember() {
           <DialogDescription>
             <div className="mt-4 space-y-2">
               <p>
-                <strong>New package:</strong> {selectedPackageName}
+                <strong>Package:</strong> {generatedEpinDetails.packageName}
               </p>
               <p>
-                <strong>New group assigned:</strong> {selectedGroupName}
+                <strong>Package Price:</strong> {generatedEpinDetails.packagePrice}
               </p>
               <p>
-                <strong>New E-PIN:</strong> {generatedEpin}
+                <strong>Group:</strong> {generatedEpinDetails.groupName}
+              </p>
+              <p>
+                <strong>Token Number:</strong> {generatedEpinDetails.tokenNumber}
+              </p>
+              <p>
+                <strong>E-PIN:</strong> {generatedEpinDetails.epinNumber}
               </p>
               <div style={{ marginBottom: "20px" }}></div>
               <div className="mt-4 space-y-2">

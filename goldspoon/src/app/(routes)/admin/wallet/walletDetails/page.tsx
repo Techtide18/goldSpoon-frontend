@@ -12,35 +12,62 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-
-// Simulated Data
-const simulatedWalletDetails = [
-  { memberId: "M001", memberName: "John Doe", currentBalance: 500, approvedBalance: 300, totalIncome: 800 },
-  { memberId: "M002", memberName: "Jane Smith", currentBalance: 700, approvedBalance: 500, totalIncome: 1200 },
-  { memberId: "M003", memberName: "Alice Johnson", currentBalance: 300, approvedBalance: 200, totalIncome: 500 },
-  { memberId: "M004", memberName: "Bob Brown", currentBalance: 1000, approvedBalance: 800, totalIncome: 1800 },
-  // Add more data to test pagination
-];
+import axios from "axios";
 
 const PAGE_SIZE = 100;
 
 export default function ViewWalletDetails() {
   const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
-  const [filteredData, setFilteredData] = useState(simulatedWalletDetails);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchWalletDetails = async (pageNumber = 0, memberNumber = null) => {
+    try {
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+      };
+
+      if (memberNumber) {
+        params.memberNumber = memberNumber;
+      }
+
+      const response = await axios.get("http://localhost:8080/payout/walletDetails", {
+        params,
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+
+      const walletData = response.data.content.map((wallet) => ({
+        memberId: wallet.memberNumber,
+        memberName: wallet.memberName,
+        currentBalance: wallet.currentBalance,
+        approvedBalance: wallet.approvedBalance,
+        totalIncome: wallet.totalIncome,
+      }));
+
+      setFilteredData(walletData);
+      setTotalPages(response.data.pagination.totalPages);
+      toast.success("Data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching wallet details:", error);
+      toast.error("Failed to fetch data.");
+    }
+  };
 
   useEffect(() => {
-    if (viewOption === "all") {
-      setFilteredData(simulatedWalletDetails);
-    }
-  }, [viewOption]);
+    fetchWalletDetails();
+  }, []);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    setFilteredData(simulatedWalletDetails);
+    fetchWalletDetails();
   };
 
   const handleViewByMemberId = () => {
@@ -53,22 +80,29 @@ export default function ViewWalletDetails() {
       return toast.error("Please enter a Member ID.");
     }
 
-    const filtered = simulatedWalletDetails.filter((data) => data.memberId === filterId);
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified Member ID.");
-      return;
-    }
-
-    setFilteredData(filtered);
+    fetchWalletDetails(0, filterId);
     setCurrentPage(1);
-    toast.success("Data fetched successfully.");
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      fetchWalletDetails(
+        currentPage - 2,
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      fetchWalletDetails(
+        currentPage,
+        viewOption === "memberId" ? filterId : null
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -142,8 +176,8 @@ export default function ViewWalletDetails() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((data, index) => (
+                {filteredData.length > 0 ? (
+                  filteredData.map((data, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {data.memberId}
@@ -194,16 +228,14 @@ export default function ViewWalletDetails() {
           <div className="flex space-x-2">
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={handlePreviousPage}
               disabled={currentPage === 1}
             >
               Previous 100
             </Button>
             <Button
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={handleNextPage}
               disabled={currentPage === totalPages}
             >
               Next 100
