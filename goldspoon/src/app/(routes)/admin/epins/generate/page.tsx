@@ -31,7 +31,7 @@ export default function GenerateEpin() {
   const [formData, setFormData] = useState({
     numberOfPins: "",
     pinPackage: "",
-    referralMemberId: "",
+    referralMemberNumber: "",
     group: "",
   });
 
@@ -43,6 +43,10 @@ export default function GenerateEpin() {
   const [referralMemberName, setReferralMemberName] = useState("");
   const [generatedPins, setGeneratedPins] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    console.log("FormData updated:", formData);
+  }, [formData]);
 
   const fetchPackages = async () => {
     try {
@@ -82,12 +86,12 @@ export default function GenerateEpin() {
   };
 
   const fetchMemberName = async () => {
-    if (!formData.referralMemberId) {
+    if (!formData.referralMemberNumber) {
       return toast.error("Please enter a Referral Member ID.");
     }
     try {
       const response = await axios.get(
-        `http://localhost:8080/member/${formData.referralMemberId}`
+        `http://localhost:8080/member/${formData.referralMemberNumber}`
       );
       const member = response.data;
       setReferralMemberName(member.fullName || "");
@@ -140,7 +144,7 @@ export default function GenerateEpin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { numberOfPins, pinPackage, referralMemberId, group } = formData;
+    const { numberOfPins, pinPackage, referralMemberNumber, group } = formData;
 
     if (!numberOfPins || !pinPackage || !group) {
       return toast.error("Please fill out all fields.");
@@ -156,8 +160,8 @@ export default function GenerateEpin() {
       automaticGroupAssign: group === "auto-assign",
     };
 
-    if (referralMemberId) {
-      requestData.referralMemberId = parseInt(referralMemberId);
+    if (referralMemberNumber) {
+      requestData.referralMemberNumber = referralMemberNumber; // Keep as string
     }
 
     if (group !== "auto-assign") {
@@ -188,7 +192,7 @@ export default function GenerateEpin() {
       setFormData({
         numberOfPins: "",
         pinPackage: "",
-        referralMemberId: "",
+        referralMemberNumber: "",
         group: "",
       });
       setSelectedPackageName("");
@@ -254,13 +258,13 @@ export default function GenerateEpin() {
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="referralMemberId">Referral Member ID</Label>
+              <Label htmlFor="referralMemberNumber">Referral Member ID</Label>
               <div className="flex gap-4">
                 <Input
-                  id="referralMemberId"
-                  name="referralMemberId"
+                  id="referralMemberNumber"
+                  name="referralMemberNumber"
                   placeholder="Referral Member ID"
-                  value={formData.referralMemberId}
+                  value={formData.referralMemberNumber}
                   onChange={handleChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />

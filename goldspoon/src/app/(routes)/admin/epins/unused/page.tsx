@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 import {
@@ -18,11 +18,20 @@ import { toast } from "sonner";
 const PAGE_SIZE = 100;
 
 export default function Report() {
-  const [viewOption, setViewOption] = useState("");
+  const [viewOption, setViewOption] = useState("all");
   const [filterId, setFilterId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    if (viewOption === "all") {
+      fetchEpins("http://localhost:8080/epins/unused", {
+        pageNumber: 0,
+        pageSize: PAGE_SIZE,
+      });
+    }
+  }, [viewOption]);
 
   const fetchEpins = async (url, params) => {
     try {
