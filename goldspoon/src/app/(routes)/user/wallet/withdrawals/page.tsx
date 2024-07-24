@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -10,49 +12,67 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-
-// Simulated Data for Withdrawal Requests
-const withdrawalRequestsData = [
-  {
-    requestDate: "14-07-2024",
-    amount: 500,
-    status: "Approved",
-  },
-  {
-    requestDate: "15-07-2024",
-    amount: 1000,
-    status: "Pending",
-  },
-  {
-    requestDate: "16-07-2024",
-    amount: 1500,
-    status: "Rejected",
-  },
-  // Add more data as needed (total 50 entries)
-  {
-    requestDate: "17-07-2024",
-    amount: 2000,
-    status: "Approved",
-  },
-];
-
-for (let i = 18; i < 68; i++) {
-  withdrawalRequestsData.push({
-    requestDate: `14-07-2024`,
-    amount: 500 + i * 10,
-    status: i % 3 === 0 ? "Approved" : i % 3 === 1 ? "Pending" : "Rejected",
-  });
-}
+import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
 
 const PAGE_SIZE = 10;
 
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
 export default function ViewWithdrawalRequests() {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(withdrawalRequestsData.length / PAGE_SIZE);
-  const paginatedData = withdrawalRequestsData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const [totalItems, setTotalItems] = useState(0);
+  const [withdrawalRequestsData, setWithdrawalRequestsData] = useState([]);
+  const [memberNumber, setMemberNumber] = useState("");
+
+  const fetchWithdrawalRequests = async (params) => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to view this information.');
+      return;
+    }
+
+    setMemberNumber(session.user.name);
+
+    try {
+      const response = await axios.get("http://localhost:8080/payout/withdrawalDetails", {
+        params: {
+          ...params,
+          memberNumber: session.user.name,
+        },
+      });
+
+      if (response.data && response.data.content) {
+        setWithdrawalRequestsData(response.data.content);
+        setTotalItems(response.data.pagination.totalItems);
+      } else {
+        setWithdrawalRequestsData([]);
+        toast.error('No data returned from the server.');
+      }
+    } catch (error) {
+      toast.error('Failed to fetch withdrawal requests.');
+      console.error("Failed to fetch withdrawal requests:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWithdrawalRequests({ pageNumber: currentPage - 1, pageSize: PAGE_SIZE });
+  }, [currentPage]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+    fetchWithdrawalRequests({ pageNumber: page - 1, pageSize: PAGE_SIZE });
+  };
+
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -79,17 +99,17 @@ export default function ViewWithdrawalRequests() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((data, index) => (
+              {withdrawalRequestsData.length > 0 ? (
+                withdrawalRequestsData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {data.requestDate}
+                      {formatDate(data.withdrawalDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.amount}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {(data.amount * 0.1).toFixed(2)}
+                      {(data.adminCharge).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.status}
@@ -113,7 +133,7 @@ export default function ViewWithdrawalRequests() {
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"

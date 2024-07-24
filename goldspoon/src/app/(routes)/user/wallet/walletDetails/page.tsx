@@ -91,15 +91,6 @@ export default function ViewWalletDetails() {
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize text-black">
-                    Total Balance:
-                  </span>
-                  <span className="text-gray-700 text-md">
-                    {walletDetails.walletDetails.approvedBalance +
-                      walletDetails.walletDetails.currentBalance}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="font-semibold text-md capitalize text-black">
                     Total Direct Income:
                   </span>
                   <span className="text-gray-700 text-md">
