@@ -39,6 +39,7 @@ export default function EditProfile() {
         } else {
           toast.error('No profile data returned from the server.');
         }
+        toast.success("Fetched profile data successfully.");
       } catch (error) {
         toast.error('Failed to fetch profile data.');
         console.error("Failed to fetch profile data:", error);

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -19,29 +21,53 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Simulated API call to fetch current amount available
-const fetchCurrentAmount = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const currentAmount = 1000; // Example amount
-      resolve(currentAmount);
-    }, 500);
-  });
-};
-
 export default function AddWithdrawalRequest() {
   const [formData, setFormData] = useState({
     withdrawalAmount: "",
   });
 
   const [currentAmount, setCurrentAmount] = useState(0);
+  const [approvedBalance, setApprovedBalance] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [memberNumber, setMemberNumber] = useState("");
+
+  const fetchCurrentAmount = async () => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to view this information.');
+      return;
+    }
+
+    setMemberNumber(session.user.name);
+
+    try {
+      const response = await axios.get("http://localhost:8080/payout/walletDetails", {
+        params: {
+          pageSize: 1,
+          pageNumber: 0,
+          memberNumber: session.user.name,
+        },
+      });
+
+      if (response.data && response.data.content && response.data.content.length > 0) {
+        const walletDetails = response.data.content[0].walletDetails;
+        setCurrentAmount(walletDetails.currentBalance);
+        setApprovedBalance(walletDetails.approvedBalance);
+      } else {
+        setCurrentAmount(0);
+        setApprovedBalance(0);
+        toast.error('No data returned from the server.');
+      }
+      toast.success("Fetched current and approved balances. Add withdrawal requests here...");
+    } catch (error) {
+      toast.error('Failed to fetch wallet details.');
+      console.error("Failed to fetch wallet details:", error);
+    }
+  };
 
   useEffect(() => {
-    fetchCurrentAmount().then((amount) => {
-      setCurrentAmount(amount);
-    });
+    fetchCurrentAmount(); // Fetch data on component mount
   }, []);
 
   const handleChange = (e) => {
@@ -70,20 +96,31 @@ export default function AddWithdrawalRequest() {
 
   const handleConfirmWithdrawal = async () => {
     const toastId = toast.loading("Processing Withdrawal Request...");
-    // Simulate API call to process withdrawal request
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      await axios.post("http://localhost:8080/payout/withdrawal/create", {
+        memberNumber,
+        amount: parseFloat(formData.withdrawalAmount),
+      });
 
-    toast.success("Withdrawal request processed successfully!", {
-      id: toastId,
-    });
+      toast.success("Withdrawal request processed successfully!", {
+        id: toastId,
+      });
 
-    setIsDialogOpen(false);
-    setIsSuccessDialogOpen(true);
+      setIsDialogOpen(false);
+      setIsSuccessDialogOpen(true);
 
-    // Reset form
-    setFormData({
-      withdrawalAmount: "",
-    });
+      // Reset form
+      setFormData({
+        withdrawalAmount: "",
+      });
+      // Fetch the updated current amount
+      fetchCurrentAmount();
+    } catch (error) {
+      toast.error("Failed to process withdrawal request.", {
+        id: toastId,
+      });
+      console.error("Failed to process withdrawal request:", error);
+    }
   };
 
   return (
@@ -91,16 +128,28 @@ export default function AddWithdrawalRequest() {
       <Card className="w-full max-w-7xl">
         <CardHeader>
           <CardTitle>ADD WITHDRAWAL REQUEST</CardTitle>
+          <CardDescription> You can place a withdrawal request from your current balance.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="currentAmount">Current Amount Available</Label>
+              <Label htmlFor="currentAmount">Current Balance Available</Label>
               <Input
                 id="currentAmount"
                 name="currentAmount"
                 placeholder="Current Amount Available"
                 value={currentAmount}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="approvedBalance">Approved Balance</Label>
+              <Input
+                id="approvedBalance"
+                name="approvedBalance"
+                placeholder="Approved Balance"
+                value={approvedBalance}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
@@ -139,10 +188,10 @@ export default function AddWithdrawalRequest() {
             <div className="mt-4 space-y-2">
               <p>Are you sure you want to process the withdrawal request?</p>
               <p>
-                Amount to Withdraw: <strong>{formData.withdrawalAmount}</strong>
+                Current Balance Available: <strong>{currentAmount}</strong>
               </p>
               <p>
-                Current Amount Available: <strong>{currentAmount}</strong>
+                Amount to Withdraw: <strong>{formData.withdrawalAmount}</strong>
               </p>
             </div>
           </DialogDescription>
@@ -162,13 +211,9 @@ export default function AddWithdrawalRequest() {
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
-          <DialogTitle>Withdrawal Successful</DialogTitle>
+          <DialogTitle>Withdrawal request placed.</DialogTitle>
           <DialogDescription>
             <div className="mt-4 space-y-2">
-              <p>
-                Withdrawal request has been successfully processed for the amount of{" "}
-                <strong>{formData.withdrawalAmount}</strong>.
-              </p>
             </div>
           </DialogDescription>
           <Button onClick={() => setIsSuccessDialogOpen(false)}>Close</Button>

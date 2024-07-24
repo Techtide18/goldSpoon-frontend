@@ -14,48 +14,62 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
 
 export default function UsedEpinReport() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0); // Start from 0
   const [totalItems, setTotalItems] = useState(0);
   const [epinData, setEpinData] = useState([]);
 
   const fetchEpins = async (params) => {
     const session = await getSession();
     if (!session || !session.user || !session.user.name) {
-      toast.error('You must be logged in to view this information.');
+      toast.error("You must be logged in to view this information.");
       return;
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/epin/used`, {
+      const response = await axios.get(`http://localhost:8080/epins/used`, {
+        headers: {
+          adminMemberId: 2,
+        },
         params: {
+          isRefferal: true,
           ...params,
-          memberId: session.user.name,
-          referral: true,
+          memberNumber: session.user.name,
         },
       });
 
-      if (response.data && response.data.epins) {
-        setEpinData(response.data.epins);
+      if (response.data && response.data.content) {
+        setEpinData(response.data.content);
         setTotalItems(response.data.pagination.totalItems);
       } else {
         setEpinData([]);
-        toast.error('No data returned from the server.');
+        toast.error("No data returned from the server.");
       }
+      toast.success("Fetched Used EPIN data successfully.");
     } catch (error) {
-      toast.error('Failed to fetch EPIN data.');
+      toast.error("Failed to fetch EPIN data.");
       console.error("Failed to fetch EPIN data:", error);
     }
   };
 
   useEffect(() => {
-    fetchEpins({ pageNumber: currentPage - 1, pageSize: PAGE_SIZE });
+    fetchEpins({ pageNumber: currentPage, pageSize: PAGE_SIZE }); // Use currentPage directly
   }, [currentPage]);
 
   const handlePageChange = (event, page) => {
-    setCurrentPage(page);
+    setCurrentPage(page - 1); // Adjust the page index
     fetchEpins({ pageNumber: page - 1, pageSize: PAGE_SIZE });
   };
 
@@ -83,15 +97,6 @@ export default function UsedEpinReport() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   CREATED DATE
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  REFERRAL MEMBER ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  GROUP
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  RE-TOPUP DATE
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -99,25 +104,16 @@ export default function UsedEpinReport() {
                 epinData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {data.epinId}
+                      {data.epinNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.memberId}
+                      {data.memberNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.packageName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.createdDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.referralMemberId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.group}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.reTopupDate}
+                      {formatDate(data.createdDate)}
                     </td>
                   </tr>
                 ))
@@ -137,7 +133,7 @@ export default function UsedEpinReport() {
         <CardFooter className="flex justify-end space-x-2">
           <Pagination
             count={totalPages}
-            page={currentPage}
+            page={currentPage + 1} // Adjust for 0-based index
             onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
@@ -151,19 +147,19 @@ export default function UsedEpinReport() {
           />
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
+            onClick={() => handlePageChange(null, Math.max(currentPage, 1))}
+            disabled={currentPage === 0}
           >
-            Previous
+            Previous 20
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              handlePageChange(null, Math.min(currentPage + 2, totalPages))
             }
-            disabled={currentPage === totalPages}
+            disabled={currentPage + 1 === totalPages}
           >
-            Next
+            Next 20
           </Button>
         </CardFooter>
       </Card>

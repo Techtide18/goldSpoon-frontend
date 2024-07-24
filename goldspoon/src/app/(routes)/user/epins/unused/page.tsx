@@ -15,9 +15,19 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner"; // Assuming 'sonner' exposes a 'toast' function
 import { Pagination } from "@/components/ui/pagination";
 
-const PAGE_SIZE = 50;  // Updated page size to 50
+const PAGE_SIZE = 20;  // Updated page size to 50
 
-export default function EpinReport() {
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
+export default function UnusedEpinReport() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [epinData, setEpinData] = useState([]);
@@ -30,21 +40,25 @@ export default function EpinReport() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/epin/unused`, {
+      const response = await axios.get(`http://localhost:8080/epins/unused`, {
+        headers: {
+          adminMemberId: 2,
+        },
         params: {
+          isRefferal: true,
           ...params,
-          memberId: session.user.name,
-          referral: true,
+          memberNumber: session.user.name,
         },
       });
 
-      if (response.data && response.data.epins) {
-        setEpinData(response.data.epins);
+      if (response.data && response.data.content) {
+        setEpinData(response.data.content);
         setTotalItems(response.data.pagination.totalItems);
       } else {
         setEpinData([]);
         toast.error('No data returned from the server.');
       }
+      toast.success("Fetched Unused EPIN data successfully.");
     } catch (error) {
       toast.error('Failed to fetch EPIN data.');
       console.error("Failed to fetch EPIN data:", error);
@@ -82,9 +96,6 @@ export default function EpinReport() {
                   Created Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Referral Member ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -94,20 +105,17 @@ export default function EpinReport() {
                 epinData.map((data, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {data.EpinID}
+                      {data.epinNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.packageName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.createdDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.referralMemberId}
+                      {formatDate(data.createdDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Link
-                        href={`/register?epinId=${data.EpinID}`}
+                        href={`/register?epinId=${data.epinNumber}`}
                         legacyBehavior
                       >
                         <a
@@ -154,14 +162,14 @@ export default function EpinReport() {
             onClick={() => handlePageChange(null, Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            Previous 20
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() => handlePageChange(null, Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            Next
+            Next 20
           </Button>
         </CardFooter>
       </Card>

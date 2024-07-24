@@ -37,6 +37,7 @@ export default function ViewProfile() {
         } else {
           toast.error('No profile data returned from the server.');
         }
+        toast.success("Fetched profile.");
       } catch (error) {
         toast.error('Failed to fetch profile data.');
         console.error("Failed to fetch profile data:", error);
@@ -59,7 +60,6 @@ export default function ViewProfile() {
     { label: "PAN Number", value: profile.panNumber },
     { label: "Address", value: profile.addressDetails },
     { label: "Bank Account Details", value: profile.bankAccDetails },
-    { label: "Created Date", value: formatDate( profile.createdDate) },
   ];
 
   return (

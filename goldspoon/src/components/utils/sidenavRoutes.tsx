@@ -146,17 +146,6 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "My Team",
-    path: "/user/myTeam",
-    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
-    submenu: true,
-    subMenuItems: [
-      { title: "View All", path: "/user/myTeam/byAll" },
-      { title: "View Count", path: "/user/myTeam/byCount" },
-      { title: "Pay For Member", path: "/user/myTeam/pay" },
-    ],
-  },
-  {
     title: "E-Pins",
     path: "/user/epins",
     icon: <Icon icon="lucide:shopping-cart" width="24" height="24" />,
@@ -193,7 +182,17 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
       },
     ],
   },
-
+  {
+    title: "My Team",
+    path: "/user/myTeam",
+    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "View All", path: "/user/myTeam/byAll" },
+      { title: "View Count", path: "/user/myTeam/byCount" },
+      { title: "Pay For Member", path: "/user/myTeam/pay" },
+    ],
+  },
   {
     title: "Wallet",
     path: "/user/wallet",

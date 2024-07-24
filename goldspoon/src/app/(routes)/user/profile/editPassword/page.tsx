@@ -36,6 +36,7 @@ export default function ViewPassword() {
         } else {
           toast.error('No password data returned from the server.');
         }
+        toast.success("Fetched password successfully.");
       } catch (error) {
         toast.error('Failed to fetch profile data.');
         console.error("Failed to fetch profile data:", error);

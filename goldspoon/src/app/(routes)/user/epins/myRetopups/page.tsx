@@ -37,8 +37,9 @@ export default function ReTopupReport() {
       if (response.data) {
         setReTopupData(response.data);
       } else {
-        toast.error('No data returned from the server.');
+        toast.error('No data returned.');
       }
+      toast.success("Fetched retopups successfully.");
     } catch (error) {
       toast.error('Failed to fetch re-topup data.');
       console.error("Failed to fetch re-topup data:", error);
