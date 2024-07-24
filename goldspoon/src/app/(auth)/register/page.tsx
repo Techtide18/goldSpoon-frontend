@@ -146,7 +146,7 @@ export default function Register() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-black flex flex-col items-center justify-center relative">
+      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
         <img
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
@@ -155,7 +155,7 @@ export default function Register() {
         <div className="text-white text-bold mb-4">
           <p className="text-white font-bold">
             Already have an account?{" "}
-            <a className="text-blue-500 underline" href="/login">
+            <a className="text-black underline" href="/login">
               Login
             </a>
           </p>
@@ -172,10 +172,10 @@ export default function Register() {
           .
         </div>
       </div>
-      <div className="w-1/2 bg-yellow-100 flex items-center justify-center overflow-y-auto pt-24 pb-2">
-        <Card className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
+      <div className="w-1/2 bg-[#A1D6E2] flex items-center justify-center overflow-y-auto pt-24 pb-2">
+        <Card className="w-full max-w-lg bg-[#F1F1F2] shadow-lg rounded-lg p-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-semibold text-gray-800 text-center">
+            <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
               Register With Epin
             </CardTitle>
           </CardHeader>

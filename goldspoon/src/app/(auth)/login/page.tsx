@@ -39,7 +39,7 @@ const Login = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-black flex flex-col items-center justify-center relative">
+      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
         <img
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
@@ -57,10 +57,10 @@ const Login = () => {
           .
         </div>
       </div>
-      <div className="w-1/2 bg-yellow-100 flex items-center justify-center">
-        <Card className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
+      <div className="w-1/2 bg-[#A1D6E2] flex items-center justify-center">
+        <Card className="w-full max-w-md bg-[#F1F1F2] shadow-lg rounded-lg p-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-semibold text-gray-800 text-center">
+            <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
               Login
             </CardTitle>
             <CardDescription className="text-gray-600 text-center">
@@ -71,7 +71,7 @@ const Login = () => {
             <LoginClient onSuccess={handleLoginSuccess} />
           </CardContent>
           <CardFooter className="flex flex-col gap-4 items-center">
-          <div className="flex items-center w-full">
+            <div className="flex items-center w-full">
               <div className="flex-grow border-t border-gray-300"></div>
               <span className="mx-4 text-gray-600">OR</span>
               <div className="flex-grow border-t border-gray-300"></div>
