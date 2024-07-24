@@ -44,10 +44,12 @@ export default function ViewWalletDetails() {
 
       const walletData = response.data.content.map((wallet) => ({
         memberId: wallet.memberNumber,
-        memberName: wallet.memberName,
-        currentBalance: wallet.currentBalance,
-        approvedBalance: wallet.approvedBalance,
-        totalIncome: wallet.totalIncome,
+        memberName: wallet.fullName,
+        currentBalance: wallet.walletDetails.currentBalance,
+        approvedBalance: wallet.walletDetails.approvedBalance,
+        totalIncome: wallet.walletDetails.totalIncomeHistory,
+        totalRenewalIncome: wallet.totalDirectIncome,
+        totalLevelIncome: wallet.totalLevelIncome,
       }));
 
       setFilteredData(walletData);
@@ -173,6 +175,12 @@ export default function ViewWalletDetails() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total Income History
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Renewal Income History
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Level Income History
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -194,12 +202,18 @@ export default function ViewWalletDetails() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.totalIncome}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.totalRenewalIncome}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.totalLevelIncome}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="5"
+                      colSpan="7"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No data

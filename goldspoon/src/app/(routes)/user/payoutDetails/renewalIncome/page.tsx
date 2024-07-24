@@ -46,7 +46,7 @@ export default function RenewalIncomeReport() {
         params: {
           pageNumber: pageNumber - 1, // API page numbers typically start from 0
           pageSize: PAGE_SIZE,
-          type: 'renewal',
+          type: 'level',
           memberNumber: session.user.name,
         },
       });

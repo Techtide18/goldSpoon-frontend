@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +33,7 @@ export default function AddInstallment() {
 
   const [memberName, setMemberName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [installmentsPaidTillNow, setInstallmentsPaidTillNow] = useState(0);
 
   const fetchMemberName = async () => {
     try {
@@ -78,16 +79,21 @@ export default function AddInstallment() {
 
     const toastId = toast.loading("Adding Installment...");
     try {
-      await axios.put("http://localhost:8080/installments/add", requestData, {
-        headers: {
-          adminMemberId: 1,
-        },
-      });
+      const response = await axios.put(
+        "http://localhost:8080/installments/add",
+        requestData,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
 
       toast.success("Installment added successfully!", {
         id: toastId,
       });
 
+      setInstallmentsPaidTillNow(response.data.installmentsPaidTillNow);
       setIsDialogOpen(true);
       setFormData({
         memberId: "",
@@ -227,6 +233,11 @@ export default function AddInstallment() {
           <DialogDescription>
             <div className="mt-4 space-y-2">
               <p>Successfully added installment for the member.</p>
+              <p>
+                <strong>
+                  Total Installments Paid Till Now: {installmentsPaidTillNow}
+                </strong>
+              </p>
             </div>
           </DialogDescription>
           <Button onClick={() => setIsDialogOpen(false)}>Close</Button>

@@ -100,12 +100,16 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
         path: "/admin/wallet/withdrawalRequests",
       },
       {
-        title: "Wallet Details",
-        path: "/admin/wallet/walletDetails",
+        title: "Add Transaction",
+        path: "/admin/wallet/addTransaction",
       },
       {
-        title: "Transaction Details",
+        title: "View Transaction Details",
         path: "/admin/wallet/transactionDetails",
+      },
+      {
+        title: "View Wallet Details",
+        path: "/admin/wallet/walletDetails",
       },
     ],
   },

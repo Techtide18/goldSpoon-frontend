@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,7 @@ export default function ViewWithdrawalRequests() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
   const fetchWithdrawalRequests = async (
@@ -49,7 +50,7 @@ export default function ViewWithdrawalRequests() {
       }
 
       const response = await axios.get(
-        "http://localhost:8080/payout/withdrawalDetails",
+        "http://localhost:8080/payout/withdrawalRequest/Details",
         {
           params,
           headers: {
@@ -61,19 +62,16 @@ export default function ViewWithdrawalRequests() {
 
       const requestData = response.data.content.map((request) => ({
         requestId: request.id,
-        requestDate: formatDate(request.requestDate),
-        memberId: request.receivingMemberNumber,
-        memberName: request.memberName,
-        epinId: request.epinId,
-        amountRequested: request.receivedAmount,
-        groupName: request.groupName,
+        requestDate: formatDate(request.withdrawalDate),
+        memberId: request.memberNumber,
+        memberName: request.fullName,
+        amountRequested: request.amount,
+        adminCharge: request.adminCharge,
         status: request.status.toLowerCase(),
       }));
 
       setFilteredData(requestData);
-      setTotalPages(
-        Math.ceil(response.data.pagination.totalItems / PAGE_SIZE)
-      );
+      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
       toast.success("Data fetched successfully.");
     } catch (error) {
       console.error("Error fetching withdrawal requests:", error);
@@ -81,16 +79,18 @@ export default function ViewWithdrawalRequests() {
     }
   };
 
-  useEffect(() => {
-    fetchWithdrawalRequests();
-  }, []);
-
   const handleViewOption = (option) => {
     setViewOption(option);
     setFilterId("");
     setCurrentPage(1);
-    fetchWithdrawalRequests(0, option.toUpperCase());
+    if (option !== "memberId") {
+      fetchWithdrawalRequests(0, option.toUpperCase());
+    }
   };
+
+  useEffect(() => {
+    fetchWithdrawalRequests();
+  }, []);
 
   const getByMemberId = () => {
     if (!filterId) {
@@ -106,20 +106,43 @@ export default function ViewWithdrawalRequests() {
     setIsApproveDialogOpen(true);
   };
 
-  const handleApprove = () => {
-    // Simulate API call to approve request
-    toast.success(
-      `Request for amount ${selectedRequest.amountRequested} for member ID ${selectedRequest.memberId} approved.`
-    );
-    setIsApproveDialogOpen(false);
-    // Update the status to 'approved'
-    setFilteredData((prevData) =>
-      prevData.map((data) =>
-        data.requestId === selectedRequest.requestId
-          ? { ...data, status: "approved" }
-          : data
-      )
-    );
+  const rejectRequest = (request) => {
+    setSelectedRequest(request);
+    setIsRejectDialogOpen(true);
+  };
+
+  const handleAction = async (action) => {
+    const toastId = toast.loading(`Processing ${action} request...`);
+    try {
+      await axios.put(
+        `http://localhost:8080/payout/withdrawalRequest/Details/${selectedRequest.requestId}`,
+        { status: action },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        }
+      );
+
+      toast.success(`Request ${action.toLowerCase()} successfully!`, {
+        id: toastId,
+      });
+
+      if (action === "APPROVED") {
+        setIsApproveDialogOpen(false);
+      } else {
+        setIsRejectDialogOpen(false);
+      }
+
+      // Refresh the data
+      fetchWithdrawalRequests(currentPage - 1, viewOption.toUpperCase());
+    } catch (error) {
+      toast.error(`Failed to ${action.toLowerCase()} request.`, {
+        id: toastId,
+      });
+      console.error(`Error ${action.toLowerCase()} request:`, error);
+    }
   };
 
   const handlePreviousPage = () => {
@@ -235,17 +258,14 @@ export default function ViewWithdrawalRequests() {
                     Member Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    EPIN ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount Requested
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Group Name
+                    Admin Charge (10%)
                   </th>
                   {viewOption === "pending" && (
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Approve Request
+                      Action
                     </th>
                   )}
                 </tr>
@@ -267,21 +287,24 @@ export default function ViewWithdrawalRequests() {
                         {data.memberName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.epinId}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.amountRequested}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.groupName}
+                        {data.adminCharge}
                       </td>
                       {viewOption === "pending" && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
                           <Button
                             onClick={() => approveRequest(data)}
                             className="bg-green-500 text-white"
                           >
                             Approve
+                          </Button>
+                          <Button
+                            onClick={() => rejectRequest(data)}
+                            className="bg-red-500 text-white"
+                          >
+                            Reject
                           </Button>
                         </td>
                       )}
@@ -290,7 +313,7 @@ export default function ViewWithdrawalRequests() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={viewOption === "pending" ? 8 : 7}
+                      colSpan={viewOption === "pending" ? 7 : 6}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No data
@@ -333,8 +356,35 @@ export default function ViewWithdrawalRequests() {
           </DialogDescription>
           <DialogFooter>
             <Button onClick={() => setIsApproveDialogOpen(false)}>No</Button>
-            <Button onClick={handleApprove} className="bg-green-500 text-white">
+            <Button
+              onClick={() => handleAction("APPROVED")}
+              className="bg-green-500 text-white"
+            >
               Yes, Approve
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Request Dialog */}
+      <Dialog
+        open={isRejectDialogOpen}
+        onOpenChange={(open) => setIsRejectDialogOpen(open)}
+      >
+        <DialogContent>
+          <DialogTitle>Reject Request</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to reject the request for amount{" "}
+            <strong>{selectedRequest?.amountRequested}</strong> for member ID{" "}
+            <strong>{selectedRequest?.memberId}</strong>?
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={() => setIsRejectDialogOpen(false)}>No</Button>
+            <Button
+              onClick={() => handleAction("REJECTED")}
+              className="bg-red-500 text-white"
+            >
+              Yes, Reject
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -97,7 +97,7 @@ export default function AddWithdrawalRequest() {
   const handleConfirmWithdrawal = async () => {
     const toastId = toast.loading("Processing Withdrawal Request...");
     try {
-      await axios.post("http://localhost:8080/payout/withdrawal/create", {
+      await axios.post("http://localhost:8080/payout/withdrawalRequest/member/create", {
         memberNumber,
         amount: parseFloat(formData.withdrawalAmount),
       });
