@@ -94,7 +94,7 @@ export default function AddWithdrawalRequest() {
     setIsDialogOpen(true);
   };
 
-  const handleConfirmWithdrawal = async () => {
+  const handleConfirmWithdrawal = async () => { 
     const toastId = toast.loading("Processing Withdrawal Request...");
     try {
       await axios.post("http://localhost:8080/payout/withdrawalRequest/member/create", {
