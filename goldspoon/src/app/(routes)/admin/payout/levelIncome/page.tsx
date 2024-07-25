@@ -28,7 +28,7 @@ export default function ViewLevelIncome() {
       const params = {
         pageNumber,
         pageSize: PAGE_SIZE,
-        incomeType: "level",
+        incomeType: "LEVEL",
       };
 
       if (memberNumber) {

@@ -57,6 +57,7 @@ export default function ViewWithdrawalRequests() {
         setWithdrawalRequestsData([]);
         toast.error('No data returned from the server.');
       }
+      toast.success("All withdrawals fetched successfully!");
     } catch (error) {
       toast.error('Failed to fetch withdrawal requests.');
       console.error("Failed to fetch withdrawal requests:", error);
