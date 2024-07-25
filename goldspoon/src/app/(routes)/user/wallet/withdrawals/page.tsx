@@ -46,7 +46,7 @@ export default function ViewWithdrawalRequests() {
       const response = await axios.get("http://localhost:8080/payout/withdrawalRequest/Details", {
         params: {
           ...params,
-          memberNumber: session.user.name,
+          memberNumber: session.user.name, 
         },
       });
 
