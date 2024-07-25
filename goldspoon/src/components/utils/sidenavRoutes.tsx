@@ -96,20 +96,16 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       {
-        title: "Withdrawal Requests",
+        title: "View Withdrawal Requests",
         path: "/admin/wallet/withdrawalRequests",
+      },
+      {
+        title: "Add Withdrawal Requests For Member",
+        path: "/admin/wallet/addWithdrawalRequest",
       },
       {
         title: "Add Transaction",
         path: "/admin/wallet/addTransaction",
-      },
-      {
-        title: "View Transaction Details",
-        path: "/admin/wallet/transactionDetails",
-      },
-      {
-        title: "View Wallet Details",
-        path: "/admin/wallet/walletDetails",
       },
     ],
   },
@@ -119,6 +115,14 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="tabler:report" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
+      {
+        title: "View Transaction Details",
+        path: "/admin/wallet/transactionDetails",
+      },
+      {
+        title: "View Wallet Details",
+        path: "/admin/wallet/walletDetails",
+      },
       { title: "View Directs", path: "/admin/reports/viewDirects" },
       { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "View Downline", path: "/admin/reports/downline" },
@@ -187,17 +191,6 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "My Team",
-    path: "/user/myTeam",
-    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
-    submenu: true,
-    subMenuItems: [
-      { title: "View All", path: "/user/myTeam/byAll" },
-      { title: "View Count", path: "/user/myTeam/byCount" },
-      { title: "Pay For Member", path: "/user/myTeam/pay" },
-    ],
-  },
-  {
     title: "Wallet",
     path: "/user/wallet",
     icon: <Icon icon="lucide:wallet" width="24" height="24" />,
@@ -207,6 +200,17 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
       { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
       { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
       { title: "View Transaction Details", path: "/user/wallet/transactions" },
+    ],
+  },
+  {
+    title: "My Team",
+    path: "/user/myTeam",
+    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "View All", path: "/user/myTeam/byAll" },
+      { title: "View Count", path: "/user/myTeam/byCount" },
+      { title: "Pay For Member", path: "/user/myTeam/pay" },
     ],
   },
 ];

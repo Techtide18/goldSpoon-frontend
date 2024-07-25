@@ -1,65 +1,61 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-
-// Simulated Data for Transaction Details
-const transactionDetailsData = [
-  {
-    transactionDate: "14-07-2024",
-    transactionMode: "Cash",
-    amount: 500,
-  },
-  {
-    transactionDate: "15-07-2024",
-    transactionMode: "Gold",
-    amount: 1000,
-  },
-  {
-    transactionDate: "16-07-2024",
-    transactionMode: "Others",
-    amount: 1500,
-  },
-  {
-    transactionDate: "17-07-2024",
-    transactionMode: "Cash",
-    amount: 2000,
-  },
-];
-
-for (let i = 18; i < 68; i++) {
-  transactionDetailsData.push({
-    transactionDate: `14-07-2024`,
-    transactionMode: i % 3 === 0 ? "Cash" : i % 3 === 1 ? "Gold" : "Others",
-    amount: 500 + i * 10,
-  });
-}
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
 export default function ViewTransactionDetails() {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(transactionDetailsData.length / PAGE_SIZE);
-  const paginatedData = transactionDetailsData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const [transactionDetailsData, setTransactionDetailsData] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [memberNumber, setMemberNumber] = useState("");
+
+  useEffect(() => {
+    fetchTransactionDetails(currentPage);
+  }, [currentPage]);
+
+  const fetchTransactionDetails = async (pageNumber) => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error("You must be logged in to view this information.");
+      return;
+    }
+
+    setMemberNumber(session.user.name);
+
+    try {
+      const response = await axios.get("http://localhost:8080/payout/transactions", {
+        params: {
+          memberNumber: session.user.name,
+          pageSize: PAGE_SIZE,
+          pageNumber: pageNumber - 1, // Server expects zero-based page number
+        },
+        headers: {
+          adminMemberId: 1,
+        },
+      });
+
+      const data = response.data.content;
+      setTransactionDetailsData(data);
+      setTotalPages(response.data.pagination.totalPages);
+      toast.success("Fetched transaction details successfully.");
+    } catch (error) {
+      toast.error("Failed to fetch transaction details.");
+      console.error("Failed to fetch transaction details:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            VIEW TRANSACTION DETAILS
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">VIEW TRANSACTION DETAILS</CardTitle>
         </CardHeader>
         <CardContent>
           <table className="min-w-full divide-y divide-gray-200">
@@ -86,35 +82,31 @@ export default function ViewTransactionDetails() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((data, index) => {
-                  const adminCharges = data.amount * 0.1;
+              {transactionDetailsData.length > 0 ? (
+                transactionDetailsData.map((data, index) => {
+                  const adminCharges = Math.round(data.amount * 0.1);
                   const finalAmount = data.amount - adminCharges;
-                  const note =
-                    data.transactionMode === "Cash" ||
-                    data.transactionMode === "Gold"
-                      ? "Paid for member 123 renewal"
-                      : `Paid for member ${127 + index} renewal`;
+                  const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
 
                   return (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {data.transactionDate}
+                        {new Date(data.createdDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.transactionMode}
+                        {transactionMode}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.amount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {adminCharges.toFixed(2)}
+                        {adminCharges}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {finalAmount.toFixed(2)}
+                        {finalAmount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {note}
+                        {data.note || ""}
                       </td>
                     </tr>
                   );

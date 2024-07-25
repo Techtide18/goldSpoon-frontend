@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -14,43 +15,6 @@ import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
-// Simulated Data
-const simulatedTransactions = [
-  {
-    id: 1,
-    memberId: "D001",
-    receivedFromMemberId: "M001",
-    amount: 100,
-    dateTime: "2024-06-15 10:00:00",
-    incomeType: "Renewal Income",
-  },
-  {
-    id: 2,
-    memberId: "D002",
-    receivedFromMemberId: "M002",
-    amount: 200,
-    dateTime: "2024-07-01 12:30:00",
-    incomeType: "Level Income",
-  },
-  {
-    id: 3,
-    memberId: "D002",
-    receivedFromMemberId: "M003",
-    amount: 150,
-    dateTime: "2024-07-10 15:45:00",
-    incomeType: "Renewal Income",
-  },
-  {
-    id: 4,
-    memberId: "D004",
-    receivedFromMemberId: "M004",
-    amount: 250,
-    dateTime: "2024-07-15 09:20:00",
-    incomeType: "Level Income",
-  },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 100;
 
 export default function ViewTransactionDetails() {
@@ -58,26 +22,41 @@ export default function ViewTransactionDetails() {
   const [memberName, setMemberName] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const getTransactions = () => {
+  const getTransactions = async () => {
     if (!filterId) {
       return toast.error("Please enter a Member ID.");
     }
 
-    // Simulate fetching transaction data from backend based on the entered Member ID
-    // and setting the memberName and filteredData
-    const member = { memberName: "John Doe" }; // Simulated member name
-    const filtered = simulatedTransactions.filter(
-      (data) => data.memberId === filterId
-    ); // Simulated filtered data
+    try {
+      const response = await axios.get("http://localhost:8080/payout/transactions", {
+        params: {
+          memberNumber: filterId,
+          pageSize: PAGE_SIZE,
+          pageNumber: currentPage - 1,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
 
-    setMemberName(member.memberName);
-    setFilteredData(filtered);
-    setCurrentPage(1);
-    toast.success("Transaction data fetched successfully.");
+      const memberDetails = response.data.content;
+      setMemberName(memberDetails.length > 0 ? memberDetails[0].fullName : "Unknown");
+      setFilteredData(memberDetails);
+      setTotalPages(response.data.pagination.totalPages);
+
+      toast.success("Transaction data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching transaction data:", error);
+      setMemberName("Unknown");
+      setFilteredData([]);
+      toast.error("Failed to fetch transaction data.");
+    }
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const totalItems = filteredData.length;
   const paginatedData = filteredData.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
@@ -140,50 +119,68 @@ export default function ViewTransactionDetails() {
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Member ID (Received Money For)
+                    Transaction Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Admin Charges (10%)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Final Amount Paid
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     DateTime
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Income Type
+                    Note
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedData.length > 0 ? (
-                  paginatedData.map((data, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {data.id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.memberId}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.receivedFromMemberId}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.amount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.dateTime}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.incomeType}
-                      </td>
-                    </tr>
-                  ))
+                  paginatedData.map((data, index) => {
+                    const adminCharges = Math.round(data.amount * 0.1);
+                    const finalAmount = data.amount - adminCharges;
+                    const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
+
+                    return (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {data.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.memberNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {transactionMode}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.amount}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {adminCharges}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {finalAmount}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.createdDate}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.note}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="8"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
-                      No data
+                      No transactions
                     </td>
                   </tr>
                 )}

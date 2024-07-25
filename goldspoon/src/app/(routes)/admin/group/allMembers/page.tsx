@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,47 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
-
-// Simulated Data
-const simulatedGroupMembers = [
-  {
-    id: 1,
-    memberId: "M001",
-    memberName: "Member 1",
-    isActive: true,
-    phone: "123-456-7890",
-    email: "member1@example.com",
-    groupName: "G12",
-  },
-  {
-    id: 2,
-    memberId: "M002",
-    memberName: "Member 2",
-    isActive: false,
-    phone: "234-567-8901",
-    email: "member2@example.com",
-    groupName: "G12",
-  },
-  {
-    id: 3,
-    memberId: "M003",
-    memberName: "Member 3",
-    isActive: true,
-    phone: "345-678-9012",
-    email: "member3@example.com",
-    groupName: "G20",
-  },
-  {
-    id: 4,
-    memberId: "M004",
-    memberName: "Member 4",
-    isActive: true,
-    phone: "456-789-0123",
-    email: "member4@example.com",
-    groupName: "G12",
-  },
-  // Add more data to test pagination
-];
+import axios from "axios";
 
 const PAGE_SIZE = 100;
 
@@ -61,32 +21,50 @@ export default function ViewGroupMembers() {
   const [filterGroupName, setFilterGroupName] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const getGroupMembers = () => {
+  const getGroupMembers = async () => {
     if (!filterGroupName) {
       return toast.error("Please enter a Group Name.");
     }
 
-    // Simulate fetching group members data from backend based on the entered Group Name
-    const filtered = simulatedGroupMembers.filter(
-      (data) => data.groupName === filterGroupName
-    );
+    try {
+      const response = await axios.get("http://localhost:8080/group/members", {
+        headers: {
+          adminMemberId: 1,
+        },
+        params: {
+          pageNumber: currentPage - 1,
+          pageSize: PAGE_SIZE,
+          groupName: filterGroupName,
+        },
+      });
 
-    if (filtered.length === 0) {
-      toast.error("No members found for the specified group.");
-    } else {
-      toast.success("Group members data fetched successfully.");
+      const { content, pagination } = response.data;
+
+      setFilteredData(content);
+      setTotalPages(pagination.totalPages);
+      setCurrentPage(pagination.currentPage + 1);
+
+      if (content.length === 0) {
+        toast.error("No members found for the specified group.");
+      } else {
+        toast.success("Group members data fetched successfully.");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch group members data.");
     }
-
-    setFilteredData(filtered);
-    setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  useEffect(() => {
+    if (filterGroupName) {
+      getGroupMembers();
+    }
+  }, [currentPage]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -109,7 +87,7 @@ export default function ViewGroupMembers() {
               className="flex-1"
             />
           </div>
-          <Button onClick={getGroupMembers} className="w-full">
+          <Button onClick={() => getGroupMembers()} className="w-full">
             View Members in Group
           </Button>
         </CardContent>
@@ -126,9 +104,6 @@ export default function ViewGroupMembers() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Member ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -136,6 +111,9 @@ export default function ViewGroupMembers() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Is Active
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Is Blocked
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Phone
@@ -149,20 +127,20 @@ export default function ViewGroupMembers() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((data, index) => (
+                {filteredData.length > 0 ? (
+                  filteredData.map((data, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {data.id}
+                        {data.memberNumber}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.memberId}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.memberName}
+                        {data.fullName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.isActive ? "Yes" : "No"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.isBlock ? "Yes" : "No"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.phone}
@@ -171,7 +149,7 @@ export default function ViewGroupMembers() {
                         {data.email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.groupName}
+                        {filterGroupName}
                       </td>
                     </tr>
                   ))
@@ -193,7 +171,7 @@ export default function ViewGroupMembers() {
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"

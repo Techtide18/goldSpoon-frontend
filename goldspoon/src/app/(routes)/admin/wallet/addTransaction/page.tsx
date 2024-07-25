@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea"; // Assuming Textarea component exists
 import {
   Select,
   SelectTrigger,
@@ -14,54 +15,53 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function AddTransaction() {
   const [formData, setFormData] = useState({
     memberId: "",
-    selectedWithdrawal: "",
+    transactionType: "",
+    amount: "",
+    note: "",
   });
 
   const [memberName, setMemberName] = useState("");
-  const [approvedWithdrawals, setApprovedWithdrawals] = useState([]);
+  const [approvedBalance, setApprovedBalance] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const fetchMemberNameAndWithdrawals = async () => {
+  const fetchWalletDetails = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/member/${formData.memberId}`,
-        {
-          headers: {
-            adminMemberId: 1,
-          },
-        }
-      );
-      setMemberName(response.data.fullName);
-
-      const withdrawalResponse = await axios.get(
-        "http://localhost:8080/payout/withdrawalRequest/Details",
+        "http://localhost:8080/payout/walletDetails",
         {
           params: {
-            pageSize: 50,
+            pageSize: 1,
             pageNumber: 0,
             memberNumber: formData.memberId,
-            status: "APPROVED",
           },
           headers: {
+            "Content-Type": "application/json",
             adminMemberId: 1,
           },
         }
       );
-      const withdrawals = withdrawalResponse.data.content.map((wd) => ({
-        id: wd.id,
-        date: new Date(wd.withdrawalDate).toLocaleDateString(),
-        amount: wd.amount,
-      }));
-      setApprovedWithdrawals(withdrawals);
 
-      toast.success("Fetched member details and approved withdrawal requests successfully.");
+      const memberDetails = response.data.content[0];
+      setMemberName(memberDetails.fullName || "Unknown");
+      setApprovedBalance(memberDetails.walletDetails.approvedBalance || "0");
+
+      toast.success("Fetched wallet details successfully.");
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching wallet details:", error);
       setMemberName("Unknown");
-      toast.error("Failed to fetch member name or withdrawals.");
+      setApprovedBalance("0");
+      toast.error("Failed to fetch wallet details.");
     }
   };
 
@@ -75,21 +75,27 @@ export default function AddTransaction() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { memberId, selectedWithdrawal } = formData;
+    const { memberId, transactionType, amount, note } = formData;
 
-    if (!memberId || !selectedWithdrawal) {
-      return toast.error("Please fill out all fields.");
+    if (!memberId || !transactionType || !amount) {
+      return toast.error("Please fill out all required fields.");
+    }
+
+    if (parseInt(amount) > parseInt(approvedBalance)) {
+      return toast.error("Amount cannot be greater than Approved Balance.");
     }
 
     const requestData = {
       memberNumber: memberId,
-      withdrawalRequestId: selectedWithdrawal,
+      transactionType,
+      amount: parseInt(amount),
+      note,
     };
 
     const toastId = toast.loading("Adding Transaction...");
     try {
       await axios.post(
-        "http://localhost:8080/payout/withdrawal/admin/create",
+        `http://localhost:8080/payout/transaction/${formData.memberId}`,
         requestData,
         {
           headers: {
@@ -98,18 +104,22 @@ export default function AddTransaction() {
         }
       );
 
-      toast.success("Transaction added successfully!", {
+      toast.success("Transaction completed successfully!", {
         id: toastId,
       });
 
+      setIsDialogOpen(true);
+
       setFormData({
         memberId: "",
-        selectedWithdrawal: "",
+        transactionType: "",
+        amount: "",
+        note: "",
       });
       setMemberName("");
-      setApprovedWithdrawals([]);
+      setApprovedBalance("");
     } catch (error) {
-      toast.error("Failed to complete transaction. Please try again.", {
+      toast.error(`Failed to complete transaction: ${error.response?.data || "Please try again."}`, {
         id: toastId,
       });
     }
@@ -136,7 +146,7 @@ export default function AddTransaction() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
                 <Button
-                  onClick={fetchMemberNameAndWithdrawals}
+                  onClick={fetchWalletDetails}
                   type="button"
                   className="min-w-max"
                 >
@@ -156,32 +166,61 @@ export default function AddTransaction() {
               />
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="approvedWithdrawals">Approved Withdrawal</Label>
+              <Label htmlFor="approvedBalance">Approved Balance</Label>
+              <Input
+                id="approvedBalance"
+                name="approvedBalance"
+                placeholder="Auto Generated"
+                value={approvedBalance}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="transactionType">Transaction Type</Label>
               <Select
-                name="approvedWithdrawals"
-                value={formData.selectedWithdrawal}
+                name="transactionType"
+                value={formData.transactionType}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, selectedWithdrawal: value })
+                  setFormData({ ...formData, transactionType: value })
                 }
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Approved Withdrawal Requests" />
+                  <SelectValue placeholder="Select Transaction Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {approvedWithdrawals.length > 0 ? (
-                    approvedWithdrawals.map((wd) => (
-                      <SelectItem key={wd.id} value={wd.id.toString()}>
-                        {`${wd.date} - ₹${wd.amount}`}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-requests" disabled>
-                      No approved withdrawal requests present
-                    </SelectItem>
-                  )}
+                  <SelectItem value="CASH">CASH</SelectItem>
+                  <SelectItem value="GIFT">GIFT</SelectItem>
+                  <SelectItem value="GOLD">GOLD</SelectItem>
+                  <SelectItem value="OTHERS">OTHERS</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="amount">Amount</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                placeholder="Amount"
+                value={formData.amount}
+                onChange={handleChange}
+                required
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="note">Note</Label>
+              <Textarea
+                id="note"
+                name="note"
+                placeholder="Note"
+                value={formData.note}
+                onChange={handleChange}
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                rows={4} // This will make the textarea bigger
+              />
             </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">
@@ -191,6 +230,19 @@ export default function AddTransaction() {
           </form>
         </CardContent>
       </Card>
+      {/* Success Dialog */}
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => setIsDialogOpen(open)}
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Transaction Successful</DialogTitle>
+          <DialogDescription>
+            The transaction for member <strong>{memberName}</strong> has been completed successfully.
+          </DialogDescription>
+          <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

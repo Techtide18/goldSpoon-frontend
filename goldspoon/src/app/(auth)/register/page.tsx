@@ -134,8 +134,8 @@ export default function Register() {
         aadhaarNumber: "",
         panNumber: "",
         addressDetails: "",
-        password: "",
-        confirmPassword: "",
+        password,
+        confirmPassword,
       });
     } catch (error) {
       const errorMessage =
@@ -146,21 +146,21 @@ export default function Register() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
+      <div className="w-1/2 bg-[#000000] flex flex-col items-center justify-center relative">
         <img
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
-          className="w-48 mb-4"
+          className="w-48 mb-4 z-10"
         />
-        <div className="text-white text-bold mb-4">
+        <div className="text-white font-bold mb-4">
           <p className="text-white font-bold">
             Already have an account?{" "}
-            <a className="text-black underline" href="/login">
+            <a className="underline" href="/login">
               Login
             </a>
           </p>
         </div>
-        <div className="absolute bottom-4 text-center text-white text-sm px-4">
+        <div className="absolute bottom-4 text-center text-white text-sm px-4 z-10">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">
             Terms of Service

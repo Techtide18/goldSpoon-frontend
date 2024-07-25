@@ -28,7 +28,7 @@ export default function ViewRenewalIncome() {
       const params = {
         pageNumber,
         pageSize: PAGE_SIZE,
-        incomeType: "direct",
+        incomeType: "DIRECT",
       };
 
       if (memberNumber) {

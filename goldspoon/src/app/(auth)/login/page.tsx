@@ -39,13 +39,18 @@ const Login = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
+      <div className="w-1/2 bg-[#000807] flex flex-col items-center justify-center relative">
         <img
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
-          className="w-48 mb-4"
+          className="w-48 mb-4 z-10"
         />
-        <div className="absolute bottom-4 text-center text-white text-sm px-4">
+        <img
+          src="https://images4.alphacoders.com/134/1348334.jpg"
+          alt="Scenic Image"
+          className="absolute bottom-0 w-full h-auto z-0"
+        />
+        <div className="absolute bottom-4 text-center text-white text-sm px-4 z-10">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">
             Terms of Service
