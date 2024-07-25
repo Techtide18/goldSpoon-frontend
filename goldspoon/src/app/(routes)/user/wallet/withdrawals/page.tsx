@@ -52,7 +52,7 @@ export default function ViewWithdrawalRequests() {
 
       if (response.data && response.data.content) {
         setWithdrawalRequestsData(response.data.content);
-        setTotalItems(response.data.pagination.totalItems);
+        setTotalItems(response.data.pagination.totalItems); 
       } else {
         setWithdrawalRequestsData([]);
         toast.error('No data returned from the server.');
