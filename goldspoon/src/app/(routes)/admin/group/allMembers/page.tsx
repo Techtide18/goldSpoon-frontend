@@ -1,8 +1,7 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -25,7 +24,7 @@ export default function ViewGroupMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const getGroupMembers = async () => {
+  const getGroupMembers = useCallback(async () => {
     if (!filterGroupName) {
       return toast.error("Please enter a Group Name.");
     }
@@ -56,13 +55,13 @@ export default function ViewGroupMembers() {
     } catch (error) {
       toast.error("Failed to fetch group members data.");
     }
-  };
+  }, [filterGroupName, currentPage]);
 
   useEffect(() => {
     if (filterGroupName) {
       getGroupMembers();
     }
-  }, [currentPage]);
+  }, [filterGroupName, currentPage, getGroupMembers]);
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);

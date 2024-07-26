@@ -1,8 +1,8 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import axios from "axios";
 import {
   Card,
@@ -37,7 +37,7 @@ const ViewMonthlyPayout = () => {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
-  const fetchPayouts = async (pageNumber = 0, month = null) => {
+  const fetchPayouts = useCallback(async (pageNumber = 0, month = null) => {
     try {
       const params = {
         pageNumber,
@@ -76,11 +76,11 @@ const ViewMonthlyPayout = () => {
       console.error("Error fetching payouts:", error);
       toast.error("Failed to fetch payouts data.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPayouts(0);
-  }, []);
+  }, [fetchPayouts]);
 
   const handleViewAll = () => {
     setViewOption("all");
@@ -299,7 +299,7 @@ const ViewMonthlyPayout = () => {
       </div>
     </div>
   );
-}
+};
 
 // Wrap the component export in dynamic import to disable SSR
 export default dynamic(() => Promise.resolve(ViewMonthlyPayout), { ssr: false });

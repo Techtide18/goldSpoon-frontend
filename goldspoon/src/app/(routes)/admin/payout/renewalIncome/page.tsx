@@ -1,8 +1,7 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -25,7 +24,7 @@ export default function ViewRenewalIncome() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchRenewalIncome = async (pageNumber = 0, memberNumber = null) => {
+  const fetchRenewalIncome = useCallback(async (pageNumber = 0, memberNumber = null) => {
     try {
       const params = {
         pageNumber,
@@ -60,11 +59,11 @@ export default function ViewRenewalIncome() {
       console.error("Error fetching renewal income:", error);
       toast.error("Failed to fetch renewal income data.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRenewalIncome(0);
-  }, []);
+  }, [fetchRenewalIncome]);
 
   const handleViewAll = () => {
     setViewOption("all");
@@ -184,7 +183,7 @@ export default function ViewRenewalIncome() {
                     Received Money For (Member ID)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                   Level
+                    Level
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount Received

@@ -1,8 +1,7 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   Card,
@@ -35,7 +34,7 @@ export default function ViewWithdrawalRequests() {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const fetchWithdrawalRequests = async (
+  const fetchWithdrawalRequests = useCallback(async (
     pageNumber = 0,
     status = "PENDING",
     memberNumber = null
@@ -79,7 +78,7 @@ export default function ViewWithdrawalRequests() {
       console.error("Error fetching withdrawal requests:", error);
       toast.error("Failed to fetch data.");
     }
-  };
+  }, []);
 
   const handleViewOption = (option) => {
     setViewOption(option);
@@ -92,7 +91,7 @@ export default function ViewWithdrawalRequests() {
 
   useEffect(() => {
     fetchWithdrawalRequests();
-  }, []);
+  }, [fetchWithdrawalRequests]);
 
   const getByMemberId = () => {
     if (!filterId) {

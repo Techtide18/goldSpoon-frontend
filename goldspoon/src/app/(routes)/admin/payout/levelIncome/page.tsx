@@ -1,8 +1,7 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   Card,
@@ -25,46 +24,51 @@ export default function ViewLevelIncome() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchLevelIncome = async (pageNumber = 0, memberNumber = null) => {
-    try {
-      const params = {
-        pageNumber,
-        pageSize: PAGE_SIZE,
-        incomeType: "LEVEL",
-      };
+  const fetchLevelIncome = useCallback(
+    async (pageNumber = 0, memberNumber = null) => {
+      try {
+        const params = {
+          pageNumber,
+          pageSize: PAGE_SIZE,
+          incomeType: "LEVEL",
+        };
 
-      if (memberNumber) {
-        params.memberNumber = memberNumber;
+        if (memberNumber) {
+          params.memberNumber = memberNumber;
+        }
+
+        const response = await axios.get("http://localhost:8080/payout", {
+          params,
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        });
+
+        const payoutData = response.data.content.map((payout) => ({
+          memberId: payout.receivingMemberNumber,
+          dateTime: formatDate(payout.receivedDate),
+          receivedMoneyFor: payout.receivedFromMemberNumber,
+          level: payout.level,
+          amountReceived: payout.receivedAmount,
+        }));
+
+        setFilteredData(payoutData);
+        setTotalPages(
+          Math.ceil(response.data.pagination.totalItems / PAGE_SIZE)
+        );
+        toast.success("Level income data fetched successfully.");
+      } catch (error) {
+        console.error("Error fetching level income:", error);
+        toast.error("Failed to fetch level income data.");
       }
-
-      const response = await axios.get("http://localhost:8080/payout", {
-        params,
-        headers: {
-          "Content-Type": "application/json",
-          adminMemberId: 1,
-        },
-      });
-
-      const payoutData = response.data.content.map((payout) => ({
-        memberId: payout.receivingMemberNumber,
-        dateTime: formatDate(payout.receivedDate),
-        receivedMoneyFor: payout.receivedFromMemberNumber,
-        level: payout.level,
-        amountReceived: payout.receivedAmount,
-      }));
-
-      setFilteredData(payoutData);
-      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
-      toast.success("Level income data fetched successfully.");
-    } catch (error) {
-      console.error("Error fetching level income:", error);
-      toast.error("Failed to fetch level income data.");
-    }
-  };
+    },
+    []
+  );
 
   useEffect(() => {
     fetchLevelIncome(0);
-  }, []);
+  }, [fetchLevelIncome]);
 
   const handleViewAll = () => {
     setViewOption("all");
