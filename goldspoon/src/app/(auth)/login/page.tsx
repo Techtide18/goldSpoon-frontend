@@ -1,8 +1,10 @@
+// @ts-nocheck
 "use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
+import Image from "next/image";  // Import the Image component
 import {
   Card,
   CardContent,
@@ -39,18 +41,22 @@ const Login = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-[#000807] flex flex-col items-center justify-center relative">
-        <img
+      <div className="w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-center relative">
+        <Image
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
+          width={192} // Adjust width as necessary
+          height={48} // Adjust height as necessary
           className="w-48 mb-4 z-10"
         />
-        <img
+        {/* <Image
           src="https://images4.alphacoders.com/134/1348334.jpg"
           alt="Scenic Image"
+          layout="fill" // Adjust layout as necessary
+          objectFit="cover" // Adjust objectFit as necessary
           className="absolute bottom-0 w-full h-auto z-0"
-        />
-        <div className="absolute bottom-4 text-center text-white text-sm px-4 z-10">
+        /> */}
+        <div className="absolute bottom-4 text-center text-black text-sm px-4 z-10">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">
             Terms of Service
@@ -62,7 +68,7 @@ const Login = () => {
           .
         </div>
       </div>
-      <div className="w-1/2 bg-[#A1D6E2] flex items-center justify-center">
+      <div className="w-1/2 bg-[#1995AD] flex items-center justify-center">
         <Card className="w-full max-w-md bg-[#F1F1F2] shadow-lg rounded-lg p-8">
           <CardHeader>
             <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">

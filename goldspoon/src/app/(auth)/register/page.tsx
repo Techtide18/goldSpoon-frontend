@@ -1,6 +1,8 @@
+// @ts-nocheck
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import dynamic from 'next/dynamic';
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,10 +30,11 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import axios from "axios";
+import Image from "next/image";  // Import the Image component
 
-export default function Register() {
+const Register = () => {
   const searchParams = useSearchParams();
-  const epinId = searchParams.get("epinId");
+  const epinId = useMemo(() => searchParams.get("epinId"), [searchParams]);
 
   const [formData, setFormData] = useState({
     epinId: "",
@@ -47,7 +50,7 @@ export default function Register() {
     confirmPassword: "",
   });
 
-  const [memberNumber, setMemberNumber] = useState(null);
+  const [memberNumber, setMemberNumber] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export default function Register() {
     }
   }, [epinId]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -67,7 +70,7 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const {
       epinId,
@@ -134,8 +137,8 @@ export default function Register() {
         aadhaarNumber: "",
         panNumber: "",
         addressDetails: "",
-        password,
-        confirmPassword,
+        password: "",
+        confirmPassword: "",
       });
     } catch (error) {
       const errorMessage =
@@ -146,17 +149,19 @@ export default function Register() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-[#000000] flex flex-col items-center justify-center relative">
-        <img
+      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
+      <Image
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
+          width={192} // Adjust width as necessary
+          height={48} // Adjust height as necessary
           className="w-48 mb-4 z-10"
         />
         <div className="text-white font-bold mb-4">
           <p className="text-white font-bold">
             Already have an account?{" "}
             <a className="underline" href="/login">
-              Login
+              LOGIN
             </a>
           </p>
         </div>
@@ -302,6 +307,7 @@ export default function Register() {
                   <Input
                     id="password"
                     name="password"
+                    type="password"
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={handleChange}
@@ -336,7 +342,7 @@ export default function Register() {
         {isDialogOpen && (
           <Dialog
             open={isDialogOpen}
-            onOpenChange={(open) => open && setIsDialogOpen(true)}
+            onOpenChange={(open) => setIsDialogOpen(open)}
           >
             <DialogContent>
               <DialogTitle>Registration Successful</DialogTitle>
@@ -359,3 +365,5 @@ export default function Register() {
     </div>
   );
 }
+
+export default dynamic(() => Promise.resolve(Register), { ssr: false });

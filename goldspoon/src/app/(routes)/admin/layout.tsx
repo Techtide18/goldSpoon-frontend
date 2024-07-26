@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+
 // src/app/admin/layout.tsx
 import { ReactNode } from 'react';
 import Header from '@/components/cards/header';

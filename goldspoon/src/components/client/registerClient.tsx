@@ -11,7 +11,7 @@ const RegisterForm = () => {
 
   const handleRegisterRedirect = (event: React.FormEvent) => {
     event.preventDefault(); // Prevent the default form submission
-    toast.info("Please enter your E-PIN and details to continue with registration.", { duration: 5000 });
+    toast.info("Please enter your E-PIN and details to continue with registration.");
     router.push("/register"); // Use router.push for client-side navigation
   };
 

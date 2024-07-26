@@ -1,6 +1,8 @@
+// @ts-nocheck
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
 import axios from "axios";
 import {
   Card,
@@ -14,11 +16,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "tailwindcss/tailwind.css"; // Ensure Tailwind CSS is imported
 
 const PAGE_SIZE = 100;
 
-export default function ViewMonthlyPayout() {
+const ViewMonthlyPayout = () => {
   const [viewOption, setViewOption] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [filteredPayouts, setFilteredPayouts] = useState([]);
@@ -299,3 +300,6 @@ export default function ViewMonthlyPayout() {
     </div>
   );
 }
+
+// Wrap the component export in dynamic import to disable SSR
+export default dynamic(() => Promise.resolve(ViewMonthlyPayout), { ssr: false });

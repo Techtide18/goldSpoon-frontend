@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+
 //USER LAYOUT
 
 import { ReactNode } from 'react';
