@@ -1,8 +1,14 @@
-// @ts-nocheck
+//@ts-nocheck
 
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
+
+interface User {
+  memberId: string;
+  memberNumber: string;
+  role: string;
+}
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -27,7 +33,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             }
           );
 
-          const user = response.data;
+          const user = response.data as User;
           if (user) {
             return user;
           } else {
@@ -42,24 +48,25 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-  url: process.env.NEXTAUTH_URL,
+  //url: process.env.NEXTAUTH_URL,
   pages: {
     signIn: "/login",
   },
   callbacks: {
     jwt: async ({ token, user }) => {
       if (user) {
-        token.id = user.memberId;
-        token.name = user.memberNumber;
-        token.role = user.role;
+        const customUser = user as User;
+        token.id = customUser.memberId;
+        token.name = customUser.memberNumber;
+        token.role = customUser.role;
       }
       return token;
     },
     session: async ({ session, token }) => {
       if (session?.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

@@ -1,7 +1,4 @@
-
 "use client";
-
-
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,7 +8,11 @@ import { loginAction } from "../action/loginAction";
 import { sleep } from "@/lib/utils";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
-const LoginClient = ({ onSuccess }) => {
+interface LoginClientProps {
+  onSuccess: (memberId: string) => void;
+}
+
+const LoginClient: React.FC<LoginClientProps> = ({ onSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (

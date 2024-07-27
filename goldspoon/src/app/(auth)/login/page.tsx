@@ -16,15 +16,16 @@ import LoginClient from "@/components/client/loginClient";
 import RegisterForm from "@/components/client/registerClient";
 
 interface User {
+  memberId: string;
+  memberNumber: string;
   role: string;
-  // Add other properties if necessary
 }
 
 const Login: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleLoginSuccess = async (memberId: any) => {
+  const handleLoginSuccess = async (memberId: string) => {
     setLoading(true);
     try {
       const session = await getSession();
