@@ -37,7 +37,7 @@ const LoginClient: React.FC<LoginClientProps> = ({ onSuccess }) => {
           });
 
           // Refresh the page to update session data
-          window.location.reload();
+          //window.location.reload();
 
           onSuccess(memberId); // Pass the memberId to onSuccess
         } else {

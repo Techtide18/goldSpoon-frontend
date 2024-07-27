@@ -13,6 +13,9 @@ export default middleware((req) => {
   }
 
   if (isLoggedIn) {
+    if (nextUrl.pathname === "/signout") {
+      return;
+    }
     if (userRole === "admin" && !nextUrl.pathname.startsWith("/admin")) {
       return Response.redirect(new URL("/admin", nextUrl));
     } else if (userRole === "user" && !nextUrl.pathname.startsWith("/user")) {
