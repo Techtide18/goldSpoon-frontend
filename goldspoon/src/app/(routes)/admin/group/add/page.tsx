@@ -43,7 +43,7 @@ export default function AddNewGroup() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/package/all", {
+      const response = await axios.get("https://goldspoon.in/api/package/all", {
         headers: {
           "Content-Type": "application/json",
           "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
@@ -100,7 +100,7 @@ export default function AddNewGroup() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/group/create",
+        "https://goldspoon.in/api/group/create",
         newGroup,
         {
           headers: {

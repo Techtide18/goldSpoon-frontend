@@ -115,7 +115,7 @@ const Register = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:8080/api/member/register",
+        "https://goldspoon.in/api/member/register",
         requestData,
         {
           headers: {

@@ -48,7 +48,7 @@ const ViewMonthlyPayout = () => {
         params.month = month;
       }
 
-      const response = await axios.get("http://localhost:8080/api/payout", {
+      const response = await axios.get("https://goldspoon.in/api/payout", {
         params,
         headers: {
           "Content-Type": "application/json",

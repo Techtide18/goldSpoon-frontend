@@ -104,7 +104,7 @@ export default function Home() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/dashboard", {
+        const response = await axios.get("https://goldspoon.in/api/dashboard", {
           headers: {
             adminMemberId: 1,
           },
@@ -195,7 +195,7 @@ export default function Home() {
     const fetchRecentSales = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/dashboard/sale?pageSize=10&pageNumber=0",
+          "https://goldspoon.in/api/dashboard/sale?pageSize=10&pageNumber=0",
           {
             headers: {
               adminMemberId: 1,

@@ -44,7 +44,7 @@ export default function LevelIncomeReport() {
     setMemberNumber(session.user.name);
 
     try {
-      const response = await axios.get("http://localhost:8080/api/payout", {
+      const response = await axios.get("https://goldspoon.in/api/payout", {
         params: {
           pageNumber: pageNumber - 1, // API page numbers typically start from 0
           pageSize: PAGE_SIZE,

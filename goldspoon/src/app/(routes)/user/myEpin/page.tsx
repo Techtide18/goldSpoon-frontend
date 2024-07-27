@@ -24,7 +24,7 @@ export default function ViewEpin() {
 
   const fetchEpin = async (memberNumber) => {
     try {
-      const response = await axios.get("http://localhost:8080/api/epins/myepin", {
+      const response = await axios.get("https://goldspoon.in/api/epins/myepin", {
         params: { memberNumber },
         headers: {
           "Content-Type": "application/json",

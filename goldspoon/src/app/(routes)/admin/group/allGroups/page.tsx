@@ -17,7 +17,7 @@ export default function ViewGroups() {
 
   const fetchGroups = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/group/all", {
+      const response = await axios.get("https://goldspoon.in/api/group/all", {
         headers: {
           "Content-Type": "application/json",
           adminMemberId: 1,

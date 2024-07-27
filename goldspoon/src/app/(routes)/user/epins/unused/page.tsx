@@ -42,7 +42,7 @@ export default function UnusedEpinReport() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/epins/unused`, {
+      const response = await axios.get(`https://goldspoon.in/api/epins/unused`, {
         headers: {
           adminMemberId: 2,
         },

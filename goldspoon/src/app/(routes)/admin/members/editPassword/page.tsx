@@ -39,7 +39,7 @@ export default function EditPassword() {
     const toastId = toast.loading("Fetching Member Password...");
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/member/${memberId}`, {
+      const response = await axios.get(`https://goldspoon.in/api/member/${memberId}`, {
         headers: {
           "adminMemberId": 1,
         },
@@ -83,7 +83,7 @@ export default function EditPassword() {
     const toastId = toast.loading("Updating Member Password...");
 
     try {
-      await axios.put(`http://localhost:8080/api/member/${memberId}`, {
+      await axios.put(`https://goldspoon.in/api/member/${memberId}`, {
         password: newPassword,
       }, {
         headers: {

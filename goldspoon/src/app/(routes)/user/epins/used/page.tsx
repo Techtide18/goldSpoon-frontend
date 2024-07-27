@@ -41,7 +41,7 @@ export default function UsedEpinReport() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/epins/used`, {
+      const response = await axios.get(`https://goldspoon.in/api/epins/used`, {
         headers: {
           adminMemberId: 2,
         },

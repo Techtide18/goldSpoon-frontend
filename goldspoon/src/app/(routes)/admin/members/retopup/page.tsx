@@ -41,7 +41,7 @@ export default function RetopUpMember() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/package/all", {
+      const response = await axios.get("https://goldspoon.in/api/package/all", {
         headers: {
           adminMemberId: 1,
         },
@@ -61,7 +61,7 @@ export default function RetopUpMember() {
     if (formData.memberId) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/member/${formData.memberId}`,
+          `https://goldspoon.in/api/member/${formData.memberId}`,
           {
             headers: {
               adminMemberId: 1,
@@ -81,7 +81,7 @@ export default function RetopUpMember() {
   const fetchGroups = async (packageId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/group/package/${packageId}`,
+        `https://goldspoon.in/api/group/package/${packageId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export default function RetopUpMember() {
 
     try {
       const response = await axios.put(
-        "http://localhost:8080/api/member/retopup",
+        "https://goldspoon.in/api/member/retopup",
         requestData,
         {
           headers: {

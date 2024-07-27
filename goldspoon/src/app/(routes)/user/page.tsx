@@ -110,7 +110,7 @@ export default function Home() {
       setMemberNumber(session.user.name);
 
       try {
-        const cardResponse = await axios.get("http://localhost:8080/api/dashboard/member", {
+        const cardResponse = await axios.get("https://goldspoon.in/api/dashboard/member", {
           params: {
             memberNumber: session.user.name,
           },
@@ -192,7 +192,7 @@ export default function Home() {
       }
 
       try {
-        const withdrawalResponse = await axios.get("http://localhost:8080/api/payout/withdrawalRequest/Details", {
+        const withdrawalResponse = await axios.get("https://goldspoon.in/api/payout/withdrawalRequest/Details", {
           params: {
             pageSize: 5,
             pageNumber: 0,

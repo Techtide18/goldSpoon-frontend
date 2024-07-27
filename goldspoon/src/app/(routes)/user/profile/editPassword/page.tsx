@@ -32,7 +32,7 @@ export default function ViewPassword() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8080/api/member/${session.user.name}`);
+        const response = await axios.get(`https://goldspoon.in/api/member/${session.user.name}`);
         if (response.data && response.data.password) {
           setOldPassword(response.data.password);
         } else {
@@ -70,7 +70,7 @@ export default function ViewPassword() {
 
     try {
       const toastId = toast.loading("Updating Password...");
-      await axios.put(`http://localhost:8080/api/member/${session.user.name}`, {
+      await axios.put(`https://goldspoon.in/api/member/${session.user.name}`, {
         password: newPassword,
       });
 

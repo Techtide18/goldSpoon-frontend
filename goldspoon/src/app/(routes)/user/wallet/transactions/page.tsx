@@ -32,7 +32,7 @@ export default function ViewTransactionDetails() {
     setMemberNumber(session.user.name);
 
     try {
-      const response = await axios.get("http://localhost:8080/api/payout/transactions", {
+      const response = await axios.get("https://goldspoon.in/api/payout/transactions", {
         params: {
           memberNumber: session.user.name,
           pageSize: PAGE_SIZE,

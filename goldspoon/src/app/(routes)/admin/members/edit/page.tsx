@@ -59,7 +59,7 @@ export default function EditProfile() {
     const toastId = toast.loading("Fetching Member Details...");
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/member/${memberId}`, {
+      const response = await axios.get(`https://goldspoon.in/api/member/${memberId}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -101,7 +101,7 @@ export default function EditProfile() {
     const toastId = toast.loading("Updating Member Details...");
 
     try {
-      await axios.put(`http://localhost:8080/api/member/${memberId}`, {
+      await axios.put(`https://goldspoon.in/api/member/${memberId}`, {
         fullName: profileData.fullName,
         phone: profileData.phone,
         email: profileData.email,

@@ -31,7 +31,7 @@ export default function GeneratePayout() {
     const checkPayoutStatus = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/job/check",
+          "https://goldspoon.in/api/admin/job/check",
           {
             headers: {
               "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function GeneratePayout() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/admin/job/generate/levelIncome"
+        "https://goldspoon.in/api/admin/job/generate/levelIncome"
       );
 
       // Simulate 5-second delay

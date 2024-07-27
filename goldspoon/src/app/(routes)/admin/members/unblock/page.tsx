@@ -36,7 +36,7 @@ export default function UnblockMember() {
       return toast.error("Please enter a Member ID.");
     }
     try {
-      const response = await axios.get(`http://localhost:8080/api/member/${formData.memberId}`, {
+      const response = await axios.get(`https://goldspoon.in/api/member/${formData.memberId}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -73,7 +73,7 @@ export default function UnblockMember() {
 
     const toastId = toast.loading("Unblocking member...");
     try {
-      await axios.post(`http://localhost:8080/api/epins/unblock`, null, {
+      await axios.post(`https://goldspoon.in/api/epins/unblock`, null, {
         params: {
           memberNumber: formData.memberId
         },

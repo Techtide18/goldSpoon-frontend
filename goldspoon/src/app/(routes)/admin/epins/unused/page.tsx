@@ -27,7 +27,7 @@ export default function Report() {
 
   useEffect(() => {
     if (viewOption === "all") {
-      fetchEpins("http://localhost:8080/api/epins/unused", {
+      fetchEpins("https://goldspoon.in/api/epins/unused", {
         pageNumber: 0,
         pageSize: PAGE_SIZE,
       });
@@ -58,7 +58,7 @@ export default function Report() {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    fetchEpins("http://localhost:8080/api/epins/unused", {
+    fetchEpins("https://goldspoon.in/api/epins/unused", {
       pageNumber: 0,
       pageSize: PAGE_SIZE,
     });
@@ -75,7 +75,7 @@ export default function Report() {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
-    fetchEpins("http://localhost:8080/api/epins/unused", {
+    fetchEpins("https://goldspoon.in/api/epins/unused", {
       memberNumber: filterId,
       isRefferal: true,
       pageNumber: 0,
@@ -87,11 +87,11 @@ export default function Report() {
     setCurrentPage(page);
     const params = { pageNumber: page - 1, pageSize: PAGE_SIZE };
     if (viewOption === "all") {
-      fetchEpins("http://localhost:8080/api/epins/unused", params);
+      fetchEpins("https://goldspoon.in/api/epins/unused", params);
     } else if (viewOption === "referralId") {
       params.memberNumber = filterId;
       params.isRefferal = true;
-      fetchEpins("http://localhost:8080/api/epins/unused", params);
+      fetchEpins("https://goldspoon.in/api/epins/unused", params);
     }
   };
 

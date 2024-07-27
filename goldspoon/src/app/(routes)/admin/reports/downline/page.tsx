@@ -33,7 +33,7 @@ export default function ViewDownline() {
     try {
       // Fetch downline data from the backend based on the entered Member ID
       const response = await axios.get(
-        `http://localhost:8080/api/downline/${filterId}`, // Adjust the endpoint accordingly
+        `https://goldspoon.in/api/downline/${filterId}`, // Adjust the endpoint accordingly
         {
           headers: {
             "Content-Type": "application/json",
