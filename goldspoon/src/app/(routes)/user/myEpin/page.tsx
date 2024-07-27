@@ -24,7 +24,7 @@ export default function ViewEpin() {
 
   const fetchEpin = async (memberNumber) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/epins/myepin`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/myepin`, {
         params: { memberNumber },
         headers: {
           "Content-Type": "application/json",

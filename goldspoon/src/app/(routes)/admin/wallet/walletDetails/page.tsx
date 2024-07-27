@@ -36,7 +36,7 @@ export default function ViewWalletDetails() {
         params.memberNumber = memberNumber;
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/walletDetails`, {
         params,
         headers: {
           "Content-Type": "application/json",

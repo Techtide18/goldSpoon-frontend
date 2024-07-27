@@ -17,7 +17,7 @@ export default function ViewGroups() {
 
   const fetchGroups = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/group/all`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/group/all`, {
         headers: {
           "Content-Type": "application/json",
           adminMemberId: 1,

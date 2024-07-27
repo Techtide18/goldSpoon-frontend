@@ -20,7 +20,7 @@ export default function Report() {
 
   useEffect(() => {
     if (viewOption === "all") {
-      fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, { pageNumber: 0, pageSize: PAGE_SIZE });
+      fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, { pageNumber: 0, pageSize: PAGE_SIZE });
     }
   }, [viewOption]);
 
@@ -48,7 +48,7 @@ export default function Report() {
     setViewOption("all");
     setFilterId("");
     setCurrentPage(1);
-    fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, { pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, { pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handleViewByReferralId = () => {
@@ -68,7 +68,7 @@ export default function Report() {
       toast.error("Please enter a Referral Member ID.");
       return;
     }
-    fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, { memberNumber: filterId, isRefferal: true, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, { memberNumber: filterId, isRefferal: true, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const getEpinByMemberId = () => {
@@ -76,22 +76,22 @@ export default function Report() {
       toast.error("Please enter a Member ID.");
       return;
     }
-    fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, { memberNumber: filterId, isRefferal: false, pageNumber: 0, pageSize: PAGE_SIZE });
+    fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, { memberNumber: filterId, isRefferal: false, pageNumber: 0, pageSize: PAGE_SIZE });
   };
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
     const params = { pageNumber: page - 1, pageSize: PAGE_SIZE };
     if (viewOption === "all") {
-      fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, params);
+      fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, params);
     } else if (viewOption === "referralId") {
       params.memberNumber = filterId;
       params.isRefferal = true;
-      fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, params);
+      fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, params);
     } else if (viewOption === "memberId") {
       params.memberNumber = filterId;
       params.isRefferal = false;
-      fetchEpins(`${process.env.REACT_APP_BASE_URL}/api/epins/used`, params);
+      fetchEpins(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/used`, params);
     }
   };
 

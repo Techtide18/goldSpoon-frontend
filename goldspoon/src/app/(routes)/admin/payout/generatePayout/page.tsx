@@ -31,7 +31,7 @@ export default function GeneratePayout() {
     const checkPayoutStatus = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/api/admin/job/check`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/job/check`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function GeneratePayout() {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/api/admin/job/generate/levelIncome`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/job/generate/levelIncome`
       );
 
       // Simulate 5-second delay

@@ -21,7 +21,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       authorize: async (credentials) => {
         try {
           const response = await axios.post(
-            `${process.env.REACT_APP_BASE_URL}/api/login`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/login`,
             {
               memberNumber: credentials.memberId,
               password: credentials.password,

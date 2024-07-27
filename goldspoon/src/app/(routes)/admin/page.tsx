@@ -104,7 +104,7 @@ export default function Home() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/dashboard`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard`, {
           headers: {
             adminMemberId: 1,
           },
@@ -195,7 +195,7 @@ export default function Home() {
     const fetchRecentSales = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/api/dashboard/sale?pageSize=10&pageNumber=0`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard/sale?pageSize=10&pageNumber=0`,
           {
             headers: {
               adminMemberId: 1,

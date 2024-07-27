@@ -115,7 +115,7 @@ const Register = () => {
 
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_BASE_URL}/api/member/register`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/register`,
         requestData,
         {
           headers: {

@@ -52,7 +52,7 @@ export default function GenerateEpin() {
   const fetchPackages = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/package/all`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/package/all`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export default function GenerateEpin() {
   const fetchGroups = async (packageId) => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/group/package/${packageId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/group/package/${packageId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function GenerateEpin() {
     }
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/member/${formData.referralMemberNumber}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.referralMemberNumber}`
       );
       const member = response.data;
       setReferralMemberName(member.fullName || "");
@@ -174,7 +174,7 @@ export default function GenerateEpin() {
     const toastId = toast.loading("Generating E-PIN...");
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/api/epins/generate`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/generate`,
         requestData,
         {
           headers: {

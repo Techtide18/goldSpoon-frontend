@@ -26,7 +26,7 @@ export default function InstallmentsReport() {
       }
 
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/installments/${session.user.name}/directs`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/installments/${session.user.name}/directs`, {
           params: {
             pageNumber: currentPage - 1,
             pageSize: PAGE_SIZE,

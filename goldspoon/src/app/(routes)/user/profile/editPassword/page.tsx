@@ -32,7 +32,7 @@ export default function ViewPassword() {
       }
 
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${session.user.name}`);
         if (response.data && response.data.password) {
           setOldPassword(response.data.password);
         } else {
@@ -70,7 +70,7 @@ export default function ViewPassword() {
 
     try {
       const toastId = toast.loading("Updating Password...");
-      await axios.put(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${session.user.name}`, {
         password: newPassword,
       });
 

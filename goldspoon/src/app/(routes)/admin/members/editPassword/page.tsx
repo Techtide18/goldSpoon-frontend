@@ -39,7 +39,7 @@ export default function EditPassword() {
     const toastId = toast.loading("Fetching Member Password...");
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${memberId}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${memberId}`, {
         headers: {
           "adminMemberId": 1,
         },
@@ -83,7 +83,7 @@ export default function EditPassword() {
     const toastId = toast.loading("Updating Member Password...");
 
     try {
-      await axios.put(`${process.env.REACT_APP_BASE_URL}/api/member/${memberId}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${memberId}`, {
         password: newPassword,
       }, {
         headers: {

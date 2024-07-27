@@ -31,7 +31,7 @@ export default function ViewProfile() {
       }
 
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${session.user.name}`, {
         });
 
         if (response.data) {

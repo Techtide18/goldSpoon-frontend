@@ -48,7 +48,7 @@ const ViewMonthlyPayout = () => {
         params.month = month;
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout`, {
         params,
         headers: {
           "Content-Type": "application/json",

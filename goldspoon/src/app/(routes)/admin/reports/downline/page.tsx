@@ -33,7 +33,7 @@ export default function ViewDownline() {
     try {
       // Fetch downline data from the backend based on the entered Member ID
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/downline/${filterId}`, // Adjust the endpoint accordingly
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/downline/${filterId}`, // Adjust the endpoint accordingly
         {
           headers: {
             "Content-Type": "application/json",

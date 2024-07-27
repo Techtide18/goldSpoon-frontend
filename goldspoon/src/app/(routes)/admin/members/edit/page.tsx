@@ -59,7 +59,7 @@ export default function EditProfile() {
     const toastId = toast.loading("Fetching Member Details...");
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${memberId}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${memberId}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -101,7 +101,7 @@ export default function EditProfile() {
     const toastId = toast.loading("Updating Member Details...");
 
     try {
-      await axios.put(`${process.env.REACT_APP_BASE_URL}/api/member/${memberId}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${memberId}`, {
         fullName: profileData.fullName,
         phone: profileData.phone,
         email: profileData.email,

@@ -37,7 +37,7 @@ export default function InstallmentsPaid() {
 
   useEffect(() => {
     if (viewOption === "all") {
-      const url = `${process.env.REACT_APP_BASE_URL}/api/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
+      const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
       fetchData(url);
     }
   }, [viewOption, currentPage]);
@@ -60,7 +60,7 @@ export default function InstallmentsPaid() {
       return;
     }
     setCurrentPage(1);
-    const url = `${process.env.REACT_APP_BASE_URL}/api/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
     fetchData(url);
   };
 

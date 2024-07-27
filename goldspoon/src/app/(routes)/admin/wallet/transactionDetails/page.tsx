@@ -32,7 +32,7 @@ export default function ViewTransactionDetails() {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout/transactions`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`, {
         params: {
           memberNumber: filterId,
           pageSize: PAGE_SIZE,

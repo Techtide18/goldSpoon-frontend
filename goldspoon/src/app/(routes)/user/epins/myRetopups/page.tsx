@@ -30,7 +30,7 @@ export default function ReTopupReport() {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/retopup?memberId=${session.user.name}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/retopup?memberId=${session.user.name}`, {
         headers: {
           'Content-Type': 'application/json',
         }

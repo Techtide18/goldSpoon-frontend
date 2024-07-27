@@ -26,7 +26,7 @@ export default function ViewDirects() {
 
   const fetchDirects = async (minDirects, maxDirects) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/directs`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/directs`, {
         params: { minDirects, maxDirects },
         headers: {
           "Content-Type": "application/json",

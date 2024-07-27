@@ -51,7 +51,7 @@ export default function ViewWithdrawalRequests() {
       }
 
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/payout/withdrawalRequest/Details`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/withdrawalRequest/Details`,
         {
           params,
           headers: {
@@ -116,7 +116,7 @@ export default function ViewWithdrawalRequests() {
     const toastId = toast.loading(`Processing ${action} request...`);
     try {
       await axios.put(
-        `${process.env.REACT_APP_BASE_URL}/api/payout/withdrawalRequest/Details/${selectedRequest.requestId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/withdrawalRequest/Details/${selectedRequest.requestId}`,
         { status: action },
         {
           headers: {

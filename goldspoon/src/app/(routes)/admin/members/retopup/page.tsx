@@ -41,7 +41,7 @@ export default function RetopUpMember() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/package/all`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/package/all`, {
         headers: {
           adminMemberId: 1,
         },
@@ -61,7 +61,7 @@ export default function RetopUpMember() {
     if (formData.memberId) {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/api/member/${formData.memberId}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.memberId}`,
           {
             headers: {
               adminMemberId: 1,
@@ -81,7 +81,7 @@ export default function RetopUpMember() {
   const fetchGroups = async (packageId) => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/group/package/${packageId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/group/package/${packageId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export default function RetopUpMember() {
 
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_BASE_URL}/api/member/retopup`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/retopup`,
         requestData,
         {
           headers: {

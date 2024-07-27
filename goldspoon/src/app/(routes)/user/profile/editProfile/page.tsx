@@ -35,7 +35,7 @@ export default function EditProfile() {
       }
 
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${session.user.name}`);
         if (response.data) {
           setProfile(response.data);
         } else {
@@ -70,7 +70,7 @@ export default function EditProfile() {
 
     try {
       const toastId = toast.loading("Updating Profile Details...");
-      await axios.put(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${session.user.name}`, {
         fullName: profile.fullName,
         phone: profile.phone,
         email: profile.email,

@@ -40,7 +40,7 @@ export default function AddTransaction() {
   const fetchWalletDetails = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/walletDetails`,
         {
           params: {
             pageSize: 1,
@@ -97,7 +97,7 @@ export default function AddTransaction() {
     const toastId = toast.loading("Adding Transaction...");
     try {
       await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/api/payout/transaction/${formData.memberId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transaction/${formData.memberId}`,
         requestData,
         {
           headers: {

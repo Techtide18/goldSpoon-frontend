@@ -23,7 +23,7 @@ export default function ViewWalletDetails() {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/walletDetails`,
         {
           params: {
             pageSize: 1,

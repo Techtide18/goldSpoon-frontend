@@ -44,7 +44,7 @@ export default function RenewalIncomeReport() {
     setMemberNumber(session.user.name);
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout`, {
         params: {
           pageNumber: pageNumber - 1, // API page numbers typically start from 0
           pageSize: PAGE_SIZE,
