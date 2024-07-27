@@ -26,7 +26,7 @@ export default function ViewDirects() {
 
   const fetchDirects = async (minDirects, maxDirects) => {
     try {
-      const response = await axios.get("http://localhost:8080/directs", {
+      const response = await axios.get("http://localhost:8080/api/directs", {
         params: { minDirects, maxDirects },
         headers: {
           "Content-Type": "application/json",

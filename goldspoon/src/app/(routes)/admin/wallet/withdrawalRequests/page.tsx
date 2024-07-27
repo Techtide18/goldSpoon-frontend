@@ -51,7 +51,7 @@ export default function ViewWithdrawalRequests() {
       }
 
       const response = await axios.get(
-        "http://localhost:8080/payout/withdrawalRequest/Details",
+        "http://localhost:8080/api/payout/withdrawalRequest/Details",
         {
           params,
           headers: {
@@ -116,7 +116,7 @@ export default function ViewWithdrawalRequests() {
     const toastId = toast.loading(`Processing ${action} request...`);
     try {
       await axios.put(
-        `http://localhost:8080/payout/withdrawalRequest/Details/${selectedRequest.requestId}`,
+        `http://localhost:8080/api/payout/withdrawalRequest/Details/${selectedRequest.requestId}`,
         { status: action },
         {
           headers: {

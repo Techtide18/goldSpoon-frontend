@@ -30,7 +30,7 @@ export default function ViewGroupMembers() {
     }
 
     try {
-      const response = await axios.get("http://localhost:8080/group/members", {
+      const response = await axios.get("http://localhost:8080/api/group/members", {
         headers: {
           adminMemberId: 1,
         },

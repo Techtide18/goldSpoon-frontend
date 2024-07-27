@@ -37,7 +37,7 @@ export default function InstallmentsPaid() {
 
   useEffect(() => {
     if (viewOption === "all") {
-      const url = `http://localhost:8080/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
+      const url = `http://localhost:8080/api/installments?pageNumber=${currentPage - 1}&pageSize=${PAGE_SIZE}`;
       fetchData(url);
     }
   }, [viewOption, currentPage]);
@@ -60,7 +60,7 @@ export default function InstallmentsPaid() {
       return;
     }
     setCurrentPage(1);
-    const url = `http://localhost:8080/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
+    const url = `http://localhost:8080/api/installments?pageNumber=0&pageSize=${PAGE_SIZE}&memberNumber=${filterId}`;
     fetchData(url);
   };
 

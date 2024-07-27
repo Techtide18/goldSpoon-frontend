@@ -48,7 +48,7 @@ export default function CreatePackage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/package",
+        "http://localhost:8080/api/package",
         {
           packageName,
           packagePrice: parseInt(packagePrice, 10),

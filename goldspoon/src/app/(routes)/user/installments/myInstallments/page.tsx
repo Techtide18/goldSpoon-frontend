@@ -26,7 +26,7 @@ export default function InstallmentsReport() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8080/installments`, {
+        const response = await axios.get(`http://localhost:8080/api/installments`, {
           params: {
             pageNumber: currentPage,
             pageSize: PAGE_SIZE,

@@ -39,7 +39,7 @@ export default function ViewMembers() {
 
   const fetchMembers = async (pageNumber = 0) => {
     try {
-      const response = await axios.get(`http://localhost:8080/member/all`, {
+      const response = await axios.get(`http://localhost:8080/api/member/all`, {
         headers: {
           "Content-Type": "application/json",
           "adminMemberId": 1,
@@ -79,7 +79,7 @@ export default function ViewMembers() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/member/${filterId}`, {
+      const response = await axios.get(`http://localhost:8080/api/member/${filterId}`, {
         headers: {
           "Content-Type": "application/json",
           "adminMemberId": 1,

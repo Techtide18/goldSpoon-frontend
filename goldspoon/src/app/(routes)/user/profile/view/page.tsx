@@ -31,7 +31,7 @@ export default function ViewProfile() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8080/member/${session.user.name}`, {
+        const response = await axios.get(`http://localhost:8080/api/member/${session.user.name}`, {
         });
 
         if (response.data) {

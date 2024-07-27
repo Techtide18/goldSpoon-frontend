@@ -36,7 +36,7 @@ export default function BlockMember() {
       return toast.error("Please enter a Member ID.");
     }
     try {
-      const response = await axios.get(`http://localhost:8080/member/${formData.memberId}`, {
+      const response = await axios.get(`http://localhost:8080/api/member/${formData.memberId}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -73,7 +73,7 @@ export default function BlockMember() {
 
     const toastId = toast.loading("Blocking member...");
     try {
-      await axios.post(`http://localhost:8080/epins/block`, null, {
+      await axios.post(`http://localhost:8080/api/epins/block`, null, {
         params: {
           memberNumber: formData.memberId
         },

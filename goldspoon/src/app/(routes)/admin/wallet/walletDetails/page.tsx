@@ -36,7 +36,7 @@ export default function ViewWalletDetails() {
         params.memberNumber = memberNumber;
       }
 
-      const response = await axios.get("http://localhost:8080/payout/walletDetails", {
+      const response = await axios.get("http://localhost:8080/api/payout/walletDetails", {
         params,
         headers: {
           "Content-Type": "application/json",

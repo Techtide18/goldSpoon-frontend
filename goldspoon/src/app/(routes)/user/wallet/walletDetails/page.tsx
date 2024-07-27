@@ -23,7 +23,7 @@ export default function ViewWalletDetails() {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/payout/walletDetails",
+        "http://localhost:8080/api/payout/walletDetails",
         {
           params: {
             pageSize: 1,

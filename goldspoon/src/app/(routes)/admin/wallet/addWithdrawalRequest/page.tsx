@@ -25,7 +25,7 @@ export default function AddWithdrawalRequest() {
 
   const fetchMemberDetails = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/payout/walletDetails", {
+      const response = await axios.get("http://localhost:8080/api/payout/walletDetails", {
         params: {
           pageSize: 1,
           pageNumber: 0,
@@ -81,7 +81,7 @@ export default function AddWithdrawalRequest() {
   const handleConfirmWithdrawal = async () => {
     const toastId = toast.loading("Processing Withdrawal Request...");
     try {
-      await axios.post("http://localhost:8080/payout/withdrawalRequest/admin/create", {
+      await axios.post("http://localhost:8080/api/payout/withdrawalRequest/admin/create", {
         memberNumber,
         amount: parseInt(formData.withdrawalAmount, 10),
         status: "APPROVED",

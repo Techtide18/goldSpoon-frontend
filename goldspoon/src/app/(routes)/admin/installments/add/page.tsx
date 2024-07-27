@@ -40,7 +40,7 @@ export default function AddInstallment() {
   const fetchMemberName = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/member/${formData.memberId}`,
+        `http://localhost:8080/api/member/${formData.memberId}`,
         {
           headers: {
             adminMemberId: 1,
@@ -82,7 +82,7 @@ export default function AddInstallment() {
     const toastId = toast.loading("Adding Installment...");
     try {
       const response = await axios.put(
-        "http://localhost:8080/installments/add",
+        "http://localhost:8080/api/installments/add",
         requestData,
         {
           headers: {

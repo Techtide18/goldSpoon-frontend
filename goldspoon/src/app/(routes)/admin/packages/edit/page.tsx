@@ -45,7 +45,7 @@ export default function EditPackage() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/package/name/${packageName}`, {
+      const response = await axios.get(`http://localhost:8080/api/package/name/${packageName}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -94,7 +94,7 @@ export default function EditPackage() {
     };
 
     try {
-      await axios.put("http://localhost:8080/package", updatedDetails, {
+      await axios.put("http://localhost:8080/api/package", updatedDetails, {
         headers: {
           adminMemberId: 1,
         },

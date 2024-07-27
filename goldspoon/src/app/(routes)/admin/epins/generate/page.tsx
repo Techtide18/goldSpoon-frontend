@@ -52,7 +52,7 @@ export default function GenerateEpin() {
   const fetchPackages = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/package/all",
+        "http://localhost:8080/api/package/all",
         {
           headers: {
             "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export default function GenerateEpin() {
   const fetchGroups = async (packageId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/group/package/${packageId}`,
+        `http://localhost:8080/api/group/package/${packageId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function GenerateEpin() {
     }
     try {
       const response = await axios.get(
-        `http://localhost:8080/member/${formData.referralMemberNumber}`
+        `http://localhost:8080/api/member/${formData.referralMemberNumber}`
       );
       const member = response.data;
       setReferralMemberName(member.fullName || "");
@@ -174,7 +174,7 @@ export default function GenerateEpin() {
     const toastId = toast.loading("Generating E-PIN...");
     try {
       const response = await axios.post(
-        "http://localhost:8080/epins/generate",
+        "http://localhost:8080/api/epins/generate",
         requestData,
         {
           headers: {

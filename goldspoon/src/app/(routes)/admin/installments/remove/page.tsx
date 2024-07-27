@@ -33,7 +33,7 @@ export default function DeleteInstallment() {
     }
     try {
       const response = await axios.get(
-        `http://localhost:8080/member/${formData.memberId}`,
+        `http://localhost:8080/api/member/${formData.memberId}`,
         {
           headers: {
             adminMemberId: 1,
@@ -73,7 +73,7 @@ export default function DeleteInstallment() {
     const toastId = toast.loading("Deleting installment...");
     try {
       await axios.put(
-        `http://localhost:8080/installment/remove/${formData.memberId}`,
+        `http://localhost:8080/api/installment/remove/${formData.memberId}`,
         {
           installmentMonth: parseInt(formData.installmentMonth),
         },

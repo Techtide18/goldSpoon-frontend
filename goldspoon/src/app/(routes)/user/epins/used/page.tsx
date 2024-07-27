@@ -41,7 +41,7 @@ export default function UsedEpinReport() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8080/epins/used`, {
+      const response = await axios.get(`http://localhost:8080/api/epins/used`, {
         headers: {
           adminMemberId: 2,
         },
