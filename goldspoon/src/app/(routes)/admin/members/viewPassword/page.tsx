@@ -20,7 +20,7 @@ export default function ViewPasswords() {
 
   const fetchAllMembers = async (pageNumber = 0) => {
     try {
-      const response = await axios.get(`https://goldspoon.in/api/member/all?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/all?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`, {
         headers: {
           "adminMemberId": 1,
         },
@@ -40,7 +40,7 @@ export default function ViewPasswords() {
     }
 
     try {
-      const response = await axios.get(`https://goldspoon.in/api/member/${filterId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${filterId}`, {
         headers: {
           "adminMemberId": 1,
         },

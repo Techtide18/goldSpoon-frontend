@@ -26,7 +26,7 @@ export default function ViewReTopups() {
 
   const fetchReTopups = async (memberId = null) => {
     try {
-      const response = await axios.get("https://goldspoon.in/api/member/retopups", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/retopups`, {
         params: memberId ? { memberId } : {},
         headers: {
           "Content-Type": "application/json",

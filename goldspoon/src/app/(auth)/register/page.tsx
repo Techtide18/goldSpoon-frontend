@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -115,7 +115,7 @@ const Register = () => {
 
     try {
       const response = await axios.put(
-        "https://goldspoon.in/api/member/register",
+        `${process.env.REACT_APP_BASE_URL}/api/member/register`,
         requestData,
         {
           headers: {
@@ -141,9 +141,13 @@ const Register = () => {
         confirmPassword: "",
       });
     } catch (error) {
-      const errorMessage =
-        error.response?.data || "Failed to register member. Please try again.";
-      toast.error(errorMessage, { id: toastId });
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to register member. Please try again.";
+        toast.error(errorMessage, { id: toastId });
+      } else {
+        toast.error("An unexpected error occurred. Please try again.", { id: toastId });
+      }
     }
   };
 

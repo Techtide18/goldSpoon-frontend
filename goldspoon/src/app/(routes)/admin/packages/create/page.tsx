@@ -48,7 +48,7 @@ export default function CreatePackage() {
 
     try {
       const response = await axios.post(
-        "https://goldspoon.in/api/package",
+        `${process.env.REACT_APP_BASE_URL}/api/package`,
         {
           packageName,
           packagePrice: parseInt(packagePrice, 10),

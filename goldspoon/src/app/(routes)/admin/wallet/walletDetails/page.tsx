@@ -36,7 +36,7 @@ export default function ViewWalletDetails() {
         params.memberNumber = memberNumber;
       }
 
-      const response = await axios.get("https://goldspoon.in/api/payout/walletDetails", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`, {
         params,
         headers: {
           "Content-Type": "application/json",

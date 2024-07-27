@@ -15,7 +15,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       authorize: async (credentials) => {
         try {
           const response = await axios.post(
-            "https://goldspoon.in/api/login",
+            `${process.env.REACT_APP_BASE_URL}/api/login`,
             {
               memberNumber: credentials.memberId,
               password: credentials.password,

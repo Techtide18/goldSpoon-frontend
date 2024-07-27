@@ -30,7 +30,7 @@ export default function ViewGroupMembers() {
     }
 
     try {
-      const response = await axios.get("https://goldspoon.in/api/group/members", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/group/members`, {
         headers: {
           adminMemberId: 1,
         },

@@ -45,7 +45,7 @@ export default function EditPackage() {
     }
 
     try {
-      const response = await axios.get(`https://goldspoon.in/api/package/name/${packageName}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/package/name/${packageName}`, {
         headers: {
           adminMemberId: 1,
         },
@@ -94,7 +94,7 @@ export default function EditPackage() {
     };
 
     try {
-      await axios.put("https://goldspoon.in/api/package", updatedDetails, {
+      await axios.put(`${process.env.REACT_APP_BASE_URL}/api/package`, updatedDetails, {
         headers: {
           adminMemberId: 1,
         },

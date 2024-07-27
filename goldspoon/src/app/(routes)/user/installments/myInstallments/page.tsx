@@ -26,7 +26,7 @@ export default function InstallmentsReport() {
       }
 
       try {
-        const response = await axios.get(`https://goldspoon.in/api/installments`, {
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/installments`, {
           params: {
             pageNumber: currentPage,
             pageSize: PAGE_SIZE,

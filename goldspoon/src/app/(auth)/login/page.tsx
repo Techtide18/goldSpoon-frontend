@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
-import Image from "next/image";  // Import the Image component
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -16,24 +15,43 @@ import {
 import LoginClient from "@/components/client/loginClient";
 import RegisterForm from "@/components/client/registerClient";
 
-const Login = () => {
+interface User {
+  role: string;
+  // Add other properties if necessary
+}
+
+const Login: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleLoginSuccess = async (memberId) => {
+  const handleLoginSuccess = async (memberId: any) => {
     setLoading(true);
     try {
-      // Simulating a delay to fetch session
       const session = await getSession();
-      if (session?.user?.role === "admin") {
-        router.push("/admin");
-      } else if (session?.user?.role === "user") {
-        router.push("/user");
-      } else {
-        console.error("Invalid role or session");
+      const user = session?.user as User;
+
+      if (!user) {
+        console.error("No user data found.");
+        return;
+      }
+
+      switch (user.role) {
+        case "admin":
+          router.push("/admin");
+          break;
+        case "user":
+          router.push("/user");
+          break;
+        default:
+          console.error("Invalid role or session.");
+          break;
       }
     } catch (error) {
-      console.error("Error during authentication", error);
+      if (error instanceof Error) {
+        console.error("Error during authentication:", error.message);
+      } else {
+        console.error("An unknown error occurred during authentication.");
+      }
     } finally {
       setLoading(false);
     }
@@ -45,17 +63,10 @@ const Login = () => {
         <Image
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
-          width={192} // Adjust width as necessary
-          height={48} // Adjust height as necessary
+          width={192}
+          height={48}
           className="w-48 mb-4 z-10"
         />
-        {/* <Image
-          src="https://images4.alphacoders.com/134/1348334.jpg"
-          alt="Scenic Image"
-          layout="fill" // Adjust layout as necessary
-          objectFit="cover" // Adjust objectFit as necessary
-          className="absolute bottom-0 w-full h-auto z-0"
-        /> */}
         <div className="absolute bottom-4 text-center text-black text-sm px-4 z-10">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">

@@ -40,7 +40,7 @@ export default function AddInstallment() {
   const fetchMemberName = async () => {
     try {
       const response = await axios.get(
-        `https://goldspoon.in/api/member/${formData.memberId}`,
+        `${process.env.REACT_APP_BASE_URL}/api/member/${formData.memberId}`,
         {
           headers: {
             adminMemberId: 1,
@@ -82,7 +82,7 @@ export default function AddInstallment() {
     const toastId = toast.loading("Adding Installment...");
     try {
       const response = await axios.put(
-        "https://goldspoon.in/api/installments/add",
+        `${process.env.REACT_APP_BASE_URL}/api/installments/add`,
         requestData,
         {
           headers: {

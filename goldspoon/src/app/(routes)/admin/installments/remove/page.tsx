@@ -33,7 +33,7 @@ export default function DeleteInstallment() {
     }
     try {
       const response = await axios.get(
-        `https://goldspoon.in/api/member/${formData.memberId}`,
+        `${process.env.REACT_APP_BASE_URL}/api/member/${formData.memberId}`,
         {
           headers: {
             adminMemberId: 1,
@@ -73,7 +73,7 @@ export default function DeleteInstallment() {
     const toastId = toast.loading("Deleting installment...");
     try {
       await axios.put(
-        `https://goldspoon.in/api/installment/remove/${formData.memberId}`,
+        `${process.env.REACT_APP_BASE_URL}/api/installment/remove/${formData.memberId}`,
         {
           installmentMonth: parseInt(formData.installmentMonth),
         },

@@ -44,7 +44,7 @@ export default function AddWithdrawalRequest() {
     setMemberNumber(session.user.name);
 
     try {
-      const response = await axios.get("https://goldspoon.in/api/payout/walletDetails", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`, {
         params: {
           pageSize: 1,
           pageNumber: 0,
@@ -99,7 +99,7 @@ export default function AddWithdrawalRequest() {
   const handleConfirmWithdrawal = async () => { 
     const toastId = toast.loading("Processing Withdrawal Request...");
     try {
-      await axios.post("https://goldspoon.in/api/payout/withdrawalRequest/member/create", {
+      await axios.post(`${process.env.REACT_APP_BASE_URL}/api/payout/withdrawalRequest/member/create`, {
         memberNumber,
         amount: parseFloat(formData.withdrawalAmount),
       }); 

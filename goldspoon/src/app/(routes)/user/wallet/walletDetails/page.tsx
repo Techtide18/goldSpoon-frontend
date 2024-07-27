@@ -23,7 +23,7 @@ export default function ViewWalletDetails() {
 
     try {
       const response = await axios.get(
-        "https://goldspoon.in/api/payout/walletDetails",
+        `${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`,
         {
           params: {
             pageSize: 1,

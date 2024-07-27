@@ -36,7 +36,7 @@ export default function ViewRenewalIncome() {
         params.memberNumber = memberNumber;
       }
 
-      const response = await axios.get("https://goldspoon.in/api/payout", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout`, {
         params,
         headers: {
           "Content-Type": "application/json",

@@ -45,7 +45,7 @@ export default function ViewWithdrawalRequests() {
     setMemberNumber(session.user.name);
 
     try {
-      const response = await axios.get("https://goldspoon.in/api/payout/withdrawalRequest/Details", {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/payout/withdrawalRequest/Details`, {
         params: {
           ...params,
           memberNumber: session.user.name, 

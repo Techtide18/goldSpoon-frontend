@@ -40,7 +40,7 @@ export default function AddTransaction() {
   const fetchWalletDetails = async () => {
     try {
       const response = await axios.get(
-        "https://goldspoon.in/api/payout/walletDetails",
+        `${process.env.REACT_APP_BASE_URL}/api/payout/walletDetails`,
         {
           params: {
             pageSize: 1,
@@ -97,7 +97,7 @@ export default function AddTransaction() {
     const toastId = toast.loading("Adding Transaction...");
     try {
       await axios.post(
-        `https://goldspoon.in/api/payout/transaction/${formData.memberId}`,
+        `${process.env.REACT_APP_BASE_URL}/api/payout/transaction/${formData.memberId}`,
         requestData,
         {
           headers: {

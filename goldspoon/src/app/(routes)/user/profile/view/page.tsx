@@ -31,7 +31,7 @@ export default function ViewProfile() {
       }
 
       try {
-        const response = await axios.get(`https://goldspoon.in/api/member/${session.user.name}`, {
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/member/${session.user.name}`, {
         });
 
         if (response.data) {
