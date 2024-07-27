@@ -33,7 +33,7 @@ const Header = () => {
         </div>
         <div className="hidden md:flex items-center space-x-4">
           <Link
-            href="/api/auth/signout"
+            href="/api/auth/signout" 
             className="flex items-center space-x-2"
           >
             <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-center shadow-md transform transition-transform duration-200 hover:translate-x-[-8px] hover:shadow-lg">
