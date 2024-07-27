@@ -17,7 +17,9 @@ const LoginClient: React.FC<LoginClientProps> = ({ onSuccess }) => {
 
   return (
     <form
-      action={async (formData) => {
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
         const memberId = formData.get("memberId") as string;
         const password = formData.get("password") as string;
 
@@ -33,6 +35,10 @@ const LoginClient: React.FC<LoginClientProps> = ({ onSuccess }) => {
           toast.success("Login successful", {
             id: toastId,
           });
+
+          // Refresh the page to update session data
+          window.location.reload();
+
           onSuccess(memberId); // Pass the memberId to onSuccess
         } else {
           toast.error("Invalid memberId or password", {
