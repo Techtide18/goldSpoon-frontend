@@ -59,8 +59,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-center relative">
+    <div className="flex flex-col md:flex-row h-screen bg-[#A1D6E2]">
+      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-center relative p-4 md:p-0">
+        <div className="mt-20 md:mt-0"></div>
         <Image
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
@@ -68,7 +69,7 @@ const Login: React.FC = () => {
           height={48}
           className="w-48 mb-4 z-10"
         />
-        <div className="absolute bottom-4 text-center text-black text-sm px-4 z-10">
+        <div className="absolute bottom-4 text-center text-black text-sm px-4 z-10 hidden md:block">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">
             Terms of Service
@@ -80,8 +81,8 @@ const Login: React.FC = () => {
           .
         </div>
       </div>
-      <div className="w-1/2 bg-[#1995AD] flex items-center justify-center">
-        <Card className="w-full max-w-md bg-[#F1F1F2] shadow-lg rounded-lg p-8">
+      <div className="flex flex-col justify-center items-center md:w-1/2 p-4 md:p-0 bg-[#1995AD]">
+        <div className="w-full max-w-md bg-[#F1F1F2] shadow-lg rounded-lg p-8">
           <CardHeader>
             <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
               Login
@@ -101,7 +102,7 @@ const Login: React.FC = () => {
             </div>
             <RegisterForm />
           </CardFooter>
-        </Card>
+        </div>
         {loading}
       </div>
     </div>

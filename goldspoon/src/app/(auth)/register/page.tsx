@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -30,7 +29,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import axios from "axios";
-import Image from "next/image";  // Import the Image component
+import Image from "next/image";
 
 const Register = () => {
   const searchParams = useSearchParams();
@@ -152,13 +151,14 @@ const Register = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative">
-      <Image
+    <div className="flex flex-col md:flex-row h-screen bg-[#1995AD]">
+      <div className="md:w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative p-4 md:p-0">
+        <div className="mt-8 md:mt-0"></div>
+        <Image
           src="https://goldspoon.co.in/template/images/logo.svg"
           alt="Logo"
-          width={192} // Adjust width as necessary
-          height={48} // Adjust height as necessary
+          width={192}
+          height={48}
           className="w-48 mb-4 z-10"
         />
         <div className="text-white font-bold mb-4">
@@ -169,7 +169,7 @@ const Register = () => {
             </a>
           </p>
         </div>
-        <div className="absolute bottom-4 text-center text-white text-sm px-4 z-10">
+        <div className="absolute bottom-4 text-center text-white text-sm px-4 z-10 hidden md:block">
           By clicking continue, you agree to our{" "}
           <a href="/terms" className="underline">
             Terms of Service
@@ -181,167 +181,169 @@ const Register = () => {
           .
         </div>
       </div>
-      <div className="w-1/2 bg-[#A1D6E2] flex items-center justify-center overflow-y-auto pt-24 pb-2">
-        <Card className="w-full max-w-lg bg-[#F1F1F2] shadow-lg rounded-lg p-8">
-          <CardHeader>
-            <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
-              Register With Epin
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="epinId">Epin ID *</Label>
-                <Input
-                  id="epinId"
-                  name="epinId"
-                  placeholder="E Pin"
-                  value={formData.epinId}
-                  onChange={handleChange}
-                  required
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-start h-screen overflow-hidden">
+        <div className="w-full max-w-lg mt-4 overflow-y-auto p-4 h-full">
+          <Card className="bg-[#F1F1F2] shadow-lg rounded-lg p-8">
+            <CardHeader>
+              <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
+                Register With Epin
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="epinId">Epin ID *</Label>
                   <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Enter your first name"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Enter your last name"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="addressDetails">Address Details</Label>
-                <Input
-                  id="addressDetails"
-                  name="addressDetails"
-                  placeholder="Enter your address"
-                  value={formData.addressDetails}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    placeholder="Enter your telephone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select
-                    name="gender"
-                    value={formData.gender}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, gender: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="others">Others</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
-                  <Input
-                    id="aadhaarNumber"
-                    name="aadhaarNumber"
-                    placeholder="Enter your Aadhaar Number"
-                    value={formData.aadhaarNumber}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="panNumber">PAN Number</Label>
-                  <Input
-                    id="panNumber"
-                    name="panNumber"
-                    placeholder="Enter your PAN Number"
-                    value={formData.panNumber}
-                    onChange={handleChange}
-                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password *</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    placeholder="Create a password"
-                    value={formData.password}
+                    id="epinId"
+                    name="epinId"
+                    placeholder="E Pin"
+                    value={formData.epinId}
                     onChange={handleChange}
                     required
                     className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      placeholder="Enter your first name"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Enter your last name"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                  <Label htmlFor="addressDetails">Address Details</Label>
                   <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
+                    id="addressDetails"
+                    name="addressDetails"
+                    placeholder="Enter your address"
+                    value={formData.addressDetails}
                     onChange={handleChange}
-                    required
                     className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Button className="w-full" type="submit">
-                  Register Now
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-          <CardFooter className="flex justify-center flex-col items-center">
-          </CardFooter>
-        </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      placeholder="Enter your telephone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <Select
+                      name="gender"
+                      value={formData.gender}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, gender: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="others">Others</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                    <Input
+                      id="aadhaarNumber"
+                      name="aadhaarNumber"
+                      placeholder="Enter your Aadhaar Number"
+                      value={formData.aadhaarNumber}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="panNumber">PAN Number</Label>
+                    <Input
+                      id="panNumber"
+                      name="panNumber"
+                      placeholder="Enter your PAN Number"
+                      value={formData.panNumber}
+                      onChange={handleChange}
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password *</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      placeholder="Create a password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Button className="w-full" type="submit">
+                    Register Now
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-center flex-col items-center">
+            </CardFooter>
+          </Card>
+        </div>
         {isDialogOpen && (
           <Dialog
             open={isDialogOpen}
