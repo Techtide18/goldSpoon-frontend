@@ -181,7 +181,7 @@ const Register = () => {
           .
         </div>
       </div>
-      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-start h-screen overflow-hidden">
+      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-start h-screen overflow">
         <div className="w-full max-w-lg mt-4 overflow-y-auto p-4 h-full">
           <Card className="bg-[#F1F1F2] shadow-lg rounded-lg p-8">
             <CardHeader>

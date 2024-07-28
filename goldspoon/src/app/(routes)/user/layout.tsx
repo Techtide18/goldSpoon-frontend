@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="flex">
       <SideNav session={session} />
-      <main className="flex-1 ml-12">
+      <main className="flex-1 md:ml-12">
         <MarginWidthWrapper>
           <Header />
           <HeaderMobile session={session} />
