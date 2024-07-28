@@ -347,7 +347,7 @@ const Register = () => {
         {isDialogOpen && (
           <Dialog
             open={isDialogOpen}
-            onOpenChange={(open) => setIsDialogOpen(open)}
+            onOpenChange={(open) => open && setIsDialogOpen(true)}
           >
             <DialogContent>
               <DialogTitle>Registration Successful</DialogTitle>

@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -65,23 +64,23 @@ export default function ViewProfile() {
   ];
 
   return (
-    <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
+    <div className="flex justify-center items-start py-4 px-2 md:px-4 bg-gray-100 min-h-screen">
       <div className="w-full max-w-5xl mt-4">
         {/* Profile Card */}
         <Card className="shadow-lg rounded-lg overflow-hidden">
           <CardHeader className="bg-blue-600 text-white">
             <CardTitle className="text-2xl font-bold">VIEW PROFILE</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-4 md:p-6 space-y-4 md:space-y-6">
             {profileFields.map(({ label, value }) => (
               <div
-                className="flex justify-between items-center py-2 border-b border-gray-200"
+                className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 border-b border-gray-200"
                 key={label}
               >
                 <span className="font-semibold text-md capitalize">
                   {label}:
                 </span>
-                <span className="text-gray-700 text-md">{value}</span>
+                <span className="text-gray-700 text-md mt-1 md:mt-0">{value}</span>
               </div>
             ))}
           </CardContent>

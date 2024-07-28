@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -88,19 +87,19 @@ export default function ViewPassword() {
   };
 
   return (
-    <div className="flex justify-center items-start py-4 px-4 bg-gray-100 min-h-screen">
+    <div className="flex justify-center items-start py-4 px-2 md:px-4 bg-gray-100 min-h-screen">
       <div className="w-full max-w-5xl mt-4">
         {/* Password Card */}
         <Card className="shadow-lg rounded-lg overflow-hidden">
           <CardHeader className="bg-blue-600 text-white">
             <CardTitle className="text-2xl font-bold">EDIT PASSWORD</CardTitle>
           </CardHeader>
-          <CardContent className="p-8 space-y-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="flex items-center gap-4">
+          <CardContent className="p-4 md:p-8 space-y-4 md:space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <Label
                   htmlFor="oldPassword"
-                  className="font-semibold text-md w-1/3"
+                  className="font-semibold text-md w-full md:w-1/3"
                 >
                   Old Password:
                 </Label>
@@ -109,13 +108,13 @@ export default function ViewPassword() {
                   name="oldPassword"
                   value={oldPassword}
                   readOnly
-                  className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  className="w-full md:w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <Label
                   htmlFor="newPassword"
-                  className="font-semibold text-md w-1/3"
+                  className="font-semibold text-md w-full md:w-1/3"
                 >
                   New Password:
                 </Label>
@@ -125,14 +124,14 @@ export default function ViewPassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   type="password"
-                  className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  className="w-full md:w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   required
                 />
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <Label
                   htmlFor="confirmPassword"
-                  className="font-semibold text-md w-1/3"
+                  className="font-semibold text-md w-full md:w-1/3"
                 >
                   Confirm Password:
                 </Label>
@@ -142,11 +141,11 @@ export default function ViewPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
-                  className="w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  className="w-full md:w-2/3 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   required
                 />
               </div>
-              <div className="mt-12">
+              <div className="mt-8 md:mt-12">
                 <Button className="w-full" type="submit">
                   Update Password
                 </Button>

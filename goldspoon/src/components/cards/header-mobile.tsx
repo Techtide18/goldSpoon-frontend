@@ -67,7 +67,7 @@ const HeaderMobile = ({ session }: { session: Session }) => {
         />
         <motion.ul
           variants={variants}
-          className="absolute top-4 grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
+          className="absolute top-7 grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
         >
           {sideNavItems.map((item, idx) => {
             const isLastItem = idx === sideNavItems.length - 1; // Check if it's the last item
@@ -100,7 +100,7 @@ const HeaderMobile = ({ session }: { session: Session }) => {
         <MenuToggle toggle={toggleOpen} />
       </motion.nav>
       <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-white shadow-md md:hidden" style={{ padding: '1.375rem' }}>
-      <MenuToggle toggle={toggleOpen} />
+        <MenuToggle toggle={toggleOpen} />
         <Link href="/signout" className="flex items-center space-x-2 ml-auto">
           <Icon icon="mdi:power" width="24" height="24" />
           <span>Sign Out</span>
@@ -115,7 +115,8 @@ export default HeaderMobile;
 const MenuToggle = ({ toggle }: { toggle: () => void }) => (
   <button
     onClick={toggle}
-    className="pointer-events-auto absolute left-4 top-4 z-30" // Adjust the position here
+    className="pointer-events-auto relative z-30" // Adjust the position here
+    style={{ marginTop: '2px' }} // Add some margin-top to align with Sign Out button
   >
     <svg
       width="24"

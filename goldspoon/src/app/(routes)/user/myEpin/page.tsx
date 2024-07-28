@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -71,39 +70,39 @@ export default function ViewEpin() {
               <div className="text-center">Loading...</div>
             ) : epin ? (
               <>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Epin Number:</span>
                   <span className="text-gray-700 text-md">{epin.epinNumber}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Group:</span>
                   <span className="text-gray-700 text-md">{epin.groupName}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Token Number:</span>
                   <span className="text-gray-700 text-md">{epin.tokenNumber}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Package Name:</span>
                   <span className="text-gray-700 text-md">{epin.packageName}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Package Price:</span>
                   <span className="text-gray-700 text-md">{epin.packagePrice}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Installments Paid:</span>
                   <span className="text-gray-700 text-md">{epin.installmentsPaid}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Is Active:</span>
                   <span className="text-gray-700 text-md">{epin.isActiveEpin ? "Yes" : "No"}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Referred By:</span>
                   <span className="text-gray-700 text-md">{epin.referredByName}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize">Created Date:</span>
                   <span className="text-gray-700 text-md">{formatDate(epin.createdDate)}</span>
                 </div>

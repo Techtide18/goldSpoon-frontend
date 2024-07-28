@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -134,7 +133,7 @@ export default function AddWithdrawalRequest() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="currentAmount">Current Balance Available</Label>
               <Input
                 id="currentAmount"
@@ -145,7 +144,7 @@ export default function AddWithdrawalRequest() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="approvedBalance">Approved Balance</Label>
               <Input
                 id="approvedBalance"
@@ -156,7 +155,7 @@ export default function AddWithdrawalRequest() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="withdrawalAmount">Amount to Withdraw</Label>
               <Input
                 id="withdrawalAmount"
@@ -216,7 +215,7 @@ export default function AddWithdrawalRequest() {
           <DialogTitle>Withdrawal request placed.</DialogTitle>
           <DialogDescription>
             <div className="mt-4 space-y-2">
-            <p>Your withdrawal request has been successfully placed.</p>
+              <p>Your withdrawal request has been successfully placed.</p>
             </div>
           </DialogDescription>
           <Button onClick={() => setIsSuccessDialogOpen(false)}>Close</Button>
