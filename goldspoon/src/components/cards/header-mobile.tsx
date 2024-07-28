@@ -67,7 +67,7 @@ const HeaderMobile = ({ session }: { session: Session }) => {
         />
         <motion.ul
           variants={variants}
-          className="absolute grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
+          className="absolute top-4 grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
         >
           {sideNavItems.map((item, idx) => {
             const isLastItem = idx === sideNavItems.length - 1; // Check if it's the last item
@@ -99,8 +99,8 @@ const HeaderMobile = ({ session }: { session: Session }) => {
         </motion.ul>
         <MenuToggle toggle={toggleOpen} />
       </motion.nav>
-      <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-4 bg-white shadow-md md:hidden">
-        <MenuToggle toggle={toggleOpen} />
+      <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-white shadow-md md:hidden" style={{ padding: '1.375rem' }}>
+      <MenuToggle toggle={toggleOpen} />
         <Link href="/signout" className="flex items-center space-x-2 ml-auto">
           <Icon icon="mdi:power" width="24" height="24" />
           <span>Sign Out</span>
@@ -113,26 +113,26 @@ const HeaderMobile = ({ session }: { session: Session }) => {
 export default HeaderMobile;
 
 const MenuToggle = ({ toggle }: { toggle: () => void }) => (
-    <button
-      onClick={toggle}
-      className="pointer-events-auto absolute left-4 top-4 z-30" // Adjust the position here
+  <button
+    onClick={toggle}
+    className="pointer-events-auto absolute left-4 top-4 z-30" // Adjust the position here
+  >
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <line x1="3" y1="12" x2="21" y2="12" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        <line x1="3" y1="18" x2="21" y2="18" />
-      </svg>
-    </button>
-  );
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  </button>
+);
 
 const MenuItem = ({
   className,
