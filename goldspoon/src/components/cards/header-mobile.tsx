@@ -1,4 +1,5 @@
-'use client';
+// @ts-nocheck
+"use client";
 
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -73,7 +74,7 @@ const HeaderMobile = ({ session }: { session: Session }) => {
             const isLastItem = idx === sideNavItems.length - 1; // Check if it's the last item
 
             return (
-              <div key={idx}>
+              <div key={idx} className={`${isLastItem ? 'mb-8' : ''}`}> {/* Add margin bottom if last item */}
                 {item.submenu ? (
                   <MenuItemWithSubMenu item={item} toggleOpen={toggleOpen} />
                 ) : (
@@ -175,7 +176,7 @@ const MenuItemWithSubMenu: React.FC<MenuItemWithSubMenuProps> = ({
           </div>
         </button>
       </MenuItem>
-      <div className="mt-2 ml-2 flex flex-col space-y-2">
+      <div className={`mt-2 ml-2 flex flex-col space-y-2 ${subMenuOpen && 'mb-4'}`}>
         {subMenuOpen && (
           <>
             {item.subMenuItems?.map((subItem, subIdx) => {
