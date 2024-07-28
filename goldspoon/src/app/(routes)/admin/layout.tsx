@@ -8,6 +8,7 @@ import MarginWidthWrapper from '@/components/cards/margin-width-wrapper';
 import PageWrapper from '@/components/cards/page-wrapper';
 import SideNav from '@/components/cards/side-nav';
 import { auth } from '@/auth'; // Adjust the import path as needed
+import HeaderMobile from '@/components/cards/header-mobile';
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -18,6 +19,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <main className="flex-1 ml-12">
         <MarginWidthWrapper>
           <Header />
+          <HeaderMobile session={session} />
           <PageWrapper>{children}</PageWrapper>
         </MarginWidthWrapper>
       </main>
