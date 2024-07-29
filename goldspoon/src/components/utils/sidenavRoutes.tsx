@@ -165,7 +165,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     ],
   },
   {
-    title: "Payout Details",
+    title: "Income Details",
     path: "/user/payoutDetails",
     icon: <Icon icon="lucide:badge-indian-rupee" width="24" height="24" />,
     submenu: true,
@@ -175,7 +175,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
         path: "/user/payoutDetails/renewalIncome",
       },
       { title: "View Level Income", path: "/user/payoutDetails/levelIncome" },
-      { title: "View By Month", path: "/user/payoutDetails/bymonth" },
+      { title: "View Income By Month", path: "/user/payoutDetails/bymonth" },
     ],
   },
   {
@@ -186,24 +186,24 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     subMenuItems: [
       { title: "My Installments", path: "/user/installments/myInstallments" },
       {
-        title: "Direct Team's Installments",
-        path: "/user/installments/myTeam",
-      },
-      {
         title: "Pay Installment",
         path: "/user/installments/payInstallment",
       },
+      { title: "Pay Installment For Other Member", path: "/user/installments/payMember" },
     ],
   },
   {
-    title: "My Team",
+    title: "My Team Reports",
     path: "/user/myTeam",
     icon: <Icon icon="lucide:users-round" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       { title: "View All", path: "/user/myTeam/byAll" },
       { title: "View Count", path: "/user/myTeam/byCount" },
-      { title: "Pay For Member", path: "/user/myTeam/pay" },
+      {
+        title: "View Team's Installments", //give 2 levels
+        path: "/user/installments/myTeam",
+      },
     ],
   },
   {
@@ -212,9 +212,10 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="lucide:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
+      { title: "Fund Transfer", path: "/user/wallet/fundTransfer" },
       { title: "View Wallet Details", path: "/user/wallet/walletDetails" },
-      { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
-      { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
+      // { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
+      // { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
       { title: "View Transaction Details", path: "/user/wallet/transactions" },
     ],
   },

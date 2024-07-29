@@ -1,25 +1,10 @@
-// @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -29,31 +14,34 @@ import {
 } from "@/components/ui/dialog";
 
 // Simulated API call to fetch member details
-const fetchMemberDetails = (memberId) => {
+const fetchMemberDetails = (memberId: string): Promise<{ memberName: string; currentBalance: string }> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const memberDetails = {
         memberName: "John Doe",
-        groupName: "Group A",
-        packageName: "Package - 1500",
+        currentBalance: "2000",
       };
       resolve(memberDetails);
     }, 500);
   });
 };
 
-export default function PayRenewal() {
+export default function FundTransfer() {
   const [formData, setFormData] = useState({
     memberId: "",
+    amountToTransfer: "",
   });
 
-  const [memberDetails, setMemberDetails] = useState({
+  const [memberDetails, setMemberDetails] = useState<{ memberName: string; currentBalance: string }>({
     memberName: "",
-    groupName: "",
-    packageName: "",
+    currentBalance: "",
   });
+
+  const [finalAmount, setFinalAmount] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (formData.memberId) {
@@ -63,13 +51,25 @@ export default function PayRenewal() {
     } else {
       setMemberDetails({
         memberName: "",
-        groupName: "",
-        packageName: "",
+        currentBalance: "",
       });
     }
   }, [formData.memberId]);
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    if (formData.amountToTransfer) {
+      const amount = parseInt(formData.amountToTransfer);
+      if (!isNaN(amount)) {
+        setFinalAmount((amount * 0.95).toFixed(2));
+      } else {
+        setFinalAmount("");
+      }
+    } else {
+      setFinalAmount("");
+    }
+  }, [formData.amountToTransfer]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -77,22 +77,42 @@ export default function PayRenewal() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!formData.memberId) {
       return toast.error("Please fill out the Member ID field.");
     }
 
+    if (!formData.amountToTransfer || parseInt(formData.amountToTransfer) <= 0) {
+      return toast.error("Please enter a valid amount to transfer.");
+    }
+
+    if (parseInt(formData.amountToTransfer) > parseInt(memberDetails.currentBalance)) {
+      setErrorMessage(
+        "Amount to Transfer cannot be greater than the Current Balance in Wallet."
+      );
+      setErrorDialogOpen(true);
+      return;
+    }
+
+    if (parseInt(memberDetails.currentBalance) < parseFloat(finalAmount)) {
+      setErrorMessage(
+        "Your current balance is less than the final amount to be transferred."
+      );
+      setErrorDialogOpen(true);
+      return;
+    }
+
     setIsDialogOpen(true);
   };
 
-  const handleConfirmPayment = async () => {
-    const toastId = toast.loading("Processing Payment...");
-    // Simulate API call to process payment
+  const handleConfirmTransfer = async () => {
+    const toastId = toast.loading("Processing Transfer...");
+    // Simulate API call to process transfer
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("Payment processed successfully!", {
+    toast.success("Transfer processed successfully!", {
       id: toastId,
     });
 
@@ -100,11 +120,16 @@ export default function PayRenewal() {
     setIsSuccessDialogOpen(true);
   };
 
+  const handleSuccessDialogClose = () => {
+    setIsSuccessDialogOpen(false);
+    window.location.reload();
+  };
+
   return (
     <div className="flex justify-center items-center py-8 px-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle>PAY RENEWAL FOR MEMBER</CardTitle>
+          <CardTitle>FUND TRANSFER</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -132,47 +157,57 @@ export default function PayRenewal() {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="groupName">Group Name</Label>
+              <Label htmlFor="currentBalance">Current Balance in Wallet</Label>
               <Input
-                id="groupName"
-                name="groupName"
+                id="currentBalance"
+                name="currentBalance"
                 placeholder="Auto Generated"
-                value={memberDetails.groupName}
+                value={memberDetails.currentBalance}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="packageName">Package Name</Label>
+              <Label htmlFor="amountToTransfer">Amount to Transfer</Label>
               <Input
-                id="packageName"
-                name="packageName"
+                id="amountToTransfer"
+                name="amountToTransfer"
+                placeholder="Enter Amount"
+                value={formData.amountToTransfer}
+                onChange={handleChange}
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="finalAmount">Final Amount (5% deduction)</Label>
+              <Input
+                id="finalAmount"
+                name="finalAmount"
                 placeholder="Auto Generated"
-                value={memberDetails.packageName}
+                value={finalAmount}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">
-                Pay Renewal for Next Installment
+                Send
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* Confirm Payment Dialog */}
+      {/* Confirm Transfer Dialog */}
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open) => setIsDialogOpen(open)}
-        className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
-          <DialogTitle>Confirm Payment</DialogTitle>
+          <DialogTitle>Confirm Transfer</DialogTitle>
           <DialogDescription>
             <div className="mt-4 space-y-2">
-              <p>Are you sure you want to process the payment?</p>
+              <p>Are you sure you want to process the transfer?</p>
               <p>
                 Member ID: <strong>{formData.memberId}</strong>
               </p>
@@ -180,17 +215,17 @@ export default function PayRenewal() {
                 Member Name: <strong>{memberDetails.memberName}</strong>
               </p>
               <p>
-                Group Name: <strong>{memberDetails.groupName}</strong>
+                Amount to Transfer: <strong>{formData.amountToTransfer}</strong>
               </p>
               <p>
-                Package Name: <strong>{memberDetails.packageName}</strong>
+                Final Amount to be Transferred: <strong>{finalAmount}</strong>
               </p>
             </div>
           </DialogDescription>
           <div className="flex justify-end space-x-2">
             <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleConfirmPayment}>
-              Confirm Payment
+            <Button variant="destructive" onClick={handleConfirmTransfer}>
+              Confirm Transfer
             </Button>
           </div>
         </DialogContent>
@@ -199,20 +234,42 @@ export default function PayRenewal() {
       {/* Success Dialog */}
       <Dialog
         open={isSuccessDialogOpen}
-        onOpenChange={(open) => setIsSuccessDialogOpen(open)}
-        className="mt-8 mb-8"
+        onOpenChange={(open) => {
+          setIsSuccessDialogOpen(open);
+          if (!open) {
+            window.location.reload();
+          }
+        }}
       >
         <DialogContent className="max-h-screen overflow-y-auto">
-          <DialogTitle>Payment Successful</DialogTitle>
+          <DialogTitle>Transfer Successful</DialogTitle>
           <DialogDescription>
             <div className="mt-4 space-y-2">
               <p>
-                Payment has been successfully processed for Member ID{" "}
+                Transfer has been successfully processed for Member ID{" "}
                 <strong>{formData.memberId}</strong>.
               </p>
             </div>
           </DialogDescription>
-          <Button onClick={() => setIsSuccessDialogOpen(false)}>Close</Button>
+          <Button onClick={handleSuccessDialogClose}>Close</Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog
+        open={errorDialogOpen}
+        onOpenChange={(open) => setErrorDialogOpen(open)}
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Error</DialogTitle>
+          <DialogDescription>
+            <div className="space-y-2">
+              <strong>
+                <p>{errorMessage}</p>
+              </strong>
+            </div>
+          </DialogDescription>
+          <Button onClick={() => setErrorDialogOpen(false)}>Close</Button>
         </DialogContent>
       </Dialog>
     </div>

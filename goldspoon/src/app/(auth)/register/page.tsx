@@ -94,8 +94,8 @@ const Register = () => {
       return toast.error("Passwords do not match!");
     }
 
-    if (!/[A-Za-z]/.test(password.trim())) {
-      return toast.error("Password must contain at least one letter.");
+    if (password.trim().length < 4) {
+      return toast.error("Password must be at least 4 characters long.");
     }
 
     const fullName = `${firstName} ${lastName}`;
