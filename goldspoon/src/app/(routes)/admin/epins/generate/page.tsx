@@ -220,7 +220,7 @@ export default function GenerateEpin() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="numberOfPins">Enter No Of Pins</Label>
               <Input
                 id="numberOfPins"
@@ -233,7 +233,7 @@ export default function GenerateEpin() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="pinPackage">Select Package</Label>
               <Select
                 name="pinPackage"
@@ -260,7 +260,7 @@ export default function GenerateEpin() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="referralMemberNumber">Referral Member ID</Label>
               <div className="flex gap-4">
                 <Input
@@ -280,7 +280,7 @@ export default function GenerateEpin() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="referralMemberName">Referral Member Name</Label>
               <Input
                 id="referralMemberName"
@@ -291,7 +291,7 @@ export default function GenerateEpin() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="group">Select Group</Label>
               <Select
                 name="group"

@@ -82,7 +82,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
         path: "/admin/payout/generatePayout",
       },
       {
-        title: "View Monthly Payout Details",
+        title: "View Monthly Income",
         path: "/admin/payout/payoutDetails",
       },
       { title: "View Level Income", path: "/admin/payout/levelIncome" },
@@ -95,17 +95,25 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="lucide:wallet" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      {
-        title: "View Withdrawal Requests",
-        path: "/admin/wallet/withdrawalRequests",
-      },
-      {
-        title: "Add Withdrawal Requests For Member",
-        path: "/admin/wallet/addWithdrawalRequest",
-      },
+      // {
+      //   title: "View Withdrawal Requests",
+      //   path: "/admin/wallet/withdrawalRequests",
+      // },
+      // {
+      //   title: "Add Withdrawal Requests For Member",
+      //   path: "/admin/wallet/addWithdrawalRequest",
+      // },
       {
         title: "Add Transaction",
         path: "/admin/wallet/addTransaction",
+      },
+      {
+        title: "View Transaction Details",
+        path: "/admin/wallet/transactionDetails",
+      },
+      {
+        title: "View Wallet Details",
+        path: "/admin/wallet/walletDetails",
       },
     ],
   },
@@ -115,14 +123,6 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     icon: <Icon icon="tabler:report" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      {
-        title: "View Transaction Details",
-        path: "/admin/wallet/transactionDetails",
-      },
-      {
-        title: "View Wallet Details",
-        path: "/admin/wallet/walletDetails",
-      },
       { title: "View Directs", path: "/admin/reports/viewDirects" },
       { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "View Downline", path: "/admin/reports/downline" },

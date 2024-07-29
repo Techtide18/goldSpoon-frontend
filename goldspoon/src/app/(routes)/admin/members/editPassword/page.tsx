@@ -1,10 +1,9 @@
 // @ts-nocheck
 "use client";
 
-
 import React, { useState } from "react";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,6 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 const PAGE_SIZE = 100;
@@ -117,7 +115,7 @@ export default function EditPassword() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="memberId">Member ID</Label>
                 <Input
                   id="memberId"
@@ -128,7 +126,7 @@ export default function EditPassword() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="memberName">Member Name</Label>
                 <Input
                   id="memberName"
@@ -153,7 +151,7 @@ export default function EditPassword() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="oldPassword">Old Password</Label>
                 <Input
                   id="oldPassword"
@@ -164,7 +162,7 @@ export default function EditPassword() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="newPassword">New Password</Label>
                 <Input
                   id="newPassword"
@@ -175,7 +173,7 @@ export default function EditPassword() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"

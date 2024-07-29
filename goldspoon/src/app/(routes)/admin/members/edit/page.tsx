@@ -1,33 +1,16 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function EditProfile() {
   const [memberId, setMemberId] = useState("");
@@ -132,7 +115,7 @@ export default function EditProfile() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="memberId">Member ID</Label>
                 <Input
                   id="memberId"
@@ -143,7 +126,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="memberName">Member Name</Label>
                 <Input
                   id="memberName"
@@ -168,7 +151,7 @@ export default function EditProfile() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
@@ -179,7 +162,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="phone">Phone</Label>
                 <Input
                   id="phone"
@@ -190,7 +173,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -201,7 +184,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="gender">Gender</Label>
                 <Select
                   name="gender"
@@ -220,7 +203,7 @@ export default function EditProfile() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
                 <Input
                   id="aadhaarNumber"
@@ -231,7 +214,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="panNumber">PAN Number</Label>
                 <Input
                   id="panNumber"
@@ -242,7 +225,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="addressDetails">Address Details</Label>
                 <Textarea
                   id="addressDetails"
@@ -254,7 +237,7 @@ export default function EditProfile() {
                   rows={4} // This will make the textarea twice the height of a normal input
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="accountNumber">Account No.</Label>
                 <Input
                   id="accountNumber"
@@ -265,7 +248,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="accountName">Account Name</Label>
                 <Input
                   id="accountName"
@@ -276,7 +259,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="bankName">Bank Name</Label>
                 <Input
                   id="bankName"
@@ -287,7 +270,7 @@ export default function EditProfile() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="bankBranch">Bank Branch</Label>
                 <Input
                   id="bankBranch"
@@ -307,7 +290,7 @@ export default function EditProfile() {
       </div>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(true)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">

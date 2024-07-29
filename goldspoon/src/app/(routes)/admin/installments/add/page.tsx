@@ -89,8 +89,13 @@ export default function AddInstallment() {
       return toast.error("Please fill out the Member ID.");
     }
 
-    if (paymentMethod === "Wallet Amount + Cash/UPI" && walletUsedAmount > currentBalance) {
-      return toast.error("Amount Used from Wallet cannot be more than Current Balance in Wallet.");
+    if (
+      paymentMethod === "Wallet Amount + Cash/UPI" &&
+      walletUsedAmount > currentBalance
+    ) {
+      return toast.error(
+        "Amount Used from Wallet cannot be more than Current Balance in Wallet."
+      );
     }
 
     const requestData = {
@@ -99,7 +104,9 @@ export default function AddInstallment() {
       transactionId: transactionId || undefined,
       paymentMethod,
       remarks,
-      walletUsedAmount: walletUsedAmount ? parseInt(walletUsedAmount) : undefined,
+      walletUsedAmount: walletUsedAmount
+        ? parseInt(walletUsedAmount)
+        : undefined,
     };
 
     const toastId = toast.loading("Adding Installment...");
@@ -145,7 +152,7 @@ export default function AddInstallment() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
               <div className="flex gap-4">
                 <Input
@@ -166,7 +173,7 @@ export default function AddInstallment() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
                 id="memberName"
@@ -177,7 +184,7 @@ export default function AddInstallment() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="currentBalance">Current Balance in Wallet</Label>
               <Input
                 id="currentBalance"
@@ -188,8 +195,10 @@ export default function AddInstallment() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="amountToBePaid">Installment Amount to be Paid</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="amountToBePaid">
+                Installment Amount to be Paid
+              </Label>
               <Input
                 id="amountToBePaid"
                 name="amountToBePaid"
@@ -201,7 +210,7 @@ export default function AddInstallment() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="paymentMethod">Payment Method</Label>
               <Select
                 name="paymentMethod"
@@ -228,7 +237,7 @@ export default function AddInstallment() {
               </Select>
             </div>
             {formData.paymentMethod.includes("UPI") && (
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="transactionId">Payment Transaction ID</Label>
                 <Input
                   id="transactionId"
@@ -241,7 +250,7 @@ export default function AddInstallment() {
               </div>
             )}
             {formData.paymentMethod === "Wallet Amount + Cash/UPI" && (
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="walletUsedAmount">
                   Amount Used from Wallet
                 </Label>
@@ -257,7 +266,7 @@ export default function AddInstallment() {
                 />
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="remarks">Remarks</Label>
               <Textarea
                 id="remarks"

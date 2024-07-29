@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ export default function RetopUpMember() {
     group: "",
   });
   const [selectedPackageName, setSelectedPackageName] = useState("");
-  const [selectedPackageId, setSelectedPackageId] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [memberName, setMemberName] = useState("");
   const [generatedEpinDetails, setGeneratedEpinDetails] = useState({});
@@ -41,11 +39,14 @@ export default function RetopUpMember() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/package/all`, {
-        headers: {
-          adminMemberId: 1,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/package/all`,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
       setPackages(response.data);
       setPackagesLoaded(true);
     } catch (error) {
@@ -201,7 +202,7 @@ export default function RetopUpMember() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
               <div className="flex items-center space-x-4">
                 <Input
@@ -218,7 +219,7 @@ export default function RetopUpMember() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
                 id="memberName"
@@ -229,7 +230,7 @@ export default function RetopUpMember() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="pinPackage">Package</Label>
               <Select
                 name="pinPackage"
@@ -256,7 +257,7 @@ export default function RetopUpMember() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="group">Select Group</Label>
               <Select
                 name="group"
@@ -289,7 +290,7 @@ export default function RetopUpMember() {
       </Card>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(open)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">

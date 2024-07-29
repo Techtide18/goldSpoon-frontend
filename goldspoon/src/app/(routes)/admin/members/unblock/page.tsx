@@ -1,26 +1,14 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function UnblockMember() {
   const [formData, setFormData] = useState({
@@ -75,7 +63,7 @@ export default function UnblockMember() {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/unblock`, null, {
         params: {
-          memberNumber: formData.memberId
+          memberNumber: formData.memberId,
         },
         headers: {
           adminMemberId: 1,
@@ -106,7 +94,7 @@ export default function UnblockMember() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
               <div className="flex gap-4">
                 <Input
@@ -127,7 +115,7 @@ export default function UnblockMember() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
                 id="memberName"
