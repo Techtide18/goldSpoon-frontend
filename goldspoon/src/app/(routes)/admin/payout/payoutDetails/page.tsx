@@ -23,9 +23,11 @@ const ViewMonthlyPayout = () => {
   const [viewOption, setViewOption] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [filteredPayouts, setFilteredPayouts] = useState([]);
+  const [memberIncome, setMemberIncome] = useState([]);
   const [showPayoutDetails, setShowPayoutDetails] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [memberId, setMemberId] = useState("");
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -78,6 +80,42 @@ const ViewMonthlyPayout = () => {
     }
   }, []);
 
+  const fetchMemberIncome = async (pageNumber = 0, month = null, memberId = "") => {
+    try {
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+        month,
+        memberId
+      };
+
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/totalincome/month/memberNumber`, {
+        params,
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+
+      const incomeData = response.data.content.map((income) => ({
+        memberId: income.memberId,
+        amountReceived: income.amountReceived,
+        incomeType: income.isDirectIncome
+          ? "Direct Income"
+          : income.isLevelIncome
+          ? "Level Income"
+          : "Unknown",
+      }));
+
+      setMemberIncome(incomeData);
+      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
+      toast.success("Member income data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching member income:", error);
+      toast.error("Failed to fetch member income data.");
+    }
+  };
+
   useEffect(() => {
     fetchPayouts(0);
   }, [fetchPayouts]);
@@ -92,6 +130,12 @@ const ViewMonthlyPayout = () => {
 
   const handleViewByMonth = () => {
     setViewOption("byMonth");
+    setShowPayoutDetails(false);
+    setCurrentPage(1);
+  };
+
+  const handleViewMemberIncome = () => {
+    setViewOption("memberIncome");
     setShowPayoutDetails(false);
     setCurrentPage(1);
   };
@@ -113,6 +157,25 @@ const ViewMonthlyPayout = () => {
     setShowPayoutDetails(true);
     setCurrentPage(1);
     toast.success("Payout details fetched successfully.");
+  };
+
+  const getMemberIncomeDetails = () => {
+    if (!selectedMonth) {
+      return toast.error("Please select a month.");
+    }
+
+    if (!memberId) {
+      return toast.error("Please enter a member ID.");
+    }
+
+    const month = `${selectedMonth.getFullYear()}-${String(
+      selectedMonth.getMonth() + 1
+    ).padStart(2, "0")}`;
+
+    fetchMemberIncome(0, month, memberId);
+    setShowPayoutDetails(true);
+    setCurrentPage(1);
+    toast.success("Member income details fetched successfully.");
   };
 
   const paginatedPayouts = filteredPayouts.slice(
@@ -172,7 +235,18 @@ const ViewMonthlyPayout = () => {
                 onClick={handleViewByMonth}
                 variant={viewOption === "byMonth" ? "solid" : "outline"}
               >
-                View by Month
+                View All by Month
+              </Button>
+              <Button
+                className={`font-bold ${
+                  viewOption === "memberIncome"
+                    ? "bg-black text-white"
+                    : "border-black"
+                }`}
+                onClick={handleViewMemberIncome}
+                variant={viewOption === "memberIncome" ? "solid" : "outline"}
+              >
+                View Total Income of a Member by Month
               </Button>
             </div>
             {viewOption === "byMonth" && (
@@ -210,92 +284,205 @@ const ViewMonthlyPayout = () => {
                 </div>
               </div>
             )}
+            {viewOption === "memberIncome" && (
+              <div className="flex items-center space-x-4 mt-4">
+                <div className="border p-2 rounded-md w-1/4">
+                  <Calendar
+                    onChange={handleMonthChange}
+                    value={selectedMonth}
+                    view="year"
+                    onClickMonth={handleMonthChange}
+                    className="react-calendar"
+                    tileClassName="text-center"
+                    showNavigation={true}
+                  />
+                </div>
+                <div className="flex flex-col space-y-4 w-3/4">
+                  <Input
+                    id="selectedMonth"
+                    name="selectedMonth"
+                    placeholder="Selected Month"
+                    value={
+                      selectedMonth
+                        ? selectedMonth.toLocaleDateString("en-GB", {
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : ""
+                    }
+                    readOnly
+                    className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                  <Input
+                    id="memberId"
+                    name="memberId"
+                    placeholder="Member ID"
+                    value={memberId}
+                    onChange={(e) => setMemberId(e.target.value)}
+                    className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                  <Button className="w-full" onClick={getMemberIncomeDetails}>
+                    Get Member Total Income
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Payout Details Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Payout Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Member ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Payout Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Received Money For (Member ID)
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Level
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount Received
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Income Type
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedPayouts.length > 0 ? (
-                  paginatedPayouts.map((payout, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {payout.memberId}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payout.dateTime}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payout.receivedMoneyFor}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payout.level}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payout.amountReceived}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payout.incomeType}
+        {viewOption === "all" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Payout Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Member ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Payout Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Received Money For (Member ID)
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Level
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount Received
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Income Type
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedPayouts.length > 0 ? (
+                    paginatedPayouts.map((payout, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {payout.memberId}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payout.dateTime}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payout.receivedMoneyFor}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payout.level}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payout.amountReceived}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payout.incomeType}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
+                        No payout details found for the selected month.
                       </td>
                     </tr>
-                  ))
-                ) : (
+                  )}
+                </tbody>
+              </table>
+            </CardContent>
+            <CardFooter className="flex justify-end space-x-2">
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous 100
+              </Button>
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next 100
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+
+        {/* Member Income Details Card */}
+        {viewOption === "memberIncome" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Member Income Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td
-                      colSpan="6"
-                      className="px-6 py-4 text-center text-sm text-gray-500"
-                    >
-                      No payout details found for the selected month.
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Member ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount Received
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Income Type
+                    </th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-          <CardFooter className="flex justify-end space-x-2">
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-            >
-              Previous 100
-            </Button>
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-            >
-              Next 100
-            </Button>
-          </CardFooter>
-        </Card>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {memberIncome.length > 0 ? (
+                    memberIncome.map((income, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {income.memberId}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {income.amountReceived}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {income.incomeType}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
+                        No income details found for the selected month.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </CardContent>
+            <CardFooter className="flex justify-end space-x-2">
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous 100
+              </Button>
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next 100
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </div>
     </div>
   );

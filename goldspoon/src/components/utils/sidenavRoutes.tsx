@@ -175,6 +175,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
         path: "/user/payoutDetails/renewalIncome",
       },
       { title: "View Level Income", path: "/user/payoutDetails/levelIncome" },
+      { title: "View By Month", path: "/user/payoutDetails/bymonth" },
     ],
   },
   {
@@ -188,6 +189,21 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
         title: "Direct Team's Installments",
         path: "/user/installments/myTeam",
       },
+      {
+        title: "Pay Installment",
+        path: "/user/installments/payInstallment",
+      },
+    ],
+  },
+  {
+    title: "My Team",
+    path: "/user/myTeam",
+    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "View All", path: "/user/myTeam/byAll" },
+      { title: "View Count", path: "/user/myTeam/byCount" },
+      { title: "Pay For Member", path: "/user/myTeam/pay" },
     ],
   },
   {
@@ -200,17 +216,6 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
       { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
       { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
       { title: "View Transaction Details", path: "/user/wallet/transactions" },
-    ],
-  },
-  {
-    title: "My Team",
-    path: "/user/myTeam",
-    icon: <Icon icon="lucide:users-round" width="24" height="24" />,
-    submenu: true,
-    subMenuItems: [
-      { title: "View All", path: "/user/myTeam/byAll" },
-      { title: "View Count", path: "/user/myTeam/byCount" },
-      { title: "Pay For Member", path: "/user/myTeam/pay" },
     ],
   },
 ];

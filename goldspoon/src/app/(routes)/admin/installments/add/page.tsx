@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -27,17 +26,19 @@ import {
 export default function AddInstallment() {
   const [formData, setFormData] = useState({
     memberId: "",
-    amountReceived: "",
+    amountToBePaid: "",
     paymentMethod: "",
     transactionId: "",
     remarks: "",
+    walletUsedAmount: "",
   });
 
   const [memberName, setMemberName] = useState("");
+  const [currentBalance, setCurrentBalance] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [installmentsPaidTillNow, setInstallmentsPaidTillNow] = useState(0);
 
-  const fetchMemberName = async () => {
+  const fetchMemberDetails = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.memberId}`,
@@ -47,10 +48,21 @@ export default function AddInstallment() {
           },
         }
       );
-      setMemberName(response.data.fullName);
+      const memberData = response.data;
+      setMemberName(memberData.fullName);
+      setFormData((prevData) => ({
+        ...prevData,
+        amountToBePaid: memberData.amountToBePaid,
+      }));
+      setCurrentBalance(memberData.currentBalance);
     } catch (error) {
-      console.error("Error fetching member name:", error);
+      console.error("Error fetching member details:", error);
       setMemberName("Unknown");
+      setFormData((prevData) => ({
+        ...prevData,
+        amountToBePaid: "",
+      }));
+      setCurrentBalance("");
     }
   };
 
@@ -64,19 +76,30 @@ export default function AddInstallment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { memberId, amountReceived, paymentMethod, transactionId, remarks } =
-      formData;
+    const {
+      memberId,
+      amountToBePaid,
+      paymentMethod,
+      transactionId,
+      remarks,
+      walletUsedAmount,
+    } = formData;
 
-    if (!memberId || !amountReceived || !paymentMethod || !transactionId) {
-      return toast.error("Please fill out all fields.");
+    if (!memberId) {
+      return toast.error("Please fill out the Member ID.");
+    }
+
+    if (paymentMethod === "Wallet Amount + Cash/UPI" && walletUsedAmount > currentBalance) {
+      return toast.error("Amount Used from Wallet cannot be more than Current Balance in Wallet.");
     }
 
     const requestData = {
       memberNumber: memberId,
-      amountPaid: parseInt(amountReceived),
-      transactionId,
+      amountPaid: parseInt(amountToBePaid),
+      transactionId: transactionId || undefined,
       paymentMethod,
       remarks,
+      walletUsedAmount: walletUsedAmount ? parseInt(walletUsedAmount) : undefined,
     };
 
     const toastId = toast.loading("Adding Installment...");
@@ -99,12 +122,14 @@ export default function AddInstallment() {
       setIsDialogOpen(true);
       setFormData({
         memberId: "",
-        amountReceived: "",
+        amountToBePaid: "",
         paymentMethod: "",
         transactionId: "",
         remarks: "",
+        walletUsedAmount: "",
       });
       setMemberName("");
+      setCurrentBalance("");
     } catch (error) {
       toast.error("Failed to add installment. Please try again.", {
         id: toastId,
@@ -133,11 +158,11 @@ export default function AddInstallment() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
                 <Button
-                  onClick={fetchMemberName}
+                  onClick={fetchMemberDetails}
                   type="button"
                   className="min-w-max"
                 >
-                  Get Member Name
+                  Get Member Details
                 </Button>
               </div>
             </div>
@@ -153,15 +178,26 @@ export default function AddInstallment() {
               />
             </div>
             <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="amountReceived">Amount Received</Label>
+              <Label htmlFor="currentBalance">Current Balance in Wallet</Label>
               <Input
-                id="amountReceived"
-                name="amountReceived"
+                id="currentBalance"
+                name="currentBalance"
+                placeholder="Auto Generated"
+                value={currentBalance}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label htmlFor="amountToBePaid">Installment Amount to be Paid</Label>
+              <Input
+                id="amountToBePaid"
+                name="amountToBePaid"
                 type="number"
-                placeholder="Amount Received"
-                value={formData.amountReceived}
+                placeholder="Auto Generated"
+                value={formData.amountToBePaid}
                 onChange={handleChange}
-                required
+                readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -179,32 +215,48 @@ export default function AddInstallment() {
                   <SelectValue placeholder="Select Payment Method" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Cash Deposit">Cash Deposit</SelectItem>
-                  <SelectItem value="Paytm">Paytm</SelectItem>
-                  <SelectItem value="Google Pay">Google Pay</SelectItem>
-                  <SelectItem value="Phone Pay">Phone Pay</SelectItem>
-                  <SelectItem value="Cheque">Cheque</SelectItem>
-                  <SelectItem value="Internet Banking">
-                    Internet Banking
+                  <SelectItem value="UPI">UPI</SelectItem>
+                  <SelectItem value="UPI + Cash">UPI + Cash</SelectItem>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="Net Banking">Net Banking</SelectItem>
+                  <SelectItem value="Wallet Amount">Wallet Amount</SelectItem>
+                  <SelectItem value="Wallet Amount + Cash/UPI">
+                    Wallet Amount + Cash/UPI
                   </SelectItem>
-                  <SelectItem value="Money Order">Money Order</SelectItem>
-                  <SelectItem value="Demand Draft">Demand Draft</SelectItem>
                   <SelectItem value="Others">Others</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <Label htmlFor="transactionId">Payment Transaction ID</Label>
-              <Input
-                id="transactionId"
-                name="transactionId"
-                placeholder="Payment Transaction ID"
-                value={formData.transactionId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
+            {formData.paymentMethod.includes("UPI") && (
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="transactionId">Payment Transaction ID</Label>
+                <Input
+                  id="transactionId"
+                  name="transactionId"
+                  placeholder="Payment Transaction ID"
+                  value={formData.transactionId}
+                  onChange={handleChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+            )}
+            {formData.paymentMethod === "Wallet Amount + Cash/UPI" && (
+              <div className="grid grid-cols-2 gap-4 items-center">
+                <Label htmlFor="walletUsedAmount">
+                  Amount Used from Wallet
+                </Label>
+                <Input
+                  id="walletUsedAmount"
+                  name="walletUsedAmount"
+                  type="number"
+                  placeholder="Amount Used from Wallet"
+                  value={formData.walletUsedAmount}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4 items-center">
               <Label htmlFor="remarks">Remarks</Label>
               <Textarea
@@ -214,7 +266,7 @@ export default function AddInstallment() {
                 value={formData.remarks}
                 onChange={handleChange}
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                rows={4} // This will make the textarea twice the height of a normal input
+                rows={4}
               />
             </div>
             <div className="space-y-2">
