@@ -65,7 +65,7 @@ const initialCardData: DashboardCardProps[] = [
     icon: DollarSign,
   },
   {
-    label: "Total Direct Income History",
+    label: "Total Renewal Income History",
     amount: "...",
     description: "Total direct income earned",
     icon: DollarSign,
@@ -150,13 +150,13 @@ export default function Home() {
           },
           {
             label: "Total Level Income History",
-            amount: `₹${data.totalLevelIncome}`,
+            amount: `₹${data.totalDirectIncome}`,
             description: "Total income from levels",
             icon: DollarSign,
           },
           {
-            label: "Total Direct Income History",
-            amount: `₹${data.totalDirectIncome}`,
+            label: "Total Renewal Income History",
+            amount: `₹${data.totalLevelIncome}`,
             description: "Total direct income earned",
             icon: DollarSign,
           },

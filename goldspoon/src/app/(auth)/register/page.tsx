@@ -37,6 +37,8 @@ const Register = () => {
 
   const [formData, setFormData] = useState({
     epinId: "",
+    memberId: "",
+    memberName: "",
     firstName: "",
     lastName: "",
     gender: "",
@@ -49,8 +51,8 @@ const Register = () => {
     confirmPassword: "",
   });
 
-  const [memberNumber, setMemberNumber] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [memberNumber, setMemberNumber] = useState<string | null>(null);
 
   useEffect(() => {
     if (epinId) {
@@ -69,10 +71,40 @@ const Register = () => {
     });
   };
 
+  const fetchMemberName = async () => {
+    if (!formData.memberId) {
+      return toast.error("Please enter a Member ID.");
+    }
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.memberId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        }
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        memberName: response.data.fullName || "",
+      }));
+      toast.success("Member name fetched successfully.");
+    } catch (error) {
+      setFormData((prevData) => ({
+        ...prevData,
+        memberName: "Unknown",
+      }));
+      toast.error("Failed to fetch member details.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const {
       epinId,
+      memberId,
       firstName,
       lastName,
       phone,
@@ -101,6 +133,7 @@ const Register = () => {
     const fullName = `${firstName} ${lastName}`;
     const requestData = {
       epinNumber: epinId,
+      memberNumber: memberId,
       fullName,
       phone,
       email,
@@ -128,6 +161,8 @@ const Register = () => {
       setIsDialogOpen(true);
       setFormData({
         epinId: "",
+        memberId: "",
+        memberName: "",
         firstName: "",
         lastName: "",
         gender: "",
@@ -142,16 +177,19 @@ const Register = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage =
-          error.response?.data?.message || "Failed to register member. Please try again.";
+          error.response?.data?.message ||
+          "Failed to register member. Please try again.";
         toast.error(errorMessage, { id: toastId });
       } else {
-        toast.error("An unexpected error occurred. Please try again.", { id: toastId });
+        toast.error("An unexpected error occurred. Please try again.", {
+          id: toastId,
+        });
       }
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[#1995AD]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#1995AD]">
       <div className="md:w-1/2 bg-[#1995AD] flex flex-col items-center justify-center relative p-4 md:p-0">
         <div className="mt-8 md:mt-0"></div>
         <Image
@@ -181,8 +219,8 @@ const Register = () => {
           .
         </div>
       </div>
-      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-start h-screen overflow">
-        <div className="w-full max-w-lg mt-4 overflow-y-auto p-4 h-full">
+      <div className="md:w-1/2 bg-[#A1D6E2] flex flex-col items-center justify-start min-h-screen">
+        <div className="w-full max-w-lg mt-4 p-4">
           <Card className="bg-[#F1F1F2] shadow-lg rounded-lg p-8">
             <CardHeader>
               <CardTitle className="text-3xl font-semibold text-[#1995AD] text-center">
@@ -200,6 +238,35 @@ const Register = () => {
                     value={formData.epinId}
                     onChange={handleChange}
                     required
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="memberId">Referral ID / Sponser ID</Label>
+                  <Input
+                    id="memberId"
+                    name="memberId"
+                    placeholder="Enter Id of the Referral"
+                    value={formData.memberId}
+                    onChange={handleChange}
+                    className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                  <Button
+                    onClick={fetchMemberName}
+                    type="button"
+                    className="w-full mt-2"
+                  >
+                    Get Referral Name
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="memberName">Referral Name</Label>
+                  <Input
+                    id="memberName"
+                    name="memberName"
+                    placeholder="Auto Generated"
+                    value={formData.memberName}
+                    readOnly
                     className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                 </div>
@@ -340,8 +407,7 @@ const Register = () => {
                 </div>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-center flex-col items-center">
-            </CardFooter>
+            <CardFooter className="flex justify-center flex-col items-center"></CardFooter>
           </Card>
         </div>
         {isDialogOpen && (
@@ -352,8 +418,8 @@ const Register = () => {
             <DialogContent>
               <DialogTitle>Registration Successful</DialogTitle>
               <DialogDescription>
-                Your member number is <strong>{memberNumber}</strong>. Please keep
-                it safely as it will not be generated again.
+                Your member number is <strong>{memberNumber}</strong>. Please keep it
+                safely as it will not be generated again.
               </DialogDescription>
               <DialogClose asChild>
                 <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
@@ -372,3 +438,4 @@ const Register = () => {
 }
 
 export default dynamic(() => Promise.resolve(Register), { ssr: false });
+
