@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,7 +90,7 @@ export default function CreatePackage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="packageName">Package Name</Label>
               <Input
                 id="packageName"
@@ -103,7 +102,7 @@ export default function CreatePackage() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="packagePrice">Package Price</Label>
               <Input
                 id="packagePrice"
@@ -116,7 +115,7 @@ export default function CreatePackage() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="packageDuration">Package Duration (Months)</Label>
               <Input
                 id="packageDuration"
@@ -129,7 +128,7 @@ export default function CreatePackage() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"

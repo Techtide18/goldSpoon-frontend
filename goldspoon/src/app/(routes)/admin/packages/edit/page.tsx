@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -45,11 +44,14 @@ export default function EditPackage() {
     }
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/package/name/${packageName}`, {
-        headers: {
-          adminMemberId: 1,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/package/name/${packageName}`,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
 
       const fetchedData = response.data;
 
@@ -94,17 +96,24 @@ export default function EditPackage() {
     };
 
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/package`, updatedDetails, {
-        headers: {
-          adminMemberId: 1,
-        },
-      });
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/package`,
+        updatedDetails,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
 
       toast.success("Package details updated successfully!");
       setIsDialogOpen(true);
     } catch (error) {
       console.log("err", error);
-      toast.error(error.response.data || "Failed to update package details. Please try again.");
+      toast.error(
+        error.response.data ||
+          "Failed to update package details. Please try again."
+      );
     }
   };
 
@@ -118,7 +127,7 @@ export default function EditPackage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="packageName">Package Name</Label>
                 <Input
                   id="packageName"
@@ -143,7 +152,7 @@ export default function EditPackage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="name">Package Name</Label>
                 <Input
                   id="name"
@@ -154,7 +163,7 @@ export default function EditPackage() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="price">Package Price</Label>
                 <Input
                   id="price"
@@ -165,7 +174,7 @@ export default function EditPackage() {
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -177,7 +186,7 @@ export default function EditPackage() {
                   rows={4} // This will make the textarea twice the height of a normal input
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <Label htmlFor="duration">Package Duration (Months)</Label>
                 <Input
                   id="duration"

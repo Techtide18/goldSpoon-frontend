@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -135,7 +134,7 @@ export default function AddTransaction() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
               <div className="flex gap-4">
                 <Input
@@ -156,7 +155,7 @@ export default function AddTransaction() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
                 id="memberName"
@@ -167,7 +166,7 @@ export default function AddTransaction() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="approvedBalance">Approved Balance</Label>
               <Input
                 id="approvedBalance"
@@ -178,7 +177,7 @@ export default function AddTransaction() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="transactionType">Transaction Type</Label>
               <Select
                 name="transactionType"
@@ -199,7 +198,7 @@ export default function AddTransaction() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="amount">Amount</Label>
               <Input
                 id="amount"
@@ -212,7 +211,7 @@ export default function AddTransaction() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="note">Note</Label>
               <Textarea
                 id="note"

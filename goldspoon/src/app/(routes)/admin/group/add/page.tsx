@@ -1,33 +1,15 @@
 // @ts-nocheck
 "use client";
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function AddNewGroup() {
   const [formData, setFormData] = useState({
@@ -135,7 +117,7 @@ export default function AddNewGroup() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="groupName">Group Name</Label>
               <Input
                 id="groupName"
@@ -147,7 +129,7 @@ export default function AddNewGroup() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="maxTokenCount">Max Token Count</Label>
               <Input
                 id="maxTokenCount"
@@ -160,7 +142,7 @@ export default function AddNewGroup() {
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="packageId">Package Name</Label>
               <Select
                 name="packageId"
@@ -197,7 +179,7 @@ export default function AddNewGroup() {
       </Card>
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => open && setIsDialogOpen(true)}
+        onOpenChange={(open) => setIsDialogOpen(true)}
         className="mt-8 mb-8"
       >
         <DialogContent className="max-h-screen overflow-y-auto">
