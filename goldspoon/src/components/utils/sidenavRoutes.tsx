@@ -159,6 +159,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="lucide:shopping-cart" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
+      { title: "Buy Epin", path: "/user/epins/buy" },
       { title: "My Re-topups", path: "/user/epins/myRetopups" },
       { title: "Used", path: "/user/epins/used" },
       { title: "Unused", path: "/user/epins/unused" },

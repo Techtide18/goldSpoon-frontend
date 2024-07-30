@@ -1,8 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -15,6 +13,7 @@ import {
   Fingerprint,
   Braces,
   CreditCard,
+  User,
 } from "lucide-react";
 import DashboardCard, {
   DashboardCardContent,
@@ -31,6 +30,12 @@ const initialCardData: DashboardCardProps[] = [
     amount: "...",
     description: "My current epin",
     icon: Fingerprint,
+  },
+  {
+    label: "Member Id",
+    amount: "...",
+    description: "My member id",
+    icon: User,
   },
   {
     label: "Current Group",
@@ -123,6 +128,12 @@ export default function Home() {
             amount: dashboardData.epinNumber,
             description: "My current epin",
             icon: Fingerprint,
+          },
+          {
+            label: "Member Id",
+            amount: session.user.name,
+            description: "My member id",
+            icon: User,
           },
           {
             label: "Current Group",
