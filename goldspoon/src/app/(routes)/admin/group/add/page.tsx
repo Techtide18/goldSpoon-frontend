@@ -122,7 +122,7 @@ export default function AddNewGroup() {
               <Input
                 id="groupName"
                 name="groupName"
-                placeholder="Enter Group Name"
+                placeholder="Enter Group Name (no spaces in name)"
                 value={formData.groupName}
                 onChange={handleChange}
                 required

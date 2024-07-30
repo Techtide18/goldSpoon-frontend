@@ -33,8 +33,10 @@ export default function AddTransaction() {
   });
 
   const [memberName, setMemberName] = useState("");
-  const [approvedBalance, setApprovedBalance] = useState("");
+  const [currentBalance, setCurrentBalance] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const fetchWalletDetails = async () => {
     try {
@@ -55,13 +57,13 @@ export default function AddTransaction() {
 
       const memberDetails = response.data.content[0];
       setMemberName(memberDetails.fullName || "Unknown");
-      setApprovedBalance(memberDetails.walletDetails.approvedBalance || "0");
+      setCurrentBalance(memberDetails.walletDetails.currentBalance || "0");
 
       toast.success("Fetched wallet details successfully.");
     } catch (error) {
       console.error("Error fetching wallet details:", error);
       setMemberName("Unknown");
-      setApprovedBalance("0");
+      setCurrentBalance("0");
       toast.error("Failed to fetch wallet details.");
     }
   };
@@ -74,22 +76,30 @@ export default function AddTransaction() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const { memberId, transactionType, amount, note } = formData;
+    const { memberId, transactionType, amount } = formData;
 
     if (!memberId || !transactionType || !amount) {
       return toast.error("Please fill out all required fields.");
     }
 
-    if (parseInt(amount) > parseInt(approvedBalance)) {
-      return toast.error("Amount cannot be greater than Approved Balance.");
+    const amountToWithdraw = parseInt(amount);
+    if (amountToWithdraw > parseInt(currentBalance)) {
+      setErrorDialogOpen(true);
+      return;
     }
 
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmTransaction = async () => {
+    const { memberId, transactionType, amount, note } = formData;
+    const amountToWithdraw = parseInt(amount);
     const requestData = {
       memberNumber: memberId,
       transactionType,
-      amount: parseInt(amount),
+      amount: amountToWithdraw,
       note,
     };
 
@@ -110,6 +120,7 @@ export default function AddTransaction() {
       });
 
       setIsDialogOpen(true);
+      setIsConfirmDialogOpen(false);
 
       setFormData({
         memberId: "",
@@ -118,13 +129,15 @@ export default function AddTransaction() {
         note: "",
       });
       setMemberName("");
-      setApprovedBalance("");
+      setCurrentBalance("");
     } catch (error) {
       toast.error(`Failed to complete transaction: ${error.response?.data || "Please try again."}`, {
         id: toastId,
       });
     }
   };
+
+  const finalAmount = formData.amount ? parseInt(formData.amount) * 0.9 : 0;
 
   return (
     <div className="flex justify-center items-center py-8 px-4">
@@ -167,13 +180,26 @@ export default function AddTransaction() {
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="approvedBalance">Approved Balance</Label>
+              <Label htmlFor="currentBalance">Current Balance Amount</Label>
               <Input
-                id="approvedBalance"
-                name="approvedBalance"
+                id="currentBalance"
+                name="currentBalance"
                 placeholder="Auto Generated"
-                value={approvedBalance}
+                value={currentBalance}
                 readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="amount">Transaction Amount</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                placeholder="Amount"
+                value={formData.amount}
+                onChange={handleChange}
+                required
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -199,15 +225,13 @@ export default function AddTransaction() {
               </Select>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="amount">Amount</Label>
-              <Input
-                id="amount"
-                name="amount"
-                type="number"
-                placeholder="Amount"
-                value={formData.amount}
-                onChange={handleChange}
-                required
+            <Label htmlFor="finalAmount">Final Amount (after 10% admin charge)</Label>
+             <Input
+                id="finalAmount"
+                name="finalAmount"
+                placeholder="Auto Generated"
+                value={finalAmount}
+                readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -242,6 +266,40 @@ export default function AddTransaction() {
             The transaction for member <strong>{memberName}</strong> has been completed successfully.
           </DialogDescription>
           <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+      {/* Error Dialog */}
+      <Dialog
+        open={errorDialogOpen}
+        onOpenChange={(open) => setErrorDialogOpen(open)}
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Transaction Error</DialogTitle>
+          <DialogDescription>
+            The amount to withdraw exceeds the current balance.
+          </DialogDescription>
+          <Button onClick={() => setErrorDialogOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={isConfirmDialogOpen}
+        onOpenChange={(open) => setIsConfirmDialogOpen(open)}
+      >
+        <DialogContent>
+          <DialogTitle>Confirm Transaction</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to complete the transaction for member{" "}
+            <strong>{memberName}</strong> with the amount{" "}
+            <strong>{formData.amount}</strong> (final amount after 10% cut:{" "}
+            <strong>{finalAmount}</strong>)?
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={() => setIsConfirmDialogOpen(false)}>No</Button>
+            <Button onClick={handleConfirmTransaction} variant="destructive">
+              Yes, Complete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

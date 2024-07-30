@@ -24,22 +24,25 @@ export default function ViewGroupMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const getGroupMembers = useCallback(async () => {
+  const getGroupMembers = useCallback(async (page = 1) => {
     if (!filterGroupName) {
       return toast.error("Please enter a Group Name.");
     }
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/group/members`, {
-        headers: {
-          adminMemberId: 1,
-        },
-        params: {
-          pageNumber: currentPage - 1,
-          pageSize: PAGE_SIZE,
-          groupName: filterGroupName,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/group/members`,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+          params: {
+            pageNumber: page - 1,
+            pageSize: PAGE_SIZE,
+            groupName: filterGroupName, // Include the group name directly
+          },
+        }
+      );
 
       const { content, pagination } = response.data;
 
@@ -55,13 +58,13 @@ export default function ViewGroupMembers() {
     } catch (error) {
       toast.error("Failed to fetch group members data.");
     }
-  }, [filterGroupName, currentPage]);
+  }, [filterGroupName]);
 
   useEffect(() => {
-    if (filterGroupName) {
-      getGroupMembers();
+    if (currentPage !== 1) {
+      getGroupMembers(currentPage);
     }
-  }, [filterGroupName, currentPage, getGroupMembers]);
+  }, [currentPage, getGroupMembers]);
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
@@ -88,7 +91,7 @@ export default function ViewGroupMembers() {
               className="flex-1"
             />
           </div>
-          <Button onClick={() => getGroupMembers()} className="w-full">
+          <Button onClick={() => getGroupMembers(1)} className="w-full">
             View Members in Group
           </Button>
         </CardContent>
