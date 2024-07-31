@@ -78,7 +78,7 @@ const Register = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.memberId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/name/${formData.memberId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const Register = () => {
       );
       setFormData((prevData) => ({
         ...prevData,
-        memberName: response.data.fullName || "",
+        memberName: response.data || "",
       }));
       toast.success("Member name fetched successfully.");
     } catch (error) {
