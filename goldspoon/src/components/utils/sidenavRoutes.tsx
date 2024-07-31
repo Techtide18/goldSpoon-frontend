@@ -42,6 +42,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "Block", path: "/admin/members/block" },
       { title: "Unblock", path: "/admin/members/unblock" },
       { title: "Re-topup", path: "/admin/members/retopup" },
+      { title: "View Re-topups", path: "/admin/members/viewRetopups" },
       { title: "View Passwords", path: "/admin/members/viewPassword" },
       { title: "Edit Passwords", path: "/admin/members/editPassword" },
     ],
@@ -90,9 +91,9 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     ],
   },
   {
-    title: "Wallet",
-    path: "/admin/wallet",
-    icon: <Icon icon="lucide:wallet" width="24" height="24" />,
+    title: "Transactions",
+    path: "/admin/transactions",
+    icon: <Icon icon="lucide:arrow-left-right" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
       // {
@@ -105,12 +106,25 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       // },
       {
         title: "Add Transaction",
-        path: "/admin/wallet/addTransaction",
+        path: "/admin/transactions/addTransaction",
       },
       {
         title: "View Transaction Details",
-        path: "/admin/wallet/transactionDetails",
+        path: "/admin/transactions/transactionDetails",
       },
+      // {
+      //   title: "View Fund Transfer Details",
+      //   path: "/admin/transactions/fundTransfers",
+      // },
+    ],
+  },
+  {
+    title: "Wallet",
+    path: "/admin/wallet",
+    icon: <Icon icon="tabler:wallet" width="24" height="24" />,
+    submenu: true,
+    subMenuItems: [
+      { title: "Add Amount to Wallet", path: "/admin/wallet/add" },
       {
         title: "View Wallet Details",
         path: "/admin/wallet/walletDetails",
@@ -124,7 +138,6 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "View Directs", path: "/admin/reports/viewDirects" },
-      { title: "View Re-topups", path: "/admin/reports/viewRetopups" },
       { title: "View Downline", path: "/admin/reports/downline" },
     ],
   },
@@ -190,7 +203,10 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
         title: "Pay Installment",
         path: "/user/installments/payInstallment",
       },
-      { title: "Pay Installment For Other Member", path: "/user/installments/payMember" },
+      {
+        title: "Pay Installment For Other Member",
+        path: "/user/installments/payMember",
+      },
     ],
   },
   {
