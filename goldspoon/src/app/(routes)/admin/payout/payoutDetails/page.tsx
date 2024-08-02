@@ -20,7 +20,7 @@ import "react-calendar/dist/Calendar.css";
 const PAGE_SIZE = 100;
 
 const ViewMonthlyPayout = () => {
-  const [viewOption, setViewOption] = useState("all");
+  const [viewOption, setViewOption] = useState("byMonth");
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [filteredPayouts, setFilteredPayouts] = useState([]);
   const [memberIncome, setMemberIncome] = useState([]);
@@ -86,10 +86,13 @@ const ViewMonthlyPayout = () => {
         pageNumber,
         pageSize: PAGE_SIZE,
         month,
-        memberId
       };
 
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/totalincome/month/memberNumber`, {
+      if (memberId) {
+        params.memberNumber = memberId;
+      }
+
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/summary`, {
         params,
         headers: {
           "Content-Type": "application/json",
@@ -98,17 +101,14 @@ const ViewMonthlyPayout = () => {
       });
 
       const incomeData = response.data.content.map((income) => ({
-        memberId: income.memberId,
-        amountReceived: income.amountReceived,
-        incomeType: income.isDirectIncome
-          ? "Direct Income"
-          : income.isLevelIncome
-          ? "Level Income"
-          : "Unknown",
+        memberNumber: income.memberNumber,
+        amountEarnedThisMonth: income.amountEarnedThisMonth,
+        incomeType: income.incomeType,
       }));
 
       setMemberIncome(incomeData);
-      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
+      setTotalPages(response.data.pagination.totalPages);
+      setCurrentPage(response.data.pagination.currentPage + 1);
       toast.success("Member income data fetched successfully.");
     } catch (error) {
       console.error("Error fetching member income:", error);
@@ -119,14 +119,6 @@ const ViewMonthlyPayout = () => {
   useEffect(() => {
     fetchPayouts(0);
   }, [fetchPayouts]);
-
-  const handleViewAll = () => {
-    setViewOption("all");
-    setSelectedMonth(null);
-    setShowPayoutDetails(true);
-    setCurrentPage(1);
-    fetchPayouts(0);
-  };
 
   const handleViewByMonth = () => {
     setViewOption("byMonth");
@@ -164,10 +156,6 @@ const ViewMonthlyPayout = () => {
       return toast.error("Please select a month.");
     }
 
-    if (!memberId) {
-      return toast.error("Please enter a member ID.");
-    }
-
     const month = `${selectedMonth.getFullYear()}-${String(
       selectedMonth.getMonth() + 1
     ).padStart(2, "0")}`;
@@ -178,32 +166,47 @@ const ViewMonthlyPayout = () => {
     toast.success("Member income details fetched successfully.");
   };
 
-  const paginatedPayouts = filteredPayouts.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
-
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      fetchPayouts(
-        currentPage - 2,
-        selectedMonth && `${selectedMonth.getFullYear()}-${String(
-          selectedMonth.getMonth() + 1
-        ).padStart(2, "0")}`
-      );
+      if (viewOption === "byMonth") {
+        fetchPayouts(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`
+        );
+      } else if (viewOption === "memberIncome") {
+        fetchMemberIncome(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          memberId
+        );
+      }
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-      fetchPayouts(
-        currentPage,
-        selectedMonth && `${selectedMonth.getFullYear()}-${String(
-          selectedMonth.getMonth() + 1
-        ).padStart(2, "0")}`
-      );
+      if (viewOption === "byMonth") {
+        fetchPayouts(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`
+        );
+      } else if (viewOption === "memberIncome") {
+        fetchMemberIncome(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          memberId
+        );
+      }
     }
   };
 
@@ -216,16 +219,7 @@ const ViewMonthlyPayout = () => {
             <CardTitle>VIEW MONTHLY PAYOUT DETAILS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex space-x-4">
-              <Button
-                className={`font-bold ${
-                  viewOption === "all" ? "bg-black text-white" : "border-black"
-                }`}
-                onClick={handleViewAll}
-                variant={viewOption === "all" ? "solid" : "outline"}
-              >
-                View All
-              </Button>
+            <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
               <Button
                 className={`font-bold ${
                   viewOption === "byMonth"
@@ -246,12 +240,12 @@ const ViewMonthlyPayout = () => {
                 onClick={handleViewMemberIncome}
                 variant={viewOption === "memberIncome" ? "solid" : "outline"}
               >
-                View Total Income of a Member by Month
+                View Total Income of Members by Month
               </Button>
             </div>
             {viewOption === "byMonth" && (
-              <div className="flex items-center space-x-4 mt-4">
-                <div className="border p-2 rounded-md w-1/4">
+              <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0 mt-4">
+                <div className="border p-2 rounded-md w-full md:w-1/4">
                   <Calendar
                     onChange={handleMonthChange}
                     value={selectedMonth}
@@ -262,7 +256,7 @@ const ViewMonthlyPayout = () => {
                     showNavigation={true}
                   />
                 </div>
-                <div className="flex flex-col space-y-4 w-3/4">
+                <div className="flex flex-col space-y-4 w-full md:w-3/4">
                   <Input
                     id="selectedMonth"
                     name="selectedMonth"
@@ -285,8 +279,8 @@ const ViewMonthlyPayout = () => {
               </div>
             )}
             {viewOption === "memberIncome" && (
-              <div className="flex items-center space-x-4 mt-4">
-                <div className="border p-2 rounded-md w-1/4">
+              <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0 mt-4">
+                <div className="border p-2 rounded-md w-full md:w-1/4">
                   <Calendar
                     onChange={handleMonthChange}
                     value={selectedMonth}
@@ -297,7 +291,7 @@ const ViewMonthlyPayout = () => {
                     showNavigation={true}
                   />
                 </div>
-                <div className="flex flex-col space-y-4 w-3/4">
+                <div className="flex flex-col space-y-4 w-full md:w-3/4">
                   <Input
                     id="selectedMonth"
                     name="selectedMonth"
@@ -316,7 +310,7 @@ const ViewMonthlyPayout = () => {
                   <Input
                     id="memberId"
                     name="memberId"
-                    placeholder="Member ID"
+                    placeholder="Member ID (optional)"
                     value={memberId}
                     onChange={(e) => setMemberId(e.target.value)}
                     className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
@@ -331,71 +325,73 @@ const ViewMonthlyPayout = () => {
         </Card>
 
         {/* Payout Details Card */}
-        {viewOption === "all" && (
+        {viewOption === "byMonth" && showPayoutDetails && (
           <Card>
             <CardHeader>
               <CardTitle>Payout Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Member ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payout Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Received Money For (Member ID)
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Level
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount Received
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Income Type
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedPayouts.length > 0 ? (
-                    paginatedPayouts.map((payout, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {payout.memberId}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.dateTime}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.receivedMoneyFor}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.level}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.amountReceived}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.incomeType}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Member ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Payout Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Received Money For (Member ID)
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Level
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount Received
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Income Type
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredPayouts.length > 0 ? (
+                      filteredPayouts.map((payout, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {payout.memberId}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.dateTime}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.receivedMoneyFor}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.level}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.amountReceived}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.incomeType}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No payout details found for the selected month.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="6"
-                        className="px-6 py-4 text-center text-sm text-gray-500"
-                      >
-                        No payout details found for the selected month.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
               <Button
@@ -417,53 +413,55 @@ const ViewMonthlyPayout = () => {
         )}
 
         {/* Member Income Details Card */}
-        {viewOption === "memberIncome" && (
+        {viewOption === "memberIncome" && showPayoutDetails && (
           <Card>
             <CardHeader>
               <CardTitle>Member Income Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Member ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount Received
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Income Type
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {memberIncome.length > 0 ? (
-                    memberIncome.map((income, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {income.memberId}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {income.amountReceived}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {income.incomeType}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Member ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount Earned This Month
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Income Type
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {memberIncome.length > 0 ? (
+                      memberIncome.map((income, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {income.memberNumber}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {income.amountEarnedThisMonth}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {income.incomeType}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="3"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No income details found for the selected month.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="3"
-                        className="px-6 py-4 text-center text-sm text-gray-500"
-                      >
-                        No income details found for the selected month.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
               <Button
@@ -490,3 +488,4 @@ const ViewMonthlyPayout = () => {
 
 // Wrap the component export in dynamic import to disable SSR
 export default dynamic(() => Promise.resolve(ViewMonthlyPayout), { ssr: false });
+

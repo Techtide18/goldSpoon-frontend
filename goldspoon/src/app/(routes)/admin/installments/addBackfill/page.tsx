@@ -31,6 +31,7 @@ export default function AddInstallment() {
     transactionId: "",
     remarks: "",
     walletUsedAmount: "",
+    numberOfInstallments: "",
   });
 
   const [memberName, setMemberName] = useState("");
@@ -83,6 +84,7 @@ export default function AddInstallment() {
       transactionId,
       remarks,
       walletUsedAmount,
+      numberOfInstallments,
     } = formData;
 
     if (!memberId) {
@@ -94,6 +96,7 @@ export default function AddInstallment() {
       amount: parseInt(amountToBePaid),
       paymentMethod,
       remarks,
+      numberOfInstallments: parseInt(numberOfInstallments),
     };
 
     if (paymentMethod === "Wallet Amount") {
@@ -138,6 +141,7 @@ export default function AddInstallment() {
         transactionId: "",
         remarks: "",
         walletUsedAmount: "",
+        numberOfInstallments: "",
       }));
 
       // Re-fetch member details to update the form
@@ -153,7 +157,7 @@ export default function AddInstallment() {
     <div className="flex justify-center items-center py-8 px-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle>ADD INSTALLMENT</CardTitle>
+          <CardTitle>ADD BACKFILL INSTALLMENT</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -272,6 +276,19 @@ export default function AddInstallment() {
               </div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="numberOfInstallments">Number of Installment to Start From</Label>
+              <Input
+                id="numberOfInstallments"
+                name="numberOfInstallments"
+                type="number"
+                placeholder="Number of Installments"
+                value={formData.numberOfInstallments}
+                onChange={handleChange}
+                required
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="remarks">Remarks</Label>
               <Textarea
                 id="remarks"
@@ -285,7 +302,7 @@ export default function AddInstallment() {
             </div>
             <div className="space-y-2">
               <Button className="w-full" type="submit" variant="destructive">
-                Add Installment
+                Add Backfill Installment
               </Button>
             </div>
           </form>

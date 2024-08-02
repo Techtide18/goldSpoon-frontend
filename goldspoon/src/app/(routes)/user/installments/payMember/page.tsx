@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,34 +17,35 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Simulated API call to fetch member details
-const fetchMemberDetails = (memberId) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const memberDetails = {
-        memberName: "John Doe",
-        groupName: "Group A",
-        packageName: "Package - 1500",
-        amountToBePaid: "1500",
-        currentBalance: "2000",
-      };
-      resolve(memberDetails);
-    }, 500);
-  });
+const fetchMemberDetails = async (memberId, forMemberNumber) => {
+  const params = {};
+  if (forMemberNumber) {
+    params.forMemberNumber = forMemberNumber;
+  }
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/wallet/${memberId}`,
+    {
+      headers: {
+        adminMemberId: 1,
+      },
+      params,
+    }
+  );
+  return response.data;
 };
 
 export default function PayRenewal() {
   const [formData, setFormData] = useState({
-    memberId: "",
+    forMemberNumber: "",
     remarks: "",
+    numberOfInstallments: 1,
   });
 
+  const [memberId, setMemberId] = useState("");
   const [memberDetails, setMemberDetails] = useState({
     memberName: "",
-    groupName: "",
-    packageName: "",
-    amountToBePaid: "",
-    currentBalance: "",
+    packagePrice: "",
+    walletBalance: "",
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
@@ -50,20 +53,38 @@ export default function PayRenewal() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (formData.memberId) {
-      fetchMemberDetails(formData.memberId).then((details) => {
-        setMemberDetails(details);
-      });
-    } else {
-      setMemberDetails({
-        memberName: "",
-        groupName: "",
-        packageName: "",
-        amountToBePaid: "",
-        currentBalance: "",
-      });
+    const fetchInitialMemberDetails = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error("You must be logged in to view this information.");
+        return;
+      }
+
+      const memberId = session.user.name; // Assuming memberId is stored in user.name
+      setMemberId(memberId);
+    };
+
+    fetchInitialMemberDetails();
+  }, []);
+
+  const handleFetchMemberDetails = async () => {
+    if (!formData.forMemberNumber) {
+      toast.error("Please enter a Member Number to fetch details.");
+      return;
     }
-  }, [formData.memberId]);
+
+    try {
+      const details = await fetchMemberDetails(
+        memberId,
+        formData.forMemberNumber
+      );
+      setMemberDetails(details);
+    } catch (error) {
+      console.error("Error fetching member details:", error);
+      setErrorMessage("Error fetching member details. Please try again.");
+      setErrorDialogOpen(true);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,13 +97,9 @@ export default function PayRenewal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.memberId) {
-      return toast.error("Please fill out the Member ID field.");
-    }
-
     if (
-      parseInt(memberDetails.currentBalance) <
-      parseInt(memberDetails.amountToBePaid)
+      parseInt(memberDetails.walletBalance) <
+      parseInt(memberDetails.packagePrice) * formData.numberOfInstallments
     ) {
       setErrorMessage(
         "Your current balance is less than the installment amount to be paid."
@@ -95,16 +112,41 @@ export default function PayRenewal() {
   };
 
   const handleConfirmPayment = async () => {
+    const { forMemberNumber, remarks, numberOfInstallments } = formData;
+    const amount = parseInt(memberDetails.packagePrice) * numberOfInstallments;
+
+    const requestData = {
+      paidForMemberNumber: forMemberNumber,
+      amount: amount,
+      paymentMethod: "Wallet Amount",
+      paidByMemberNumber: memberId,
+      remarks,
+      numberOfInstallments,
+    };
+
     const toastId = toast.loading("Processing Payment...");
-    // Simulate API call to process payment
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/installments/add/member`,
+        requestData,
+        {
+          headers: {
+            adminMemberId: 1,
+          },
+        }
+      );
 
-    toast.success("Payment processed successfully!", {
-      id: toastId,
-    });
+      toast.success("Payment processed successfully!", {
+        id: toastId,
+      });
 
-    setIsDialogOpen(false);
-    setIsSuccessDialogOpen(true);
+      setIsDialogOpen(false);
+      setIsSuccessDialogOpen(true);
+    } catch (error) {
+      toast.error("Failed to process payment. Please try again.", {
+        id: toastId,
+      });
+    }
   };
 
   const handleSuccessDialogClose = () => {
@@ -120,18 +162,25 @@ export default function PayRenewal() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="memberId">Member ID</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <Label htmlFor="forMemberNumber">For Member Number</Label>
               <Input
-                id="memberId"
-                name="memberId"
-                placeholder="Member ID"
-                value={formData.memberId}
+                id="forMemberNumber"
+                name="forMemberNumber"
+                placeholder="Enter Member Number to Pay For"
+                value={formData.forMemberNumber}
                 onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400 col-span-2"
               />
-            </div>
+              </div>
+              <Button
+                onClick={handleFetchMemberDetails}
+                className="w-full"
+                type="button"
+              >
+                Get Member Details
+              </Button>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
@@ -144,28 +193,42 @@ export default function PayRenewal() {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="amountToBePaid">
+              <Label htmlFor="packagePrice">
                 Installment Amount to be Paid By Member
               </Label>
               <Input
-                id="amountToBePaid"
-                name="amountToBePaid"
+                id="packagePrice"
+                name="packagePrice"
                 placeholder="Auto Generated"
-                value={memberDetails.amountToBePaid}
+                value={memberDetails.packagePrice}
                 readOnly
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="currentBalance">
+              <Label htmlFor="walletBalance">
                 Current Balance in your Wallet
               </Label>
               <Input
-                id="currentBalance"
-                name="currentBalance"
+                id="walletBalance"
+                name="walletBalance"
                 placeholder="Auto Generated"
-                value={memberDetails.currentBalance}
+                value={memberDetails.walletBalance}
                 readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="numberOfInstallments">
+                Number of Installments
+              </Label>
+              <Input
+                id="numberOfInstallments"
+                name="numberOfInstallments"
+                type="number"
+                placeholder="Enter Number of Installments"
+                value={formData.numberOfInstallments}
+                onChange={handleChange}
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -201,17 +264,20 @@ export default function PayRenewal() {
           <DialogDescription>
             <div className="mt-4 space-y-2">
               <p>
-                Are you sure you want to process the payment for other member?
+                Are you sure you want to process the payment for another member?
               </p>
               <p>
-                Member ID: <strong>{formData.memberId}</strong>
+                Member ID: <strong>{formData.forMemberNumber}</strong>
               </p>
               <p>
                 Member Name: <strong>{memberDetails.memberName}</strong>
               </p>
               <p>
                 Installment Amount to be Paid:{" "}
-                <strong>{memberDetails.amountToBePaid}</strong>
+                <strong>
+                  {parseInt(memberDetails.packagePrice) *
+                    formData.numberOfInstallments}
+                </strong>
               </p>
             </div>
           </DialogDescription>
@@ -241,7 +307,7 @@ export default function PayRenewal() {
             <div className="mt-4 space-y-2">
               <p>
                 Payment has been successfully processed for Member ID{" "}
-                <strong>{formData.memberId}</strong>.
+                <strong>{formData.forMemberNumber}</strong>.
               </p>
             </div>
           </DialogDescription>

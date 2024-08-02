@@ -27,6 +27,7 @@ export default function AddInstallment() {
   const [memberName, setMemberName] = useState("");
   const [currentBalance, setCurrentBalance] = useState<string | number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [installmentsPaidTillNow, setInstallmentsPaidTillNow] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,7 +45,7 @@ export default function AddInstallment() {
 
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/member/123/${memberId}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/wallet/${memberId}`,
           {
             headers: {
               adminMemberId: 1,
@@ -52,18 +53,18 @@ export default function AddInstallment() {
           }
         );
         const memberData = response.data;
-        setMemberName(memberData.fullName);
+        setMemberName(memberData.memberName);
         setFormData((prevData) => ({
           ...prevData,
-          amountToBePaid: memberData.amountToBePaid,
+          amountToBePaid: memberData.packagePrice,
         }));
-        setCurrentBalance(memberData.currentBalance);
+        setCurrentBalance(memberData.walletBalance);
 
-        if (!memberData.currentBalance) {
+        if (!memberData.walletBalance) {
           toast.error("Failed to fetch wallet details. Cannot proceed.");
         }
 
-        if (!memberData.amountToBePaid) {
+        if (!memberData.packagePrice) {
           toast.error("Failed to fetch installment amount to be paid. Cannot proceed.");
         }
       } catch (error) {
@@ -89,9 +90,9 @@ export default function AddInstallment() {
     });
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { amountToBePaid, transactionId, remarks } = formData;
+    const { amountToBePaid } = formData;
 
     // Validate if currentBalance is null or 0
     if (currentBalance === null || currentBalance === 0) {
@@ -114,10 +115,16 @@ export default function AddInstallment() {
       return;
     }
 
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    const { amountToBePaid, transactionId, remarks } = formData;
+
     const requestData = {
       memberNumber: memberId,
-      amountPaid: parseInt(amountToBePaid),
-      transactionId: transactionId || undefined,
+      amountFromWallet: parseInt(amountToBePaid),
+      paymentMethod: "Wallet Amount",
       remarks,
     };
 
@@ -139,6 +146,7 @@ export default function AddInstallment() {
 
       setInstallmentsPaidTillNow(response.data.installmentsPaidTillNow);
       setIsDialogOpen(true);
+      setConfirmDialogOpen(false);
     } catch (error) {
       toast.error("Failed to add installment. Please try again.", {
         id: toastId,
@@ -214,6 +222,25 @@ export default function AddInstallment() {
           </form>
         </CardContent>
       </Card>
+      <Dialog
+        open={confirmDialogOpen}
+        onOpenChange={(open) => setConfirmDialogOpen(open)}
+        className="mt-8 mb-8"
+      >
+        <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogTitle>Confirm Payment</DialogTitle>
+          <DialogDescription>
+            <div className="mt-4 space-y-2">
+              <p>Do you confirm the payment of the installment amount from your wallet?</p>
+              <p>
+                <strong>Installment Amount: {formData.amountToBePaid}</strong>
+              </p>
+            </div>
+          </DialogDescription>
+          <Button onClick={handleConfirmSubmit}>Confirm</Button>
+          <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open) => {

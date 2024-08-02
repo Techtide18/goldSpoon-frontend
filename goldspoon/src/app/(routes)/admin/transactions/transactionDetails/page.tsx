@@ -1,8 +1,7 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Card,
@@ -19,33 +18,49 @@ import { Label } from "@/components/ui/label";
 
 const PAGE_SIZE = 100;
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
 export default function ViewTransactionDetails() {
   const [filterId, setFilterId] = useState("");
   const [memberName, setMemberName] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [viewOption, setViewOption] = useState("all");
 
   const getTransactions = async () => {
-    if (!filterId) {
-      return toast.error("Please enter a Member ID.");
-    }
-
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`, {
-        params: {
-          memberNumber: filterId,
-          pageSize: PAGE_SIZE,
-          pageNumber: currentPage - 1,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          adminMemberId: 1,
-        },
-      });
+      const params = {
+        pageSize: PAGE_SIZE,
+        pageNumber: currentPage - 1,
+      };
+      if (viewOption === "byMemberId" && filterId) {
+        params.memberNumber = filterId;
+      }
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`,
+        {
+          params,
+          headers: {
+            "Content-Type": "application/json",
+            adminMemberId: 1,
+          },
+        }
+      );
 
       const memberDetails = response.data.content;
-      setMemberName(memberDetails.length > 0 ? memberDetails[0].fullName : "Unknown");
+      if (viewOption === "byMemberId") {
+        setMemberName(memberDetails.length > 0 ? memberDetails[0].fullName : "Unknown");
+      }
       setFilteredData(memberDetails);
       setTotalPages(response.data.pagination.totalPages);
 
@@ -58,11 +73,22 @@ export default function ViewTransactionDetails() {
     }
   };
 
-  const totalItems = filteredData.length;
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  useEffect(() => {
+    if (viewOption === "all") {
+      getTransactions();
+    }
+  }, [currentPage, viewOption]);
+
+  const handleViewAll = () => {
+    setViewOption("all");
+    setFilterId("");
+    setCurrentPage(1);
+  };
+
+  const handleViewByMemberId = () => {
+    setViewOption("byMemberId");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
@@ -72,35 +98,61 @@ export default function ViewTransactionDetails() {
           <CardTitle>VIEW TRANSACTION DETAILS FOR MEMBER</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
-          <div className="flex flex-row items-center space-x-4">
-            <Label htmlFor="memberId" className="w-32">
-              Member ID:
-            </Label>
-            <Input
-              id="memberId"
-              type="text"
-              placeholder="Enter Member ID"
-              value={filterId}
-              onChange={(e) => setFilterId(e.target.value)}
-              className="flex-1"
-            />
+          <div className="flex space-x-4">
+            <Button
+              onClick={handleViewAll}
+              className={`font-bold ${
+                viewOption === "all" ? "bg-black text-white" : "border-black"
+              }`}
+              variant={viewOption === "all" ? "solid" : "outline"}
+            >
+              View All
+            </Button>
+            <Button
+              onClick={handleViewByMemberId}
+              className={`font-bold ${
+                viewOption === "byMemberId"
+                  ? "bg-black text-white"
+                  : "border-black"
+              }`}
+              variant={viewOption === "byMemberId" ? "solid" : "outline"}
+            >
+              View by Member ID
+            </Button>
           </div>
-          <div className="flex flex-row items-center space-x-4">
-            <Label htmlFor="memberName" className="w-32">
-              Member Name:
-            </Label>
-            <Input
-              id="memberName"
-              type="text"
-              placeholder="Auto Generated"
-              value={memberName}
-              readOnly
-              className="flex-1"
-            />
-          </div>
-          <Button onClick={getTransactions} className="w-full">
-            Get Transaction Details
-          </Button>
+          {viewOption === "byMemberId" && (
+            <>
+              <div className="flex flex-row items-center space-x-4">
+                <Label htmlFor="memberId" className="w-32">
+                  Member ID:
+                </Label>
+                <Input
+                  id="memberId"
+                  type="text"
+                  placeholder="Enter Member ID"
+                  value={filterId}
+                  onChange={(e) => setFilterId(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
+              <div className="flex flex-row items-center space-x-4">
+                <Label htmlFor="memberName" className="w-32">
+                  Member Name:
+                </Label>
+                <Input
+                  id="memberName"
+                  type="text"
+                  placeholder="Auto Generated"
+                  value={memberName}
+                  readOnly
+                  className="flex-1"
+                />
+              </div>
+              <Button onClick={getTransactions} className="w-full">
+                Get Transaction Details
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -114,9 +166,6 @@ export default function ViewTransactionDetails() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Member ID
                   </th>
@@ -141,17 +190,17 @@ export default function ViewTransactionDetails() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((data, index) => {
+                {filteredData.length > 0 ? (
+                  filteredData.map((data, index) => {
                     const adminCharges = Math.round(data.amount * 0.1);
                     const finalAmount = data.amount - adminCharges;
-                    const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
+                    const transactionMode =
+                      data.transactionType === "BALANCE_APPROVAL"
+                        ? "BALANCE APPROVAL"
+                        : data.transactionType;
 
                     return (
                       <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {data.id}
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {data.memberNumber}
                         </td>
@@ -168,7 +217,7 @@ export default function ViewTransactionDetails() {
                           {finalAmount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {data.createdDate}
+                          {formatDate(data.createdDate)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {data.note}
@@ -179,7 +228,7 @@ export default function ViewTransactionDetails() {
                 ) : (
                   <tr>
                     <td
-                      colSpan="8"
+                      colSpan="7"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No transactions
