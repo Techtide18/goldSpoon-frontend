@@ -89,16 +89,24 @@ export default function AddInstallment() {
       return toast.error("Please fill out the Member ID.");
     }
 
+    if (
+      paymentMethod === "Wallet Amount + Cash/UPI" &&
+      parseInt(walletUsedAmount) > parseInt(amountToBePaid)
+    ) {
+      return toast.error(
+        "Amount Used from Wallet cannot be more than the Package Price."
+      );
+    }
+
     let requestData = {
       memberNumber: memberId,
-      amount: parseInt(amountToBePaid),
+      amount: 0,
       paymentMethod,
       remarks,
     };
 
     if (paymentMethod === "Wallet Amount") {
       requestData.amountFromWallet = parseInt(amountToBePaid);
-      requestData.amount = parseInt(amountToBePaid);
     } else if (paymentMethod === "Wallet Amount + Cash/UPI") {
       if (walletUsedAmount > currentBalance) {
         return toast.error(
@@ -106,9 +114,12 @@ export default function AddInstallment() {
         );
       }
       requestData.amountFromWallet = parseInt(walletUsedAmount);
-      requestData.amount = parseInt(amountToBePaid);
+      requestData.amount = parseInt(amountToBePaid) - parseInt(walletUsedAmount);
     } else if (paymentMethod.includes("UPI")) {
       requestData.installmentTransactionId = transactionId || undefined;
+      requestData.amount = parseInt(amountToBePaid);
+    } else {
+      requestData.amount = parseInt(amountToBePaid);
     }
 
     const toastId = toast.loading("Adding Installment...");

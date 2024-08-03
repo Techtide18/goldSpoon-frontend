@@ -133,7 +133,6 @@ const Register = () => {
     const fullName = `${firstName} ${lastName}`;
     const requestData = {
       epinNumber: epinId,
-      memberNumber: memberId,
       referralMemberNumber: memberId, // Use memberId as referralMemberNumber
       fullName,
       phone,

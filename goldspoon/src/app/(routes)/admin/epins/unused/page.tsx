@@ -133,13 +133,13 @@ export default function Report() {
             onClick={handleViewByReferralId}
             variant={viewOption === "referralId" ? "solid" : "outline"}
           >
-            View by Referral Member ID ↓
+            Filter on Bought By (Member IDs) ↓
           </Button>
         </CardContent>
         {viewOption === "referralId" && (
           <CardFooter className="flex flex-row space-x-4">
             <Input
-              placeholder="Referral Member ID"
+              placeholder="Member ID"
               value={filterId}
               onChange={(e) => setFilterId(e.target.value)}
             />
@@ -167,22 +167,19 @@ export default function Report() {
                   Epin ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Member ID
+                  Bought By (Member ID)
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Package Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Referral Member ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Group
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Token Number (In Group)
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
@@ -197,22 +194,19 @@ export default function Report() {
                       {data.epinNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.memberNumber}
+                      {data.referredByMemberNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.packageName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(data.createdDate)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.referredByMemberNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.groupName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {data.tokenNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(data.createdDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Link
