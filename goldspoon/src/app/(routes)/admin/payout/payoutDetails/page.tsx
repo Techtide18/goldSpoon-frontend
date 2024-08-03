@@ -65,9 +65,9 @@ const ViewMonthlyPayout = () => {
         amountReceived: payout.receivedAmount,
         level: payout.level,
         incomeType: payout.isDirectIncome
-          ? "Direct Income"
-          : payout.isLevelIncome
           ? "Level Income"
+          : payout.isLevelIncome
+          ? "Renewal Income"
           : "Unknown",
       }));
 
@@ -102,8 +102,9 @@ const ViewMonthlyPayout = () => {
 
       const incomeData = response.data.content.map((income) => ({
         memberNumber: income.memberNumber,
-        amountEarnedThisMonth: income.amountEarnedThisMonth,
+        totalAmountOfMonth: income.totalAmountOfMonth,
         incomeType: income.incomeType,
+        month: month, // Add the selected month to the data
       }));
 
       setMemberIncome(incomeData);
@@ -432,6 +433,9 @@ const ViewMonthlyPayout = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Income Type
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Month
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -442,17 +446,23 @@ const ViewMonthlyPayout = () => {
                             {income.memberNumber}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {income.amountEarnedThisMonth}
+                            {income.totalAmountOfMonth}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {income.incomeType}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {selectedMonth.toLocaleDateString("en-GB", {
+                              month: "long",
+                              year: "numeric",
+                            })}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
                         <td
-                          colSpan="3"
+                          colSpan="4"
                           className="px-6 py-4 text-center text-sm text-gray-500"
                         >
                           No income details found for the selected month.
@@ -488,4 +498,3 @@ const ViewMonthlyPayout = () => {
 
 // Wrap the component export in dynamic import to disable SSR
 export default dynamic(() => Promise.resolve(ViewMonthlyPayout), { ssr: false });
-

@@ -66,7 +66,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     submenu: true,
     subMenuItems: [
       { title: "Add", path: "/admin/group/add" },
-      { title: "View Groups", path: "/admin/group/allGroups" },
+      { title: "View & Edit Groups", path: "/admin/group/allGroups" },
       {
         title: "View All Members In Group",
         path: "/admin/group/allMembers",
