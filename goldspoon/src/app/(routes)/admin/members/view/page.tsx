@@ -156,15 +156,16 @@ export default function ViewMembers() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Name</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aadhaar Number</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PAN Number</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blocked</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -173,15 +174,16 @@ export default function ViewMembers() {
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.fullName}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.memberNumber}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateString(data.createdDate)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.phone}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateString(data.createdDate)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.gender}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.aadhaarNumber}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.panNumber}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.addressDetails}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.bankAccDetails}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isBlock ? "Yes" : "No"}</td>
                     </tr>
                   ))
                 ) : (

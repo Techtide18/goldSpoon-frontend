@@ -148,7 +148,7 @@ export default function BlockMember() {
           <DialogFooter>
             <Button onClick={() => setIsConfirmDialogOpen(false)}>No</Button>
             <Button onClick={handleConfirmBlock} variant="destructive">
-              Yes, Block
+              Block
             </Button>
           </DialogFooter>
         </DialogContent>

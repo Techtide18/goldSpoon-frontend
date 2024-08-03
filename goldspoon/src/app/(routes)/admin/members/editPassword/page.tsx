@@ -15,8 +15,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-const PAGE_SIZE = 100;
-
 export default function EditPassword() {
   const [memberId, setMemberId] = useState("");
   const [memberName, setMemberName] = useState("");
@@ -74,8 +72,8 @@ export default function EditPassword() {
       return toast.error("New passwords do not match.");
     }
 
-    if (!/[a-zA-Z]/.test(newPassword)) {
-      return toast.error("New password must contain at least one letter.");
+    if (newPassword.length < 4) {
+      return toast.error("New password must be at least 4 characters long.");
     }
 
     const toastId = toast.loading("Updating Member Password...");
