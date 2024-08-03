@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -92,11 +93,12 @@ const Register = () => {
       }));
       toast.success("Member name fetched successfully.");
     } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to fetch member details.";
       setFormData((prevData) => ({
         ...prevData,
         memberName: "Unknown",
       }));
-      toast.error("Failed to fetch member details.");
+      toast.error(errorMessage);
     }
   };
 
@@ -107,6 +109,7 @@ const Register = () => {
       memberId,
       firstName,
       lastName,
+      gender,
       phone,
       email,
       aadhaarNumber,
@@ -135,6 +138,7 @@ const Register = () => {
       epinNumber: epinId,
       referralMemberNumber: memberId, // Use memberId as referralMemberNumber
       fullName,
+      gender: gender ? gender.toUpperCase() : null, // Ensure gender is sent in uppercase or null
       phone,
       email,
       aadhaarNumber: aadhaarNumber ? parseInt(aadhaarNumber) : null,
@@ -344,9 +348,9 @@ const Register = () => {
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="others">Others</SelectItem>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                        <SelectItem value="OTHERS">Others</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

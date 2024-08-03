@@ -61,7 +61,7 @@ export default function BlockMember() {
 
     const toastId = toast.loading("Blocking member...");
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/block`, null, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/block`, null, {
         params: {
           memberNumber: formData.memberId,
         },
