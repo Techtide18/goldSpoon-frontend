@@ -34,21 +34,19 @@ export default function BuyEpin() {
     numberOfPins: "",
     pinPackage: "",
     referralMemberNumber: "",
-    group: "",
   });
 
   const [packages, setPackages] = useState([]);
-  const [groups, setGroups] = useState([]);
   const [packagesLoaded, setPackagesLoaded] = useState(false);
-  const [selectedPackageName, setSelectedPackageName] = useState("");
-  const [selectedGroupName, setSelectedGroupName] = useState("");
-  const [referralMemberName, setReferralMemberName] = useState("");
+  const [selectedPackageName, setSelectedPackageName] = useState("Select Package");
+  const [selectedPackagePrice, setSelectedPackagePrice] = useState("");
   const [generatedPins, setGeneratedPins] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [walletAmount, setWalletAmount] = useState(0);
+  const [walletAmount, setWalletAmount] = useState("");
 
   useEffect(() => {
-    fetchWalletAmount();
+    fetchWalletDetails();
+    fetchSessionData();
   }, []);
 
   useEffect(() => {
@@ -74,11 +72,24 @@ export default function BuyEpin() {
     }
   };
 
-  const fetchGroups = async (packageId) => {
+  const fetchWalletDetails = async () => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error('You must be logged in to view this information.');
+      return;
+    }
+
+    const memberNumber = session.user.name;
+
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/group/package/${packageId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/walletDetails`,
         {
+          params: {
+            pageSize: 1,
+            pageNumber: 0,
+            memberNumber,
+          },
           headers: {
             "Content-Type": "application/json",
             "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
@@ -86,44 +97,20 @@ export default function BuyEpin() {
           },
         }
       );
-      setGroups(response.data);
+      const walletData = response.data.content[0]?.walletDetails || {};
+      setWalletAmount(walletData.currentBalance || 0);
     } catch (error) {
-      toast.error("Failed to fetch groups.");
+      toast.error("Failed to fetch wallet details.");
     }
   };
 
-  const fetchMemberName = async () => {
-    if (!formData.referralMemberNumber) {
-      return toast.error("Please enter a Referral Member ID.");
-    }
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${formData.referralMemberNumber}`
-      );
-      const member = response.data;
-      setReferralMemberName(member.fullName || "");
-      toast.success("Referral member name fetched successfully.");
-    } catch (error) {
-      setReferralMemberName("");
-      toast.error("Failed to fetch referral member details.");
-    }
-  };
-
-  const fetchWalletAmount = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/wallet`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-KEY": "e8f63d22-6a2d-42b0-845a-31f0f08e35b3",
-            adminMemberId: 1,
-          },
-        }
-      );
-      setWalletAmount(response.data.amount || 0);
-    } catch (error) {
-      toast.error("Failed to fetch wallet amount.");
+  const fetchSessionData = async () => {
+    const session = await getSession();
+    if (session && session.user && session.user.name) {
+      setFormData((prevData) => ({
+        ...prevData,
+        referralMemberNumber: session.user.name,
+      }));
     }
   };
 
@@ -140,65 +127,43 @@ export default function BuyEpin() {
     setFormData({
       ...formData,
       pinPackage: value,
-      group: "", // Reset group to default when a new package is selected
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
-      setSelectedGroupName(""); // Reset selected group name
-      await fetchGroups(value);
+      setSelectedPackagePrice(selectedPackage.packagePrice);
     } else {
-      setSelectedPackageName("");
-      setGroups([]);
-    }
-  };
-
-  const handleGroupChange = (value) => {
-    if (value === "auto-assign") {
-      setSelectedGroupName("Auto Assign");
-      setFormData({
-        ...formData,
-        group: "auto-assign",
-      });
-    } else {
-      const selectedGroup = groups.find((grp) => grp.id == value);
-      setSelectedGroupName(selectedGroup.groupName);
-      setFormData({
-        ...formData,
-        group: value,
-      });
+      setSelectedPackageName("Select Package");
+      setSelectedPackagePrice("");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { numberOfPins, pinPackage, referralMemberNumber, group } = formData;
+    const { numberOfPins, pinPackage, referralMemberNumber } = formData;
 
-    if (!numberOfPins || !pinPackage || !group) {
+    // Debug logs
+    console.log("Form Data on Submit:", formData);
+
+    if (!numberOfPins || !pinPackage) {
       return toast.error("Please fill out all fields.");
     }
 
-    if (numberOfPins > 50) {
+    if (parseInt(numberOfPins) > 50) {
       return toast.error("Maximum 50 Pins Allowed At One Time.");
     }
 
     const requestData = {
       totalEpins: parseInt(numberOfPins),
       packageId: parseInt(pinPackage),
-      automaticGroupAssign: group === "auto-assign",
+      automaticGroupAssign: true,
+      referralMemberNumber,
+      amountFromWallet: selectedPackagePrice,
     };
-
-    if (referralMemberNumber) {
-      requestData.referralMemberNumber = referralMemberNumber; // Keep as string
-    }
-
-    if (group !== "auto-assign") {
-      requestData.groupId = parseInt(group);
-    }
 
     const toastId = toast.loading("Generating E-PIN...");
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/generate`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/epins/member/generate`,
         requestData,
         {
           headers: {
@@ -220,11 +185,9 @@ export default function BuyEpin() {
         numberOfPins: "",
         pinPackage: "",
         referralMemberNumber: "",
-        group: "",
       });
-      setSelectedPackageName("");
-      setReferralMemberName("");
-      setSelectedGroupName("");
+      setSelectedPackageName("Select Package");
+      setSelectedPackagePrice("");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -234,37 +197,6 @@ export default function BuyEpin() {
       });
     }
   };
-
-  // Function to fetch re-topup data using session user name as memberNumber
-  const fetchData = async () => {
-    const session = await getSession();
-    if (!session || !session.user || !session.user.name) {
-      toast.error('You must be logged in to view this information.');
-      return;
-    }
-
-    const memberNumber = session.user.name;
-
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/${memberNumber}`
-      );
-      const member = response.data;
-      setReferralMemberName(member.fullName || "");
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        referralMemberNumber: memberNumber,
-      }));
-      toast.success("Member data fetched successfully.");
-    } catch (error) {
-      setReferralMemberName("");
-      toast.error("Failed to fetch member data.");
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="flex justify-center items-center py-8 px-4">
@@ -314,6 +246,17 @@ export default function BuyEpin() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="packagePrice">Package Price</Label>
+              <Input
+                id="packagePrice"
+                name="packagePrice"
+                placeholder="Auto Generated"
+                value={selectedPackagePrice}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="currentWalletAmount">Current Wallet Amount</Label>

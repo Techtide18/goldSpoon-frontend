@@ -38,7 +38,6 @@ export default function PayRenewal() {
   const [formData, setFormData] = useState({
     forMemberNumber: "",
     remarks: "",
-    numberOfInstallments: 1,
   });
 
   const [memberId, setMemberId] = useState("");
@@ -51,6 +50,7 @@ export default function PayRenewal() {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [installmentMonth, setInstallmentMonth] = useState("");
 
   useEffect(() => {
     const fetchInitialMemberDetails = async () => {
@@ -99,7 +99,7 @@ export default function PayRenewal() {
 
     if (
       parseInt(memberDetails.walletBalance) <
-      parseInt(memberDetails.packagePrice) * formData.numberOfInstallments
+      parseInt(memberDetails.packagePrice)
     ) {
       setErrorMessage(
         "Your current balance is less than the installment amount to be paid."
@@ -112,16 +112,16 @@ export default function PayRenewal() {
   };
 
   const handleConfirmPayment = async () => {
-    const { forMemberNumber, remarks, numberOfInstallments } = formData;
-    const amount = parseInt(memberDetails.packagePrice) * numberOfInstallments;
+    const { forMemberNumber, remarks } = formData;
+    const amount = parseInt(memberDetails.packagePrice);
 
     const requestData = {
       paidForMemberNumber: forMemberNumber,
-      amount: amount,
+      amountFromWallet: amount,
       paymentMethod: "Wallet Amount",
       paidByMemberNumber: memberId,
+      amount: 0,
       remarks,
-      numberOfInstallments,
     };
 
     const toastId = toast.loading("Processing Payment...");
@@ -141,6 +141,7 @@ export default function PayRenewal() {
       });
 
       setIsDialogOpen(false);
+      setInstallmentMonth(response.data.installmentMonth); // Set the installmentMonth state with the response data
       setIsSuccessDialogOpen(true);
     } catch (error) {
       toast.error("Failed to process payment. Please try again.", {
@@ -162,7 +163,7 @@ export default function PayRenewal() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="forMemberNumber">For Member Number</Label>
               <Input
                 id="forMemberNumber"
@@ -170,17 +171,16 @@ export default function PayRenewal() {
                 placeholder="Enter Member Number to Pay For"
                 value={formData.forMemberNumber}
                 onChange={handleChange}
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400 col-span-2"
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
-              </div>
               <Button
                 onClick={handleFetchMemberDetails}
-                className="w-full"
+                className="md:col-span-2"
                 type="button"
               >
                 Get Member Details
               </Button>
-            
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
               <Input
@@ -215,20 +215,6 @@ export default function PayRenewal() {
                 placeholder="Auto Generated"
                 value={memberDetails.walletBalance}
                 readOnly
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <Label htmlFor="numberOfInstallments">
-                Number of Installments
-              </Label>
-              <Input
-                id="numberOfInstallments"
-                name="numberOfInstallments"
-                type="number"
-                placeholder="Enter Number of Installments"
-                value={formData.numberOfInstallments}
-                onChange={handleChange}
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
               />
             </div>
@@ -274,10 +260,7 @@ export default function PayRenewal() {
               </p>
               <p>
                 Installment Amount to be Paid:{" "}
-                <strong>
-                  {parseInt(memberDetails.packagePrice) *
-                    formData.numberOfInstallments}
-                </strong>
+                <strong>{memberDetails.packagePrice}</strong>
               </p>
             </div>
           </DialogDescription>
@@ -308,6 +291,9 @@ export default function PayRenewal() {
               <p>
                 Payment has been successfully processed for Member ID{" "}
                 <strong>{formData.forMemberNumber}</strong>.
+              </p>
+              <p>
+                Installment Month: {" "} <strong>{installmentMonth}</strong>
               </p>
             </div>
           </DialogDescription>

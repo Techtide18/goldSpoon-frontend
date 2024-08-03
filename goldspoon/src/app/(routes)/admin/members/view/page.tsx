@@ -164,7 +164,6 @@ export default function ViewMembers() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PAN Number</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blocked</th>
                 </tr>
               </thead>
@@ -182,7 +181,6 @@ export default function ViewMembers() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.panNumber}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.addressDetails}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.bankAccDetails}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isActive ? "Yes" : "No"}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isBlock ? "Yes" : "No"}</td>
                     </tr>
                   ))

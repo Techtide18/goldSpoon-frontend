@@ -42,6 +42,7 @@ export default function GenerateEpin() {
   const [selectedPackageName, setSelectedPackageName] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [referralMemberName, setReferralMemberName] = useState("");
+  const [selectedPackagePrice, setSelectedPackagePrice] = useState("");
   const [generatedPins, setGeneratedPins] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -120,10 +121,12 @@ export default function GenerateEpin() {
     });
     if (selectedPackage) {
       setSelectedPackageName(selectedPackage.packageName);
+      setSelectedPackagePrice(selectedPackage.packagePrice);
       setSelectedGroupName(""); // Reset selected group name
       await fetchGroups(value);
     } else {
       setSelectedPackageName("");
+      setSelectedPackagePrice("");
       setGroups([]);
     }
   };
@@ -199,6 +202,7 @@ export default function GenerateEpin() {
         group: "",
       });
       setSelectedPackageName("");
+      setSelectedPackagePrice("");
       setReferralMemberName("");
       setSelectedGroupName("");
     } catch (error) {
@@ -259,6 +263,17 @@ export default function GenerateEpin() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="packagePrice">Package Price</Label>
+              <Input
+                id="packagePrice"
+                name="packagePrice"
+                placeholder="Auto Generated"
+                value={selectedPackagePrice}
+                readOnly
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <Label htmlFor="referralMemberNumber">Referral Member ID</Label>

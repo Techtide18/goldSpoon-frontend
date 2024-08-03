@@ -1,8 +1,9 @@
 // @ts-nocheck
 "use client";
 
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -15,36 +16,57 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Simulated Data
-const simulatedDirects = [
-  { memberId: "M001", memberName: "John Doe", epinId: "EPN123456", level: 1, packageName: "Package - 1500" },
-  { memberId: "M002", memberName: "Jane Smith", epinId: "EPN123457", level: 2, packageName: "Package - 2000" },
-  { memberId: "M003", memberName: "Alice Johnson", epinId: "EPN123458", level: 3, packageName: "Package - 1500" },
-  { memberId: "M004", memberName: "Bob Brown", epinId: "EPN123459", level: 4, packageName: "Package - 2000" },
-  { memberId: "M005", memberName: "Charlie Davis", epinId: "EPN123460", level: 5, packageName: "Package - 1500" },
-  { memberId: "M006", memberName: "Dave Wilson", epinId: "EPN123461", level: 6, packageName: "Package - 2000" },
-  { memberId: "M007", memberName: "Eva Green", epinId: "EPN123462", level: 7, packageName: "Package - 1500" },
-  { memberId: "M008", memberName: "Frank Harris", epinId: "EPN123463", level: 8, packageName: "Package - 2000" },
-  { memberId: "M009", memberName: "Grace Lee", epinId: "EPN123464", level: 9, packageName: "Package - 1500" },
-  { memberId: "M010", memberName: "Hank Miller", epinId: "EPN123465", level: 10, packageName: "Package - 2000" },
-  { memberId: "M011", memberName: "Ivy Walker", epinId: "EPN123466", level: 1, packageName: "Package - 1500" },
-  { memberId: "M012", memberName: "Jack Young", epinId: "EPN123467", level: 2, packageName: "Package - 2000" },
-  // Add more data to test pagination
-];
-
 const PAGE_SIZE = 50;
 
 export default function ViewDirects() {
   const [viewOption, setViewOption] = useState("all");
   const [filterLevel, setFilterLevel] = useState("");
-  const [filteredData, setFilteredData] = useState(simulatedDirects);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchDirects = async (level = null) => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error("You must be logged in to view this information.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/directs`,
+        {
+          params: {
+            memberNumber: session.user.name,
+            level,
+            pageNumber: currentPage - 1,
+            pageSize: PAGE_SIZE,
+          },
+        }
+      );
+
+      if (response.data && response.data.content) {
+        setFilteredData(response.data.content);
+        setTotalPages(Math.ceil(response.data.totalElements / PAGE_SIZE));
+      } else {
+        setFilteredData([]);
+        toast.error("No data returned from the server.");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch data.");
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDirects();
+  }, [currentPage]);
 
   const handleViewAll = () => {
     setViewOption("all");
     setFilterLevel("");
-    setFilteredData(simulatedDirects);
     setCurrentPage(1);
+    fetchDirects();
   };
 
   const handleViewByLevel = () => {
@@ -52,21 +74,11 @@ export default function ViewDirects() {
       return toast.error("Please enter a valid level between 1 and 10.");
     }
 
-    const filtered = simulatedDirects.filter(
-      (data) => data.level === parseInt(filterLevel)
-    );
-
-    if (filtered.length === 0) {
-      toast.error("No data found for the specified level.");
-      return;
-    }
-
-    setFilteredData(filtered);
+    setViewOption("level");
     setCurrentPage(1);
-    toast.success("Data fetched successfully.");
+    fetchDirects(filterLevel);
   };
 
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE

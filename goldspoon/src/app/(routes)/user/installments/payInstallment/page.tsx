@@ -125,6 +125,7 @@ export default function AddInstallment() {
       memberNumber: memberId,
       amountFromWallet: parseInt(amountToBePaid),
       paymentMethod: "Wallet Amount",
+      amount: 0,
       remarks,
     };
 

@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -70,10 +69,10 @@ export default function ViewTransactionDetails() {
                   Transaction Mode
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Approved Withdrawal Amount
+                  Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Admin Charges (10%)
+                  Entry
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Final Amount Paid
@@ -86,8 +85,6 @@ export default function ViewTransactionDetails() {
             <tbody className="bg-white divide-y divide-gray-200">
               {transactionDetailsData.length > 0 ? (
                 transactionDetailsData.map((data, index) => {
-                  const adminCharges = Math.round(data.amount * 0.1);
-                  const finalAmount = data.amount - adminCharges;
                   const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
 
                   return (
@@ -102,10 +99,10 @@ export default function ViewTransactionDetails() {
                         {data.amount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {adminCharges}
+                        {data.entry}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {finalAmount}
+                        {data.finalAmount || ""}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.note || ""}

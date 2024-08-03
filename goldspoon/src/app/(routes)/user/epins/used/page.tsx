@@ -97,7 +97,16 @@ export default function UsedEpinReport() {
                   PACKAGE NAME
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  GROUP NAME
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  TOKEN ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   CREATED DATE
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ACTIVE
                 </th>
               </tr>
             </thead>
@@ -115,7 +124,16 @@ export default function UsedEpinReport() {
                       {data.packageName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.groupName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.tokenNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(data.createdDate)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {data.isActiveEpin ? "Yes" : "No"}
                     </td>
                   </tr>
                 ))

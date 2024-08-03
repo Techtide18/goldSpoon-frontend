@@ -1,30 +1,53 @@
 // @ts-nocheck
 "use client";
 
-
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getSession } from "next-auth/react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Simulated Data for Levels and Counts
-const levelsData = [
-  { level: "Level 1", count: 23 },
-  { level: "Level 2", count: 2 },
-  { level: "Level 3", count: 3 },
-  { level: "Level 4", count: 4 },
-  { level: "Level 5", count: 5 },
-  { level: "Level 6", count: 6 },
-  { level: "Level 7", count: 7 },
-  { level: "Level 8", count: 8 },
-  { level: "Level 9", count: 9 },
-  { level: "Level 10", count: 10 },
-];
+import { toast } from "sonner";
 
 export default function ViewCount() {
+  const [levelsData, setLevelsData] = useState([]);
+
+  const fetchLevelsData = async () => {
+    const session = await getSession();
+    if (!session || !session.user || !session.user.name) {
+      toast.error("You must be logged in to view this information.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/team/levels`,
+        {
+          params: {
+            memberNumber: session.user.name,
+          },
+        }
+      );
+
+      if (response.data) {
+        setLevelsData(response.data);
+      } else {
+        setLevelsData([]);
+        toast.error("No data returned from the server.");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch data.");
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLevelsData();
+  }, []);
+
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">VIEW TEAM COUNT ACCROSS ALL LEVELS</CardTitle>
+          <CardTitle className="text-2xl font-bold">VIEW TEAM COUNT ACROSS ALL LEVELS</CardTitle>
         </CardHeader>
         <CardContent>
           <table className="min-w-full divide-y divide-gray-200">
@@ -39,16 +62,24 @@ export default function ViewCount() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {levelsData.map((data, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {data.level}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {data.count}
+              {levelsData.length > 0 ? (
+                levelsData.map((data, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {data.level}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.count}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="2" className="px-6 py-4 text-center text-sm text-gray-500">
+                    No data
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>

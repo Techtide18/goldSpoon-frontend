@@ -203,7 +203,6 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     icon: <Icon icon="mingcute:card-pay-line" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
-      { title: "My Installments", path: "/user/installments/myInstallments" },
       {
         title: "Pay My Installment",
         path: "/user/installments/payInstallment",
@@ -212,6 +211,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
         title: "Pay Installment For Other Member",
         path: "/user/installments/payMember",
       },
+      { title: "View My Installments", path: "/user/installments/myInstallments" },
     ],
   },
   {

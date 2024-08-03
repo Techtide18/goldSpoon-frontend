@@ -203,9 +203,9 @@ export default function Home() {
       }
 
       try {
-        const withdrawalResponse = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/recentTransactions`, {
+        const withdrawalResponse = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`, {
           params: {
-            pageSize: 5,
+            pageSize: 7,
             pageNumber: 0,
             memberNumber: session.user.name,
           },

@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
@@ -73,6 +72,10 @@ export default function RenewalIncomeReport() {
 
   const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl">
@@ -137,10 +140,17 @@ export default function RenewalIncomeReport() {
           </table>
         </CardContent>
         <CardFooter className="flex justify-center space-x-2">
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous 20
+          </Button>
           <Pagination
             count={totalPages}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={handlePageChange}
             siblingCount={1}
             boundaryCount={1}
             size="large"
@@ -151,13 +161,6 @@ export default function RenewalIncomeReport() {
             showFirstButton
             showLastButton
           />
-          <Button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous 20
-          </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
             onClick={() =>

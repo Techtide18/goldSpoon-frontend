@@ -84,14 +84,6 @@ export default function ViewWalletDetails() {
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 border-b border-gray-200">
                   <span className="font-semibold text-md capitalize text-black">
-                    Approved Balance:
-                  </span>
-                  <span className="text-gray-700 text-md">
-                    {walletDetails.walletDetails.approvedBalance}
-                  </span>
-                </div>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 border-b border-gray-200">
-                  <span className="font-semibold text-md capitalize text-black">
                     Total Direct Income:
                   </span>
                   <span className="text-gray-700 text-md">

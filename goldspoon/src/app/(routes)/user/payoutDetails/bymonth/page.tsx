@@ -1,13 +1,14 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import {
   Card,
   CardContent,
   CardHeader,
+  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,18 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { getSession } from "next-auth/react";
+
+const PAGE_SIZE = 100;
 
 const ViewMonthlyPayout = () => {
+  const [viewOption, setViewOption] = useState("totalLevelIncome");
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [filteredPayouts, setFilteredPayouts] = useState([]);
-  const [showPayoutDetails, setShowPayoutDetails] = useState(false);
+  const [memberIncome, setMemberIncome] = useState([]);
+  const [showPayoutDetails, setShowPayoutDetails] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -31,13 +39,16 @@ const ViewMonthlyPayout = () => {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
-  const fetchPayouts = useCallback(async (month) => {
+  const fetchPayouts = useCallback(async (pageNumber = 0, month = null) => {
     try {
       const params = {
-        pageNumber: 0,
-        pageSize: 2,
-        month,
+        pageNumber,
+        pageSize: PAGE_SIZE,
       };
+
+      if (month) {
+        params.month = month;
+      }
 
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout`, {
         params,
@@ -54,13 +65,14 @@ const ViewMonthlyPayout = () => {
         amountReceived: payout.receivedAmount,
         level: payout.level,
         incomeType: payout.isDirectIncome
-          ? "Direct Income"
-          : payout.isLevelIncome
           ? "Level Income"
+          : payout.isLevelIncome
+          ? "Renewal Income"
           : "Unknown",
       }));
 
       setFilteredPayouts(payoutData);
+      setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
       toast.success("Payout data fetched successfully.");
     } catch (error) {
       console.error("Error fetching payouts:", error);
@@ -68,11 +80,67 @@ const ViewMonthlyPayout = () => {
     }
   }, []);
 
+  const fetchMemberIncome = async (pageNumber = 0, month = null, incomeType = "") => {
+    try {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error('You must be logged in to view this information.');
+        return;
+      }
+
+      const params = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+        month,
+        incomeType,
+        memberNumber: session.user.name,
+      };
+
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/summary`, {
+        params,
+        headers: {
+          "Content-Type": "application/json",
+          adminMemberId: 1,
+        },
+      });
+
+      const incomeData = response.data.content.map((income) => ({
+        memberNumber: income.memberNumber,
+        totalAmountOfMonth: income.totalAmountOfMonth,
+        incomeType: income.incomeType,
+      }));
+
+      setMemberIncome(incomeData);
+      setTotalPages(response.data.pagination.totalPages);
+      setCurrentPage(response.data.pagination.currentPage + 1);
+      toast.success("Member income data fetched successfully.");
+    } catch (error) {
+      console.error("Error fetching member income:", error);
+      toast.error("Failed to fetch member income data.");
+    }
+  };
+
+  useEffect(() => {
+    fetchPayouts(0);
+  }, [fetchPayouts]);
+
+  const handleViewTotalLevelIncome = () => {
+    setViewOption("totalLevelIncome");
+    setShowPayoutDetails(false);
+    setCurrentPage(1);
+  };
+
+  const handleViewTotalRenewalIncome = () => {
+    setViewOption("totalRenewalIncome");
+    setShowPayoutDetails(false);
+    setCurrentPage(1);
+  };
+
   const handleMonthChange = (date) => {
     setSelectedMonth(date);
   };
 
-  const getPayoutDetails = () => {
+  const getMemberIncomeDetails = (incomeType) => {
     if (!selectedMonth) {
       return toast.error("Please select a month.");
     }
@@ -81,105 +149,310 @@ const ViewMonthlyPayout = () => {
       selectedMonth.getMonth() + 1
     ).padStart(2, "0")}`;
 
-    fetchPayouts(month);
+    fetchMemberIncome(0, month, incomeType);
     setShowPayoutDetails(true);
-    toast.success("Payout details fetched successfully.");
+    setCurrentPage(1);
+    toast.success("Member income details fetched successfully.");
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      if (viewOption === "byMonth") {
+        fetchPayouts(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`
+        );
+      } else if (viewOption === "totalLevelIncome") {
+        fetchMemberIncome(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          "DIRECT"
+        );
+      } else if (viewOption === "totalRenewalIncome") {
+        fetchMemberIncome(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          "LEVEL"
+        );
+      }
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      if (viewOption === "byMonth") {
+        fetchPayouts(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`
+        );
+      } else if (viewOption === "totalLevelIncome") {
+        fetchMemberIncome(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          "DIRECT"
+        );
+      } else if (viewOption === "totalRenewalIncome") {
+        fetchMemberIncome(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          "LEVEL"
+        );
+      }
+    }
   };
 
   return (
     <div className="flex justify-center items-center py-8 px-4">
       <div className="w-full max-w-7xl space-y-8">
-        {/* View by Month Card */}
+        {/* View Options Card */}
         <Card>
           <CardHeader>
             <CardTitle>VIEW MONTHLY PAYOUT DETAILS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col md:flex-row items-center md:items-center md:space-x-4 mt-4">
-              <div className="border p-2 rounded-md w-full md:w-1/4 mb-4 md:mb-0 flex justify-center md:block">
-                <Calendar
-                  onChange={handleMonthChange}
-                  value={selectedMonth}
-                  view="year"
-                  onClickMonth={handleMonthChange}
-                  className="react-calendar"
-                  tileClassName="text-center"
-                  showNavigation={true}
-                />
-              </div>
-              <div className="flex flex-col space-y-4 w-full md:w-3/4 justify-center">
-                <Input
-                  id="selectedMonth"
-                  name="selectedMonth"
-                  placeholder="Selected Month"
-                  value={
-                    selectedMonth
-                      ? selectedMonth.toLocaleDateString("en-GB", {
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : ""
-                  }
-                  readOnly
-                  className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-                />
-                <Button className="w-full" onClick={getPayoutDetails}>
-                  Get Monthly Payout Details
-                </Button>
-              </div>
+            <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+              <Button
+                className={`font-bold ${
+                  viewOption === "totalLevelIncome"
+                    ? "bg-black text-white"
+                    : "border-black"
+                }`}
+                onClick={handleViewTotalLevelIncome}
+                variant={viewOption === "totalLevelIncome" ? "solid" : "outline"}
+              >
+                View TOTAL LEVEL Income of Members by Month
+              </Button>
+              <Button
+                className={`font-bold ${
+                  viewOption === "totalRenewalIncome"
+                    ? "bg-black text-white"
+                    : "border-black"
+                }`}
+                onClick={handleViewTotalRenewalIncome}
+                variant={viewOption === "totalRenewalIncome" ? "solid" : "outline"}
+              >
+                View TOTAL RENEWAL Income of Members by Month
+              </Button>
             </div>
+            {(viewOption === "totalLevelIncome" || viewOption === "totalRenewalIncome") && (
+              <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0 mt-4">
+                <div className="border p-2 rounded-md w-full md:w-1/4">
+                  <Calendar
+                    onChange={handleMonthChange}
+                    value={selectedMonth}
+                    view="year"
+                    onClickMonth={handleMonthChange}
+                    className="react-calendar"
+                    tileClassName="text-center"
+                    showNavigation={true}
+                  />
+                </div>
+                <div className="flex flex-col space-y-4 w-full md:w-3/4">
+                  <Input
+                    id="selectedMonth"
+                    name="selectedMonth"
+                    placeholder="Selected Month"
+                    value={
+                      selectedMonth
+                        ? selectedMonth.toLocaleDateString("en-GB", {
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : ""
+                    }
+                    readOnly
+                    className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  />
+                  <Button
+                    className="w-full"
+                    onClick={() =>
+                      getMemberIncomeDetails(
+                        viewOption === "totalLevelIncome" ? "DIRECT" : "LEVEL"
+                      )
+                    }
+                  >
+                    Get Member Total Income
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Payout Details Card */}
-        {showPayoutDetails && (
+        {viewOption === "byMonth" && showPayoutDetails && (
           <Card>
             <CardHeader>
               <CardTitle>Payout Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payout Month
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount Received
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Income Type
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPayouts.length > 0 ? (
-                    filteredPayouts.map((payout, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.dateTime}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.amountReceived}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payout.incomeType}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Member ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Payout Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Received Money For (Member ID)
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Level
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount Received
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Income Type
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredPayouts.length > 0 ? (
+                      filteredPayouts.map((payout, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {payout.memberId}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.dateTime}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.receivedMoneyFor}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.level}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.amountReceived}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {payout.incomeType}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No payout details found for the selected month.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="3"
-                        className="px-6 py-4 text-center text-sm text-gray-500"
-                      >
-                        No payout details found for the selected month.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
+            <CardFooter className="flex justify-end space-x-2">
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous 100
+              </Button>
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next 100
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+
+        {/* Member Income Details Card */}
+        {(viewOption === "totalLevelIncome" || viewOption === "totalRenewalIncome") && showPayoutDetails && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Member Income Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Member ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount Earned This Month
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Month
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {memberIncome.length > 0 ? (
+                      memberIncome.map((income, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {income.memberNumber}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {income.totalAmountOfMonth}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {selectedMonth
+                              ? selectedMonth.toLocaleDateString("en-GB", {
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : ""}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No income details found for the selected month.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-end space-x-2">
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous 100
+              </Button>
+              <Button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next 100
+              </Button>
+            </CardFooter>
           </Card>
         )}
       </div>

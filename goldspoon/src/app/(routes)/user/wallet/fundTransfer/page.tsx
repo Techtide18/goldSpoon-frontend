@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,26 +16,29 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Simulated API call to fetch member details
-const fetchMemberDetails = (memberId: string): Promise<{ memberName: string; currentBalance: string }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const memberDetails = {
-        memberName: "John Doe",
-        currentBalance: "2000",
-      };
-      resolve(memberDetails);
-    }, 500);
-  });
+const fetchMemberDetails = async (sessionUser, forMemberNumber) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/member/wallet/${sessionUser}`,
+      {
+        params: { forMemberNumber },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch member details.");
+  }
 };
 
 export default function FundTransfer() {
   const [formData, setFormData] = useState({
     memberId: "",
     amountToTransfer: "",
+    remarks: "",
   });
 
-  const [memberDetails, setMemberDetails] = useState<{ memberName: string; currentBalance: string }>({
+  const [sessionUser, setSessionUser] = useState("");
+  const [memberDetails, setMemberDetails] = useState({
     memberName: "",
     currentBalance: "",
   });
@@ -44,17 +50,37 @@ export default function FundTransfer() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (formData.memberId) {
-      fetchMemberDetails(formData.memberId).then((details) => {
-        setMemberDetails(details);
-      });
+    const fetchSessionUser = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error("You must be logged in to view this information.");
+        return;
+      }
+      setSessionUser(session.user.name);
+    };
+    fetchSessionUser();
+  }, []);
+
+  useEffect(() => {
+    if (formData.memberId && sessionUser) {
+      fetchMemberDetails(sessionUser, formData.memberId)
+        .then((details) => {
+          setMemberDetails({
+            memberName: details.memberName,
+            currentBalance: details.walletBalance.toString(),
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Failed to fetch member details.");
+        });
     } else {
       setMemberDetails({
         memberName: "",
         currentBalance: "",
       });
     }
-  }, [formData.memberId]);
+  }, [formData.memberId, sessionUser]);
 
   useEffect(() => {
     if (formData.amountToTransfer) {
@@ -69,7 +95,7 @@ export default function FundTransfer() {
     }
   }, [formData.amountToTransfer]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -109,15 +135,29 @@ export default function FundTransfer() {
 
   const handleConfirmTransfer = async () => {
     const toastId = toast.loading("Processing Transfer...");
-    // Simulate API call to process transfer
-    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    toast.success("Transfer processed successfully!", {
-      id: toastId,
-    });
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/wallet/transfer`,
+        {
+          transferFromMemberNumber: sessionUser,
+          transferToMemberNumber: formData.memberId,
+          amount: parseInt(formData.amountToTransfer),
+          remarks: formData.remarks,
+        }
+      );
 
-    setIsDialogOpen(false);
-    setIsSuccessDialogOpen(true);
+      toast.success("Transfer processed successfully!", {
+        id: toastId,
+      });
+
+      setIsDialogOpen(false);
+      setIsSuccessDialogOpen(true);
+    } catch (error) {
+      toast.error("Failed to process transfer. Please try again.", {
+        id: toastId,
+      });
+    }
   };
 
   const handleSuccessDialogClose = () => {
@@ -176,6 +216,18 @@ export default function FundTransfer() {
                 value={formData.amountToTransfer}
                 onChange={handleChange}
                 className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <Label htmlFor="remarks">Remarks</Label>
+              <Textarea
+                id="remarks"
+                name="remarks"
+                placeholder="Enter Remarks"
+                value={formData.remarks}
+                onChange={handleChange}
+                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                rows={4}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
