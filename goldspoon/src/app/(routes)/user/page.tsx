@@ -74,7 +74,7 @@ const initialCardData: DashboardCardProps[] = [
     icon: DollarSign,
   },
   {
-    label: "Approved Wallet Balance",
+    label: "My Referral Member ID",
     amount: "...",
     description: "Total approved balance in wallet",
     icon: DollarSign,
@@ -86,13 +86,13 @@ const initialCardData: DashboardCardProps[] = [
     icon: PersonStanding,
   },
   {
-    label: "Total Withdrawals Count",
+    label: "Total Transactions Count",
     amount: "...",
     description: "Total withdrawal operations",
     icon: CreditCard,
   },
   {
-    label: "Total Withdrawals Amount",
+    label: "Total Transactions Amount",
     amount: "...",
     description: "Total amount withdrawn",
     icon: CreditCard,
@@ -155,13 +155,13 @@ export default function Home() {
           },
           {
             label: "Renewal Income History",
-            amount: dashboardData.totalDirectIncome.toString(),
+            amount: dashboardData.totalLevelIncome.toString(),
             description: "Total renewal income generated",
             icon: DollarSign,
           },
           {
             label: "Level Income History",
-            amount: dashboardData.totalLevelIncome.toString(),
+            amount: dashboardData.totalDirectIncome.toString(),
             description: "Total level income generated",
             icon: DollarSign,
           },
@@ -172,8 +172,8 @@ export default function Home() {
             icon: DollarSign,
           },
           {
-            label: "Approved Wallet Balance",
-            amount: dashboardData.totalApprovedBalance.toString(),
+            label: "My Referral Member ID",
+            amount: dashboardData.refferedByMemberNumber?.toString() || "0",
             description: "Total approved balance in wallet",
             icon: DollarSign,
           },
@@ -184,14 +184,14 @@ export default function Home() {
             icon: PersonStanding,
           },
           {
-            label: "Total Withdrawals Count",
-            amount: dashboardData.totalWithdrawals.toString(),
+            label: "Total Transactions Count",
+            amount: dashboardData.totalNumberOfTransactions?.toString() || "0",
             description: "Total withdrawal operations",
             icon: CreditCard,
           },
           {
-            label: "Total Withdrawals Amount",
-            amount: dashboardData.getTotalApprovedWithdrawalAmount.toString(),
+            label: "Total Transactions Amount",
+            amount: dashboardData.getTotalApprovedWithdrawalAmount?.toString() || "0",
             description: "Total amount withdrawn",
             icon: CreditCard,
           },
@@ -203,7 +203,7 @@ export default function Home() {
       }
 
       try {
-        const withdrawalResponse = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/withdrawalRequest/Details`, {
+        const withdrawalResponse = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/recentTransactions`, {
           params: {
             pageSize: 5,
             pageNumber: 0,
