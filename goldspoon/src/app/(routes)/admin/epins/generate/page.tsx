@@ -247,7 +247,7 @@ export default function GenerateEpin() {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue className="text-black">
+                  <SelectValue placeholder="Select Package">
                     {selectedPackageName || "Select Package"}
                   </SelectValue>
                 </SelectTrigger>

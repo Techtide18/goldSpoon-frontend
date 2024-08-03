@@ -134,6 +134,7 @@ const Register = () => {
     const requestData = {
       epinNumber: epinId,
       memberNumber: memberId,
+      referralMemberNumber: memberId, // Use memberId as referralMemberNumber
       fullName,
       phone,
       email,
@@ -176,7 +177,7 @@ const Register = () => {
       });
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorMessage =
+        const errorMessage = error.response?.data || 
           error.response?.data?.message ||
           "Failed to register member. Please try again.";
         toast.error(errorMessage, { id: toastId });
@@ -242,7 +243,7 @@ const Register = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="memberId">Referral ID / Sponser ID</Label>
+                  <Label htmlFor="memberId">Referral ID / Sponsor ID</Label>
                   <Input
                     id="memberId"
                     name="memberId"
@@ -438,4 +439,3 @@ const Register = () => {
 }
 
 export default dynamic(() => Promise.resolve(Register), { ssr: false });
-
