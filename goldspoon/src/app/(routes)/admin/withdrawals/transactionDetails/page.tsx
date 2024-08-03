@@ -53,6 +53,7 @@ export default function ViewTransactionDetails() {
           headers: {
             "Content-Type": "application/json",
             adminMemberId: 1,
+            type: "withdrawal"
           },
         }
       );
@@ -95,7 +96,7 @@ export default function ViewTransactionDetails() {
       {/* Card 1 */}
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle>VIEW TRANSACTION DETAILS FOR MEMBER</CardTitle>
+          <CardTitle>VIEW WITHDRAWAL DETAILS FOR MEMBER</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
           <div className="flex space-x-4">
@@ -192,8 +193,9 @@ export default function ViewTransactionDetails() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredData.length > 0 ? (
                   filteredData.map((data, index) => {
-                    const adminCharges = Math.round(data.amount * 0.1);
-                    const finalAmount = data.amount - adminCharges;
+                    const finalAmount = data.amount;
+                    const adminCharges = Math.round(finalAmount * 0.1 / 0.9);
+                    const originalAmount = finalAmount + adminCharges;
                     const transactionMode =
                       data.transactionType === "BALANCE_APPROVAL"
                         ? "BALANCE APPROVAL"
@@ -208,7 +210,7 @@ export default function ViewTransactionDetails() {
                           {transactionMode}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {data.amount}
+                          {originalAmount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {adminCharges}

@@ -92,8 +92,8 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
     ],
   },
   {
-    title: "Transactions",
-    path: "/admin/transactions",
+    title: "Withdrawals",
+    path: "/admin/withdrawals",
     icon: <Icon icon="lucide:arrow-left-right" width="24" height="24" />,
     submenu: true,
     subMenuItems: [
@@ -106,12 +106,12 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       //   path: "/admin/wallet/addWithdrawalRequest",
       // },
       {
-        title: "Add Transaction",
-        path: "/admin/transactions/addTransaction",
+        title: "Add Withdrawal Transaction",
+        path: "/admin/withdrawals/add",
       },
       {
-        title: "View Transaction Details",
-        path: "/admin/transactions/transactionDetails",
+        title: "View Withdrawal Details",
+        path: "/admin/withdrawals/transactionDetails",
       },
       // {
       //   title: "View Fund Transfer Details",
@@ -129,6 +129,10 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       {
         title: "View Wallet Details",
         path: "/admin/wallet/walletDetails",
+      },
+      {
+        title: "View Wallet Transactions",
+        path: "/admin/wallet/transactionDetails",
       },
     ],
   },

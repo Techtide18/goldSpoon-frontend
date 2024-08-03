@@ -80,12 +80,13 @@ const ViewMonthlyPayout = () => {
     }
   }, []);
 
-  const fetchMemberIncome = async (pageNumber = 0, month = null, memberId = "") => {
+  const fetchMemberIncome = async (pageNumber = 0, month = null, memberId = "", incomeType = "") => {
     try {
       const params = {
         pageNumber,
         pageSize: PAGE_SIZE,
         month,
+        incomeType
       };
 
       if (memberId) {
@@ -104,7 +105,6 @@ const ViewMonthlyPayout = () => {
         memberNumber: income.memberNumber,
         totalAmountOfMonth: income.totalAmountOfMonth,
         incomeType: income.incomeType,
-        month: month, // Add the selected month to the data
       }));
 
       setMemberIncome(incomeData);
@@ -127,8 +127,14 @@ const ViewMonthlyPayout = () => {
     setCurrentPage(1);
   };
 
-  const handleViewMemberIncome = () => {
-    setViewOption("memberIncome");
+  const handleViewTotalLevelIncome = () => {
+    setViewOption("totalLevelIncome");
+    setShowPayoutDetails(false);
+    setCurrentPage(1);
+  };
+
+  const handleViewTotalRenewalIncome = () => {
+    setViewOption("totalRenewalIncome");
     setShowPayoutDetails(false);
     setCurrentPage(1);
   };
@@ -152,7 +158,7 @@ const ViewMonthlyPayout = () => {
     toast.success("Payout details fetched successfully.");
   };
 
-  const getMemberIncomeDetails = () => {
+  const getMemberIncomeDetails = (incomeType) => {
     if (!selectedMonth) {
       return toast.error("Please select a month.");
     }
@@ -161,7 +167,7 @@ const ViewMonthlyPayout = () => {
       selectedMonth.getMonth() + 1
     ).padStart(2, "0")}`;
 
-    fetchMemberIncome(0, month, memberId);
+    fetchMemberIncome(0, month, memberId, incomeType);
     setShowPayoutDetails(true);
     setCurrentPage(1);
     toast.success("Member income details fetched successfully.");
@@ -177,13 +183,23 @@ const ViewMonthlyPayout = () => {
             selectedMonth.getMonth() + 1
           ).padStart(2, "0")}`
         );
-      } else if (viewOption === "memberIncome") {
+      } else if (viewOption === "totalLevelIncome") {
         fetchMemberIncome(
           currentPage - 2,
           selectedMonth && `${selectedMonth.getFullYear()}-${String(
             selectedMonth.getMonth() + 1
           ).padStart(2, "0")}`,
-          memberId
+          memberId,
+          "DIRECT"
+        );
+      } else if (viewOption === "totalRenewalIncome") {
+        fetchMemberIncome(
+          currentPage - 2,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          memberId,
+          "LEVEL"
         );
       }
     }
@@ -199,13 +215,23 @@ const ViewMonthlyPayout = () => {
             selectedMonth.getMonth() + 1
           ).padStart(2, "0")}`
         );
-      } else if (viewOption === "memberIncome") {
+      } else if (viewOption === "totalLevelIncome") {
         fetchMemberIncome(
           currentPage,
           selectedMonth && `${selectedMonth.getFullYear()}-${String(
             selectedMonth.getMonth() + 1
           ).padStart(2, "0")}`,
-          memberId
+          memberId,
+          "DIRECT"
+        );
+      } else if (viewOption === "totalRenewalIncome") {
+        fetchMemberIncome(
+          currentPage,
+          selectedMonth && `${selectedMonth.getFullYear()}-${String(
+            selectedMonth.getMonth() + 1
+          ).padStart(2, "0")}`,
+          memberId,
+          "LEVEL"
         );
       }
     }
@@ -234,14 +260,25 @@ const ViewMonthlyPayout = () => {
               </Button>
               <Button
                 className={`font-bold ${
-                  viewOption === "memberIncome"
+                  viewOption === "totalLevelIncome"
                     ? "bg-black text-white"
                     : "border-black"
                 }`}
-                onClick={handleViewMemberIncome}
-                variant={viewOption === "memberIncome" ? "solid" : "outline"}
+                onClick={handleViewTotalLevelIncome}
+                variant={viewOption === "totalLevelIncome" ? "solid" : "outline"}
               >
-                View Total Income of Members by Month
+                View TOTAL LEVEL Income of Members by Month
+              </Button>
+              <Button
+                className={`font-bold ${
+                  viewOption === "totalRenewalIncome"
+                    ? "bg-black text-white"
+                    : "border-black"
+                }`}
+                onClick={handleViewTotalRenewalIncome}
+                variant={viewOption === "totalRenewalIncome" ? "solid" : "outline"}
+              >
+                View TOTAL RENEWAL Income of Members by Month
               </Button>
             </div>
             {viewOption === "byMonth" && (
@@ -279,7 +316,7 @@ const ViewMonthlyPayout = () => {
                 </div>
               </div>
             )}
-            {viewOption === "memberIncome" && (
+            {(viewOption === "totalLevelIncome" || viewOption === "totalRenewalIncome") && (
               <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0 mt-4">
                 <div className="border p-2 rounded-md w-full md:w-1/4">
                   <Calendar
@@ -316,7 +353,14 @@ const ViewMonthlyPayout = () => {
                     onChange={(e) => setMemberId(e.target.value)}
                     className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
-                  <Button className="w-full" onClick={getMemberIncomeDetails}>
+                  <Button
+                    className="w-full"
+                    onClick={() =>
+                      getMemberIncomeDetails(
+                        viewOption === "totalLevelIncome" ? "DIRECT" : "LEVEL"
+                      )
+                    }
+                  >
                     Get Member Total Income
                   </Button>
                 </div>
@@ -414,7 +458,7 @@ const ViewMonthlyPayout = () => {
         )}
 
         {/* Member Income Details Card */}
-        {viewOption === "memberIncome" && showPayoutDetails && (
+        {(viewOption === "totalLevelIncome" || viewOption === "totalRenewalIncome") && showPayoutDetails && (
           <Card>
             <CardHeader>
               <CardTitle>Member Income Details</CardTitle>
@@ -429,9 +473,6 @@ const ViewMonthlyPayout = () => {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Amount Earned This Month
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Income Type
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Month
@@ -449,13 +490,12 @@ const ViewMonthlyPayout = () => {
                             {income.totalAmountOfMonth}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {income.incomeType}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {selectedMonth.toLocaleDateString("en-GB", {
-                              month: "long",
-                              year: "numeric",
-                            })}
+                            {selectedMonth
+                              ? selectedMonth.toLocaleDateString("en-GB", {
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : ""}
                           </td>
                         </tr>
                       ))

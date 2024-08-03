@@ -28,6 +28,7 @@ export default function EditProfile() {
     accountName: "",
     bankName: "",
     bankBranch: "",
+    nominee: "",  // New field for nominee
   });
 
   const handleMemberIdChange = (e) => {
@@ -49,19 +50,21 @@ export default function EditProfile() {
       });
 
       const fetchedData = response.data;
+      console.log("Fetched Data:", fetchedData);
 
       setProfileData({
-        fullName: fetchedData.fullName,
-        phone: fetchedData.phone,
-        email: fetchedData.email,
-        gender: fetchedData.gender,
-        aadhaarNumber: fetchedData.aadhaarNumber,
-        panNumber: fetchedData.panNumber,
-        addressDetails: fetchedData.addressDetails,
-        accountNumber: fetchedData.accountNumber,
-        accountName: fetchedData.accountName,
-        bankName: fetchedData.bankName,
-        bankBranch: fetchedData.bankBranch,
+        fullName: fetchedData.fullName || "",
+        phone: fetchedData.phone || "",
+        email: fetchedData.email || "",
+        gender: fetchedData.gender || "",
+        aadhaarNumber: fetchedData.aadhaarNumber || "",
+        panNumber: fetchedData.panNumber || "",
+        addressDetails: fetchedData.addressDetails || "",
+        accountNumber: fetchedData.bankAccDetails?.split(', ')[0] || "",
+        accountName: fetchedData.bankAccDetails?.split(', ')[1] || "",
+        bankName: fetchedData.bankAccDetails?.split(', ')[2] || "",
+        bankBranch: fetchedData.bankAccDetails?.split(', ')[3] || "",
+        nominee: fetchedData.nominee || "",  // Populate the nominee field
       });
       setMemberName(fetchedData.fullName);
       toast.success("Member details fetched successfully!", { id: toastId });
@@ -88,10 +91,12 @@ export default function EditProfile() {
         fullName: profileData.fullName,
         phone: profileData.phone,
         email: profileData.email,
+        gender: profileData.gender ? profileData.gender.toUpperCase() : null, // Ensure gender is sent in uppercase or null
         aadhaarNumber: profileData.aadhaarNumber,
         panNumber: profileData.panNumber,
         addressDetails: profileData.addressDetails,
         bankAccDetails: `${profileData.accountNumber}, ${profileData.accountName}, ${profileData.bankName}, ${profileData.bankBranch}`,
+        nominee: profileData.nominee,  // Include nominee in the update payload
       }, {
         headers: {
           adminMemberId: 1,
@@ -197,9 +202,9 @@ export default function EditProfile() {
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -277,6 +282,17 @@ export default function EditProfile() {
                   name="bankBranch"
                   placeholder="Bank Branch"
                   value={profileData.bankBranch}
+                  onChange={handleChange}
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                <Label htmlFor="nominee">Nominee Name</Label>
+                <Input
+                  id="nominee"
+                  name="nominee"
+                  placeholder="Nominee Name"
+                  value={profileData.nominee}
                   onChange={handleChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
