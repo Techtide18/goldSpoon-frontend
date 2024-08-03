@@ -137,7 +137,7 @@ export default function ViewPackage() {
                 {filteredPackages.map((pkg, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{pkg.packageName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.packagePrice}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{"₹ " + pkg.packagePrice}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.packageDurationInMonths}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(pkg.createdDate)}</td>

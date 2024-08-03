@@ -29,7 +29,6 @@ export default function EditPackage() {
     name: "",
     price: "",
     description: "",
-    duration: "",
   });
   const [originalDetails, setOriginalDetails] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -60,7 +59,6 @@ export default function EditPackage() {
         name: fetchedData.packageName,
         price: fetchedData.packagePrice,
         description: fetchedData.description,
-        duration: fetchedData.packageDurationInMonths,
       });
       setOriginalDetails(fetchedData); // Save original details for comparison
       toast.success("Package details fetched successfully!");
@@ -92,7 +90,6 @@ export default function EditPackage() {
       packageName: packageDetails.name,
       packagePrice: packageDetails.price,
       description: packageDetails.description,
-      packageDurationInMonths: packageDetails.duration,
     };
 
     try {
@@ -184,18 +181,6 @@ export default function EditPackage() {
                   onChange={handleChange}
                   className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   rows={4} // This will make the textarea twice the height of a normal input
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                <Label htmlFor="duration">Package Duration (Months)</Label>
-                <Input
-                  id="duration"
-                  name="duration"
-                  placeholder="Package Duration in Months"
-                  type="number"
-                  value={packageDetails.duration}
-                  onChange={handleChange}
-                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                 />
               </div>
               <Button className="w-full" type="submit">

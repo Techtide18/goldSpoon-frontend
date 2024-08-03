@@ -1,7 +1,6 @@
 // @ts-nocheck
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ export default function ViewGroups() {
   const [filterGroupName, setFilterGroupName] = useState("");
   const [groups, setGroups] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [groupNames, setGroupNames] = useState({});
 
   const fetchGroups = async () => {
     try {
@@ -47,6 +47,11 @@ export default function ViewGroups() {
     setFilterGroupName("");
   };
 
+  const handleEditGroupName = () => {
+    setViewOption("editGroupName");
+    setFilterGroupName("");
+  };
+
   const handleGroupNameChange = (e) => {
     const searchValue = e.target.value;
     setFilterGroupName(searchValue);
@@ -58,6 +63,35 @@ export default function ViewGroups() {
       const filtered = groups.filter((group) => regex.test(group.groupName));
       setFilteredData(filtered);
     }
+  };
+
+  const handleGroupNameUpdate = (groupId) => {
+    const newGroupName = groupNames[groupId];
+    const group = groups.find((g) => g.id === groupId);
+
+    if (!newGroupName) {
+      return toast.error("Please enter a new group name.");
+    }
+
+    const updatedGroup = {
+      maxTokenCapacity: group.maxTokenCapacity,
+      groupName: newGroupName,
+    };
+
+    axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/group/${groupId}`, updatedGroup, {
+      headers: {
+        "Content-Type": "application/json",
+        adminMemberId: 1,
+      },
+    })
+    .then(() => {
+      toast.success("Group name updated successfully!");
+      fetchGroups();
+    })
+    .catch((error) => {
+      console.error("Error updating group name:", error);
+      toast.error("Failed to update group name. Please try again.");
+    });
   };
 
   const formatDate = (dateString) => {
@@ -92,6 +126,13 @@ export default function ViewGroups() {
           >
             View by Group Name ↓
           </Button>
+          <Button
+            className={`font-bold ${viewOption === "editGroupName" ? "bg-black text-white" : "border-black"}`}
+            onClick={handleEditGroupName}
+            variant={viewOption === "editGroupName" ? "solid" : "outline"}
+          >
+            Edit Group Name
+          </Button>
         </CardContent>
         {viewOption === "groupName" && (
           <CardFooter className="flex flex-row space-x-4">
@@ -112,29 +153,57 @@ export default function ViewGroups() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Token Capacity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Token Count</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Filled</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filled Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Completed</th>
+                {viewOption === "editGroupName" ? (
+                  <>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change Group Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Token Capacity</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Token Count</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Filled</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filled Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Completed</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredData.map((data, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.createdDate)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.maxTokenCapacity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.currentTokenCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupFullDate ? "Yes" : "No"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFullDate)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isCompleted ? "Yes" : "No"}</td>
+                  {viewOption === "editGroupName" ? (
+                    <>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.groupName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <Input
+                          placeholder="New Group Name"
+                          value={groupNames[data.id] || ""}
+                          onChange={(e) => setGroupNames({ ...groupNames, [data.id]: e.target.value })}
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <Button onClick={() => handleGroupNameUpdate(data.id)}>Update Name</Button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{data.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.createdDate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.maxTokenCapacity}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.currentTokenCount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.groupFullDate ? "Yes" : "No"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(data.groupFullDate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.packageName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.isCompleted ? "Yes" : "No"}</td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
