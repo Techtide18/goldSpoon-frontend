@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -59,13 +57,13 @@ const initialCardData: DashboardCardProps[] = [
     icon: ShoppingCart,
   },
   {
-    label: "Total Level Income History",
+    label: "Level Income History",
     amount: "...",
     description: "Total income from levels",
     icon: DollarSign,
   },
   {
-    label: "Total Renewal Income History",
+    label: "Renewal Income History",
     amount: "...",
     description: "Total direct income earned",
     icon: DollarSign,
@@ -97,8 +95,7 @@ const initialCardData: DashboardCardProps[] = [
 ];
 
 export default function Home() {
-  const [cardData, setCardData] =
-    useState<DashboardCardProps[]>(initialCardData);
+  const [cardData, setCardData] = useState<DashboardCardProps[]>(initialCardData);
   const [userSalesData, setUserSalesData] = useState<SalesProps[]>([]);
 
   useEffect(() => {
@@ -110,6 +107,8 @@ export default function Home() {
           },
         });
         const data = response.data;
+
+        console.log('Dashboard data:', data); // Debugging
 
         const updatedCardData: DashboardCardProps[] = [
           {
@@ -149,26 +148,26 @@ export default function Home() {
             icon: ShoppingCart,
           },
           {
-            label: "Total Level Income History",
+            label: "Level Income History",
             amount: `₹${data.totalDirectIncome}`,
             description: "Total income from levels",
             icon: DollarSign,
           },
           {
-            label: "Total Renewal Income History",
+            label: "Renewal Income History",
             amount: `₹${data.totalLevelIncome}`,
             description: "Total direct income earned",
             icon: DollarSign,
           },
           {
             label: "Total Withdrawals Count",
-            amount: data.totalWithdrawals.toString(),
+            amount: data.totalTransactions.toString(),
             description: "Total withdrawals made",
             icon: ArrowBigDownDashIcon,
           },
           {
             label: "Total Withdrawals Amount",
-            amount: `₹${data.totalAmountWithdrawals}`,
+            amount: `₹${data.walletAmount}`,
             description: "Total amount withdrawn",
             icon: DollarSign,
           },
@@ -204,9 +203,12 @@ export default function Home() {
         );
         const salesData = response.data.content.map((sale: any) => ({
           name: "Epin: " + sale.epinNumber,
-          email: "Reffered by: " + (sale.referredByMemberNumber || "None"),
+          email: "Referred by: " + (sale.referredByMemberNumber || "None"),
           saleAmount: `+₹${sale.packagePrice}`,
         }));
+
+        console.log('Sales data:', salesData); // Debugging
+
         setUserSalesData(salesData);
       } catch (error) {
         console.error("Error fetching recent sales data:", error);
