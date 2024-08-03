@@ -65,19 +65,19 @@ const initialCardData: DashboardCardProps[] = [
   {
     label: "Renewal Income History",
     amount: "...",
-    description: "Total direct income earned",
+    description: "Total renewal income earned",
     icon: DollarSign,
   },
   {
     label: "Total Withdrawals Count",
     amount: "...",
-    description: "Total withdrawals made",
+    description: "Total withdrawals made by memebers",
     icon: ArrowBigDownDashIcon,
   },
   {
-    label: "Total Withdrawals Amount",
+    label: "Total Wallet Amount",
     amount: "...",
-    description: "Total amount withdrawn",
+    description: "Total amount present in wallet of members",
     icon: DollarSign,
   },
   {
@@ -156,19 +156,19 @@ export default function Home() {
           {
             label: "Renewal Income History",
             amount: `₹${data.totalLevelIncome}`,
-            description: "Total direct income earned",
+            description: "Total renewal income earned",
             icon: DollarSign,
           },
           {
             label: "Total Withdrawals Count",
             amount: data.totalTransactions.toString(),
-            description: "Total withdrawals made",
+            description: "Total withdrawals made by memebers",
             icon: ArrowBigDownDashIcon,
           },
           {
-            label: "Total Withdrawals Amount",
+            label: "Total Wallet Amount",
             amount: `₹${data.walletAmount}`,
-            description: "Total amount withdrawn",
+            description: "Total amount present in wallet of members",
             icon: DollarSign,
           },
           {

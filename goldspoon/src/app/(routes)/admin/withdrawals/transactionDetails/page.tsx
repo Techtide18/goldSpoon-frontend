@@ -188,14 +188,15 @@ export default function ViewTransactionDetails() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Note
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Entry
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredData.length > 0 ? (
                   filteredData.map((data, index) => {
-                    const finalAmount = data.amount;
-                    const adminCharges = Math.round(finalAmount * 0.1 / 0.9);
-                    const originalAmount = finalAmount + adminCharges;
+                    const adminCharges = Math.round(data.amount * 0.1);
                     const transactionMode =
                       data.transactionType === "BALANCE_APPROVAL"
                         ? "BALANCE APPROVAL"
@@ -210,13 +211,13 @@ export default function ViewTransactionDetails() {
                           {transactionMode}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {originalAmount}
+                          {data.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {adminCharges}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {finalAmount}
+                          {data.finalAmount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {formatDate(data.createdDate)}
@@ -224,13 +225,16 @@ export default function ViewTransactionDetails() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {data.note}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.entry}
+                        </td>
                       </tr>
                     );
                   })
                 ) : (
                   <tr>
                     <td
-                      colSpan="7"
+                      colSpan="8"
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       No transactions

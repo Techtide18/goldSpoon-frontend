@@ -29,7 +29,7 @@ const formatDate = (dateString) => {
 };
 
 const calculateAdminCharges = (amount, transactionType) => {
-  const adminChargePercentage = transactionType === "WALLET_TRANSFER" ? 0.05 : 0.05;
+  const adminChargePercentage = transactionType === "WALLET_TRANSFER" ? 0.05 : 0;
   const adminCharges = Math.round(amount * adminChargePercentage);
   return { adminCharges, adminChargePercentage };
 };
@@ -59,6 +59,7 @@ export default function ViewWalletTransactions() {
           headers: {
             "Content-Type": "application/json",
             adminMemberId: 1,
+            type:"others"
           },
         }
       );
@@ -93,6 +94,15 @@ export default function ViewWalletTransactions() {
 
   const handleViewByMemberId = () => {
     setViewOption("byMemberId");
+    setCurrentPage(1);
+  };
+
+  const getByMemberId = () => {
+    if (!filterId) {
+      return toast.error("Please enter a Member ID.");
+    }
+
+    getTransactions(0, filterId);
     setCurrentPage(1);
   };
 
@@ -154,7 +164,7 @@ export default function ViewWalletTransactions() {
                   className="flex-1"
                 />
               </div>
-              <Button onClick={getTransactions} className="w-full">
+              <Button onClick={getByMemberId} className="w-full">
                 Get Transaction Details
               </Button>
             </>
@@ -202,11 +212,6 @@ export default function ViewWalletTransactions() {
                 {filteredData.length > 0 ? (
                   filteredData.map((data, index) => {
                     const { adminCharges, adminChargePercentage } = calculateAdminCharges(data.amount, data.transactionType);
-                    const originalAmount = data.amount + adminCharges;
-                    const transactionMode =
-                      data.transactionType === "BALANCE_APPROVAL"
-                        ? "BALANCE APPROVAL"
-                        : data.transactionType;
 
                     return (
                       <tr key={index}>
@@ -214,10 +219,10 @@ export default function ViewWalletTransactions() {
                           {data.memberNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {transactionMode}
+                          {data.transactionType}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {originalAmount}
+                          {data.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {adminCharges}
@@ -226,7 +231,7 @@ export default function ViewWalletTransactions() {
                           {(adminChargePercentage * 100)}%
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {data.amount}
+                          {data.finalAmount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {data.entry}
