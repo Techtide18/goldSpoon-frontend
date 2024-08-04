@@ -188,10 +188,10 @@ export default function ViewReTopups() {
                         {data.newPackage}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.groupName}
+                        {data.oldGroupName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.groupName}
+                        {data.newGroupName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDateString(data.retopUpDate)}

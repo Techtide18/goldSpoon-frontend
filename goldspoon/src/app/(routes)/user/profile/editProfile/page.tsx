@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -52,10 +53,17 @@ export default function EditProfile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile({
-      ...profile,
+    setProfile((prevProfile) => ({
+      ...prevProfile,
       [name]: value,
-    });
+    }));
+  };
+
+  const handleGenderChange = (value) => {
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      gender: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -77,6 +85,8 @@ export default function EditProfile() {
         panNumber: profile.panNumber,
         addressDetails: profile.addressDetails,
         bankAccDetails: profile.bankAccDetails,
+        gender: profile.gender,
+        nominee: profile.nominee,
       });
 
       toast.success("Profile details updated successfully!", { id: toastId });
@@ -100,6 +110,7 @@ export default function EditProfile() {
     "panNumber",
     "addressDetails",
     "bankAccDetails",
+    "nominee",
   ];
 
   return (
@@ -127,12 +138,36 @@ export default function EditProfile() {
                   <Input
                     id={key}
                     name={key}
-                    value={profile[key]}
+                    value={profile[key] || ""}
                     onChange={handleChange}
                     className="col-span-2 transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
                   />
                 </div>
               ))}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <Label
+                  htmlFor="gender"
+                  className="font-semibold text-md capitalize"
+                >
+                  Gender:
+                </Label>
+                <div className="col-span-2">
+                  <Select
+                    value={profile.gender || ""}
+                    onValueChange={handleGenderChange}
+                    className="w-full transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" value={profile.gender || ""} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MALE">Male</SelectItem>
+                      <SelectItem value="FEMALE">Female</SelectItem>
+                      <SelectItem value="OTHERS">Others</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="mt-8">
                 <Button className="w-full" type="submit">
                   Update Profile

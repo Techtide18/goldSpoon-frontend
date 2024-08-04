@@ -236,9 +236,11 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
     subMenuItems: [
       { title: "Fund Transfer", path: "/user/wallet/fundTransfer" },
       { title: "View Wallet Details", path: "/user/wallet/walletDetails" },
+      { title: "View Withdrawal Details", path: "/user/wallet/withdrawal" },
       // { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
       // { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
       { title: "View Transaction Details", path: "/user/wallet/transactions" },
+
     ],
   },
 ];

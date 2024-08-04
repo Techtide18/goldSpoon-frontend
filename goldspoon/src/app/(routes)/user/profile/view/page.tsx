@@ -57,9 +57,11 @@ export default function ViewProfile() {
     { label: "Member ID", value: profile.memberNumber },
     { label: "Phone", value: profile.phone },
     { label: "Email", value: profile.email },
+    { label: "Gender", value: profile.gender },
     { label: "Aadhaar Number", value: profile.aadhaarNumber },
     { label: "PAN Number", value: profile.panNumber },
     { label: "Address", value: profile.addressDetails },
+    { label: "Nominee", value: profile.nominee },
     { label: "Bank Account Details", value: profile.bankAccDetails },
   ];
 

@@ -11,11 +11,20 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
 
 export default function InstallmentsReport() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -35,7 +44,7 @@ export default function InstallmentsReport() {
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/installments`,
           {
             params: {
-              pageNumber: currentPage,
+              pageNumber: currentPage, // Ensure currentPage is a number
               pageSize: PAGE_SIZE,
               memberNumber: session.user.name,
             },
@@ -44,7 +53,7 @@ export default function InstallmentsReport() {
 
         if (response.data && response.data.content) {
           setInstallmentsData(response.data.content);
-          setTotalPages(Math.ceil(response.data.totalElements / PAGE_SIZE));
+          setTotalPages(Math.ceil(response.data.pagination.totalItems / PAGE_SIZE));
         } else {
           setInstallmentsData([]);
           toast.error("No data returned from the server.");
@@ -65,61 +74,73 @@ export default function InstallmentsReport() {
           <CardTitle className="text-2xl font-bold">MY INSTALLMENTS</CardTitle>
         </CardHeader>
         <CardContent>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  EPIN Number
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Installment Paid On Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Installment Month Count
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment Method
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Transaction ID
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {installmentsData.length > 0 ? (
-                installmentsData.map((data, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.epinNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {new Date(data.transactionDate).toLocaleDateString(
-                        "en-GB"
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.installmentMonth}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.paymentMethod}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.transactionId || "N/A"}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Epin ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Installment Month
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Installment Paid Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount Paid (Rupees)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Payment Method
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Paid By (Member ID)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Transaction ID
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {installmentsData.length > 0 ? (
+                  installmentsData.map((data, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {data.epinNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.installmentMonth}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(data.transactionDate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.amountPaid}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.paymentMethod}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.paidByMemberNumber ? data.paidByMemberNumber : "Self"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {data.transactionId}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No data
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No data
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
           <Button
@@ -127,7 +148,7 @@ export default function InstallmentsReport() {
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
             disabled={currentPage === 0}
           >
-            Previous 10
+            Previous
           </Button>
           <Button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
@@ -136,24 +157,8 @@ export default function InstallmentsReport() {
             }
             disabled={currentPage >= totalPages - 1}
           >
-            Next 10
+            Next
           </Button>
-        </CardFooter>
-        <CardFooter className="flex justify-end space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage + 1}
-            onChange={(e, page) => setCurrentPage(page - 1)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
         </CardFooter>
       </Card>
     </div>
