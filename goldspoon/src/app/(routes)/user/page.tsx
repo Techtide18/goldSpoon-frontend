@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
 import DashboardTitle from "@/components/cards/dashboardTitle";
@@ -155,19 +154,19 @@ export default function Home() {
           },
           {
             label: "Renewal Income History",
-            amount: dashboardData.totalLevelIncome.toString(),
+            amount: dashboardData.totalLevelIncome?.toString() || "0",
             description: "Total renewal income generated",
             icon: DollarSign,
           },
           {
             label: "Level Income History",
-            amount: dashboardData.totalDirectIncome.toString(),
+            amount: dashboardData.totalDirectIncome?.toString() || "0",
             description: "Total level income generated",
             icon: DollarSign,
           },
           {
             label: "Total Wallet Balance",
-            amount: dashboardData.totalWalletBalance.toString(),
+            amount: dashboardData.totalWalletBalance?.toString() || "0",
             description: "Total balance in wallet",
             icon: DollarSign,
           },
@@ -211,11 +210,15 @@ export default function Home() {
           },
         });
 
-        const withdrawals = withdrawalResponse.data.content.map((wd, index) => ({
-          epin: new Date(wd.withdrawalDate).toLocaleDateString(),
-          date: "Withdrawal date",
-          saleAmount: `+₹${wd.adminCharge}`,
-        }));
+        const withdrawals = withdrawalResponse.data.content.map((wd) => {
+          const amountPrefix = wd.entry === "CREDIT" ? "+" : "-";
+          return {
+            epin: new Date(wd.createdDate).toLocaleDateString(),
+            date: wd.transactionType,
+            saleAmount: `${amountPrefix}₹${wd.amount}`,
+          };
+        });
+
         setWithdrawalsData(withdrawals);
       } catch (error) {
         console.error("Error fetching withdrawals data:", error);

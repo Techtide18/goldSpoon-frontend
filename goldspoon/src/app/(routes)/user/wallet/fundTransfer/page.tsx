@@ -61,7 +61,7 @@ export default function FundTransfer() {
     fetchSessionUser();
   }, []);
 
-  useEffect(() => {
+  const handleFetchMemberDetails = () => {
     if (formData.memberId && sessionUser) {
       fetchMemberDetails(sessionUser, formData.memberId)
         .then((details) => {
@@ -80,7 +80,7 @@ export default function FundTransfer() {
         currentBalance: "",
       });
     }
-  }, [formData.memberId, sessionUser]);
+  };
 
   useEffect(() => {
     if (formData.amountToTransfer) {
@@ -175,15 +175,20 @@ export default function FundTransfer() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberId">Member ID</Label>
-              <Input
-                id="memberId"
-                name="memberId"
-                placeholder="Member ID"
-                value={formData.memberId}
-                onChange={handleChange}
-                required
-                className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
-              />
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="memberId"
+                  name="memberId"
+                  placeholder="Member ID"
+                  value={formData.memberId}
+                  onChange={handleChange}
+                  required
+                  className="transition-colors duration-300 focus:border-primary-500 dark:focus:border-primary-400"
+                />
+                <Button type="button" onClick={handleFetchMemberDetails}>
+                  Get Member Details
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <Label htmlFor="memberName">Member Name</Label>
