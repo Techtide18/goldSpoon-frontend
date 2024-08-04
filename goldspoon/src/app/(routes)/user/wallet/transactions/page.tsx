@@ -39,6 +39,7 @@ export default function ViewTransactionDetails() {
         },
         headers: {
           adminMemberId: 1,
+          type: "others",
         },
       });
 
@@ -52,76 +53,112 @@ export default function ViewTransactionDetails() {
     }
   };
 
+  const getAdminChargePercentage = (transactionType) => {
+    return transactionType === "WALLET_TRANSFER" ? 5 : 0;
+  };
+
+  const calculateAdminCharges = (amount, percentage) => {
+    return (amount * percentage) / 100;
+  };
+
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
       <Card className="w-full max-w-7xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">VIEW TRANSACTION DETAILS</CardTitle>
+          <CardTitle className="text-2xl font-bold">VIEW WALLET TRANSACTIONS</CardTitle>
         </CardHeader>
         <CardContent>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Transaction Completed Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Transaction Mode
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Entry
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Final Amount Paid
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Note
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {transactionDetailsData.length > 0 ? (
-                transactionDetailsData.map((data, index) => {
-                  const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
-
-                  return (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {new Date(data.createdDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {transactionMode}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.amount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.entry}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.finalAmount || ""}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {data.note || ""}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No data
-                  </td>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Transaction Completed Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Transaction Mode
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Admin Charge Percentage
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Admin Charges
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Final Amount Paid
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Entry
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Paid By Member ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Paid To Member ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Note
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {transactionDetailsData.length > 0 ? (
+                  transactionDetailsData.map((data, index) => {
+                    const transactionMode = data.transactionType === "BALANCE_APPROVAL" ? "BALANCE APPROVAL" : data.transactionType;
+                    const adminChargePercentage = getAdminChargePercentage(data.transactionType);
+                    const adminCharges = calculateAdminCharges(data.amount, adminChargePercentage);
+
+                    return (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {new Date(data.createdDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {transactionMode}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.amount}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {adminChargePercentage}%
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {adminCharges}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.finalAmount || ""}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.entry}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.paidByMemberNumber || ""}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.paidToMemberNumber || ""}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {data.note || ""}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="10"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No data
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-center space-x-2">
           <Pagination

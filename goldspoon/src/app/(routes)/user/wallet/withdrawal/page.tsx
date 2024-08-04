@@ -12,12 +12,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
 
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 10;
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -30,140 +28,54 @@ const formatDate = (dateString) => {
 };
 
 export default function ViewTransactionDetails() {
-  const [filterId, setFilterId] = useState("");
-  const [memberName, setMemberName] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [viewOption, setViewOption] = useState("all");
-
-  const getTransactions = async () => {
-    const session = await getSession();
-    if (!session || !session.user || !session.user.name) {
-      toast.error('You must be logged in to view this information.');
-      return;
-    }
-    try {
-      const params = {
-        pageSize: PAGE_SIZE,
-        pageNumber: currentPage - 1,
-        memberNumber:session.user.name,
-      };
-      if (viewOption === "byMemberId" && filterId) {
-        params.memberNumber = filterId;
-      }
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`,
-        {
-          params,
-          headers: {
-            "Content-Type": "application/json",
-            adminMemberId: 1,
-            type: "withdrawal"
-          },
-        }
-      );
-
-      const memberDetails = response.data.content;
-      if (viewOption === "byMemberId") {
-        setMemberName(memberDetails.length > 0 ? memberDetails[0].fullName : "Unknown");
-      }
-      setFilteredData(memberDetails);
-      setTotalPages(response.data.pagination.totalPages);
-
-      toast.success("Transaction data fetched successfully.");
-    } catch (error) {
-      console.error("Error fetching transaction data:", error);
-      setMemberName("Unknown");
-      setFilteredData([]);
-      toast.error("Failed to fetch transaction data.");
-    }
-  };
 
   useEffect(() => {
-    if (viewOption === "all") {
-      getTransactions();
-    }
-  }, [currentPage, viewOption]);
+    const fetchTransactions = async () => {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.name) {
+        toast.error('You must be logged in to view this information.');
+        return;
+      }
 
-  const handleViewAll = () => {
-    setViewOption("all");
-    setFilterId("");
-    setCurrentPage(1);
-  };
+      try {
+        const params = {
+          pageSize: PAGE_SIZE,
+          pageNumber: currentPage - 1,
+          memberNumber: session.user.name,
+        };
 
-  const handleViewByMemberId = () => {
-    setViewOption("byMemberId");
-    setCurrentPage(1);
-  };
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/payout/transactions`,
+          {
+            params,
+            headers: {
+              "Content-Type": "application/json",
+              adminMemberId: 1,
+              type: "withdrawal",
+            },
+          }
+        );
+
+        const memberDetails = response.data.content;
+        setFilteredData(memberDetails);
+        setTotalPages(response.data.pagination.totalPages);
+
+        toast.success("Transaction data fetched successfully.");
+      } catch (error) {
+        console.error("Error fetching transaction data:", error);
+        setFilteredData([]);
+        toast.error("Failed to fetch transaction data.");
+      }
+    };
+
+    fetchTransactions();
+  }, [currentPage]);
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
-      {/* Card 1 */}
-      <Card className="w-full max-w-7xl">
-        <CardHeader>
-          <CardTitle>VIEW WITHDRAWAL DETAILS FOR MEMBER</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col space-y-4">
-          <div className="flex space-x-4">
-            <Button
-              onClick={handleViewAll}
-              className={`font-bold ${
-                viewOption === "all" ? "bg-black text-white" : "border-black"
-              }`}
-              variant={viewOption === "all" ? "solid" : "outline"}
-            >
-              View All
-            </Button>
-            <Button
-              onClick={handleViewByMemberId}
-              className={`font-bold ${
-                viewOption === "byMemberId"
-                  ? "bg-black text-white"
-                  : "border-black"
-              }`}
-              variant={viewOption === "byMemberId" ? "solid" : "outline"}
-            >
-              View by Member ID
-            </Button>
-          </div>
-          {viewOption === "byMemberId" && (
-            <>
-              <div className="flex flex-row items-center space-x-4">
-                <Label htmlFor="memberId" className="w-32">
-                  Member ID:
-                </Label>
-                <Input
-                  id="memberId"
-                  type="text"
-                  placeholder="Enter Member ID"
-                  value={filterId}
-                  onChange={(e) => setFilterId(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-              <div className="flex flex-row items-center space-x-4">
-                <Label htmlFor="memberName" className="w-32">
-                  Member Name:
-                </Label>
-                <Input
-                  id="memberName"
-                  type="text"
-                  placeholder="Auto Generated"
-                  value={memberName}
-                  readOnly
-                  className="flex-1"
-                />
-              </div>
-              <Button onClick={getTransactions} className="w-full">
-                Get Transaction Details
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Card 2 */}
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
@@ -267,24 +179,6 @@ export default function ViewTransactionDetails() {
             showFirstButton
             showLastButton
           />
-          <div className="flex space-x-2">
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous 100
-            </Button>
-            <Button
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next 100
-            </Button>
-          </div>
         </CardFooter>
       </Card>
     </div>

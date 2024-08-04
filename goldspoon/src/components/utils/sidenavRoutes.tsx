@@ -239,7 +239,7 @@ export const SIDENAV_ITEMS_USER: SideNavItem[] = [
       { title: "View Withdrawal Details", path: "/user/wallet/withdrawal" },
       // { title: "Add Withdrawal Request", path: "/user/wallet/addWithdrawal" },
       // { title: "View Withdrawal Requests", path: "/user/wallet/withdrawals" },
-      { title: "View Transaction Details", path: "/user/wallet/transactions" },
+      { title: "View Wallet Transactions", path: "/user/wallet/transactions" },
 
     ],
   },
