@@ -63,6 +63,7 @@ export default function ViewTransactionDetails() {
         setFilteredData(memberDetails);
         setTotalPages(response.data.pagination.totalPages);
 
+        console.log("Total Pages:", response.data.pagination.totalPages); // Debug statement
         toast.success("Transaction data fetched successfully.");
       } catch (error) {
         console.error("Error fetching transaction data:", error);
@@ -76,7 +77,6 @@ export default function ViewTransactionDetails() {
 
   return (
     <div className="flex flex-col justify-center items-center py-8 px-4 space-y-4">
-      {/* Card 2 */}
       <Card className="w-full max-w-7xl mb-4">
         <CardHeader>
           <CardTitle className="text-lg font-bold">Transaction Details Report</CardTitle>
@@ -165,20 +165,20 @@ export default function ViewTransactionDetails() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
-            siblingCount={1}
-            boundaryCount={1}
-            size="large"
-            shape="rounded"
-            variant="outlined"
-            color="primary"
-            className="mt-4"
-            showFirstButton
-            showLastButton
-          />
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous 10
+          </Button>
+          <Button
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next 10
+          </Button>
         </CardFooter>
       </Card>
     </div>
