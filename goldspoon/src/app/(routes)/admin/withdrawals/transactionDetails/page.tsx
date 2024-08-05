@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   Card,
@@ -36,7 +36,7 @@ export default function ViewTransactionDetails() {
   const [totalPages, setTotalPages] = useState(0);
   const [viewOption, setViewOption] = useState("all");
 
-  const getTransactions = async () => {
+  const getTransactions = useCallback(async () => {
     try {
       const params = {
         pageSize: PAGE_SIZE,
@@ -72,13 +72,13 @@ export default function ViewTransactionDetails() {
       setFilteredData([]);
       toast.error("Failed to fetch transaction data.");
     }
-  };
+  }, [currentPage, viewOption, filterId]);
 
   useEffect(() => {
     if (viewOption === "all") {
       getTransactions();
     }
-  }, [currentPage, viewOption]);
+  }, [currentPage, viewOption, getTransactions]);
 
   const handleViewAll = () => {
     setViewOption("all");

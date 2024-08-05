@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { getSession } from "next-auth/react";
 import {
@@ -25,7 +25,7 @@ export default function ViewDirects() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchDirects = async (level = null) => {
+  const fetchDirects = useCallback(async (level = null) => {
     const session = await getSession();
     if (!session || !session.user || !session.user.name) {
       toast.error("You must be logged in to view this information.");
@@ -56,11 +56,11 @@ export default function ViewDirects() {
       toast.error("Failed to fetch data.");
       console.error("Failed to fetch data:", error);
     }
-  };
+  }, [currentPage]);
 
   useEffect(() => {
     fetchDirects();
-  }, [currentPage]);
+  }, [currentPage, fetchDirects]);
 
   const handleViewAll = () => {
     setViewOption("all");

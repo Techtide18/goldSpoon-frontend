@@ -17,6 +17,7 @@ export const SIDENAV_ITEMS_ADMIN: SideNavItem[] = [
       { title: "Generate", path: "/admin/epins/generate" },
       { title: "Used", path: "/admin/epins/used" },
       { title: "Unused", path: "/admin/epins/unused" },
+      { title: "Mark Inactive", path: "/admin/epins/inactive" },
     ],
   },
   {
