@@ -18,6 +18,7 @@ export default function GeneratePayout() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("New payout is generating...");
+  const [error, setError] = useState(null); // New error state
 
   useEffect(() => {
     const currentDate = new Date();
@@ -52,6 +53,7 @@ export default function GeneratePayout() {
     setIsButtonEnabled(false);
     setIsLoading(true);
     setIsDialogOpen(true);
+    setError(null); // Reset error state
 
     try {
       const response = await axios.post(
@@ -73,6 +75,7 @@ export default function GeneratePayout() {
         error.response?.data?.message ||
         "Failed to generate payout. Please try again.";
       setMessage(errorMessage);
+      setError(errorMessage); // Set error state
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -146,6 +149,8 @@ export default function GeneratePayout() {
                   New payout is generating...
                 </span>
               </div>
+            ) : error ? (
+              <span className="font-semibold text-red-500">{message}</span>
             ) : (
               <span className="font-semibold">{message}</span>
             )}
