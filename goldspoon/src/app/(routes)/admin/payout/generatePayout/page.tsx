@@ -25,7 +25,7 @@ export default function GeneratePayout() {
     const dayOfMonth = currentDate.getDate();
 
     // Check the date condition
-    const isDateConditionMet = dayOfMonth >= 1;
+    const isDateConditionMet = dayOfMonth >= 15;
 
     // Call the check API
     const checkPayoutStatus = async () => {
